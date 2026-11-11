@@ -429,6 +429,7 @@ export function ConnectorInstanceList({
         headingLevel="h2"
         title="No connectors yet"
         description="Connect your first security tool to start ingesting alerts. Credentials are encrypted at rest with the AiSOC vault."
+        /* [HIDDEN-UI D2 DUP-ST-01 hide empty-state button, keep header button in ConnectorsView.tsx:217]
         action={
           <button
             type="button"
@@ -441,6 +442,7 @@ export function ConnectorInstanceList({
             Add your first connector
           </button>
         }
+        */
       />
     );
   }

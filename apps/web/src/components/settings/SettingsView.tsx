@@ -394,7 +394,8 @@ const PRIMARY_TAB_IDS: TabId[] = [
 ];
 
 export function SettingsView() {
-  const [tab, setTab] = useState<TabId>('integrations');
+  // [HIDDEN-UI D2 DUP-ST-02 default to workspace since integrations is hidden from rail]
+  const [tab, setTab] = useState<TabId>('workspace');
 
   const primaryTabs = PRIMARY_TAB_IDS.map(
     (id) => TABS.find((t) => t.id === id)!,
@@ -470,7 +471,10 @@ export function SettingsView() {
       <div className="grid items-start gap-4 lg:grid-cols-[200px_minmax(0,1fr)]">
         {/* [P4] Sticky section rail: one list; selecting a section switches the panel (no tabs-under-tabs). */}
         <nav aria-label="Settings sections" className="flex flex-row flex-wrap gap-1 lg:sticky lg:top-4 lg:flex-col lg:flex-nowrap">
-          {[...primaryTabs, ...secondaryTabs].map((t) => {
+          {/* [HIDDEN-UI D2 DUP-ST-02 / DUP-ST-03 hide Settings tab entries; deep links still render panels] */}
+          {[...primaryTabs, ...secondaryTabs]
+            .filter((t) => t.id !== 'integrations' && t.id !== 'audit')
+            .map((t) => {
             const active = tab === t.id;
             const displayLabel = t.id === 'integrations' ? 'Connectors' : t.label;
             return (
