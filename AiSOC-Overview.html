@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="A high-level, plain-language guide to AiSOC components and event flow.">
+  <title>AiSOC | System Overview</title>
+  <style>
+    :root {
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: #e8eef8;
+      background: #0a1020;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+      --panel: #111a2d;
+      --line: #27344b;
+      --muted: #9cabc2;
+      --blue: #60a5fa;
+      --violet: #c4a4ff;
+      --green: #6ee7b7;
+      --orange: #fdba74;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; }
+    a { color: #93c5fd; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(2.5rem, 7vw, 5.5rem) max(1.25rem, calc((100vw - 1120px) / 2));
+      border-bottom: 1px solid var(--line);
+      background:
+        radial-gradient(ellipse at 86% 12%, rgb(91 72 178 / 35%), transparent 34rem),
+        radial-gradient(ellipse at 8% 95%, rgb(22 114 163 / 24%), transparent 30rem),
+        #0d1527;
+    }
+
+    .eyebrow {
+      margin: 0 0 1rem;
+      color: #93c5fd;
+      font-size: .75rem;
+      font-weight: 750;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      max-width: 780px;
+      margin: 0;
+      font-size: clamp(2.4rem, 6vw, 4.8rem);
+      letter-spacing: -.055em;
+      line-height: 1.02;
+    }
+
+    .hero-copy {
+      max-width: 690px;
+      margin: 1.25rem 0 0;
+      color: #bac7da;
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      line-height: 1.7;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .6rem;
+      margin-top: 1.75rem;
+    }
+
+    .pill {
+      padding: .45rem .7rem;
+      border: 1px solid #35445e;
+      border-radius: 999px;
+      color: #d7e4f7;
+      background: rgb(17 26 45 / 75%);
+      font-size: .8rem;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 2.5rem));
+      margin: 0 auto;
+      padding: 2rem 0 4rem;
+    }
+
+    section { margin-top: 2.75rem; }
+    .section-heading {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: clamp(1.35rem, 3vw, 1.8rem);
+      letter-spacing: -.025em;
+    }
+
+    .section-heading p {
+      max-width: 620px;
+      margin: .4rem 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .flow {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: .75rem;
+      align-items: stretch;
+    }
+
+    .flow-step {
+      position: relative;
+      min-height: 170px;
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: .9rem;
+      background: linear-gradient(155deg, #162139, #10182a);
+    }
+
+    .flow-step:not(:last-child)::after {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      right: -.78rem;
+      width: .8rem;
+      color: #7185a5;
+      content: "›";
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      transform: translateY(-50%);
+    }
+
+    .step-num {
+      display: inline-grid;
+      width: 1.75rem;
+      height: 1.75rem;
+      place-items: center;
+      border-radius: .55rem;
+      color: #dbeafe;
+      background: #1d4167;
+      font-size: .8rem;
+      font-weight: 750;
+    }
+
+    .flow-step h3 { margin: .8rem 0 .4rem; font-size: 1rem; }
+    .flow-step p { margin: 0; color: var(--muted); font-size: .88rem; line-height: 1.55; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: .85rem;
+    }
+
+    .card {
+      padding: 1.1rem;
+      border: 1px solid var(--line);
+      border-radius: .85rem;
+      background: var(--panel);
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      margin-bottom: .65rem;
+    }
+
+    .icon {
+      display: grid;
+      width: 2.25rem;
+      height: 2.25rem;
+      flex: 0 0 auto;
+      place-items: center;
+      border: 1px solid #34435d;
+      border-radius: .65rem;
+      color: var(--blue);
+      background: #17243b;
+      font-size: .78rem;
+      font-weight: 800;
+      letter-spacing: .02em;
+    }
+
+    .card h3 { margin: 0; font-size: 1rem; }
+    .card p { margin: .35rem 0 0; color: var(--muted); font-size: .9rem; line-height: 1.6; }
+    .card .detail { color: #d4deed; font-size: .82rem; }
+    .ai .icon { color: var(--violet); }
+    .data .icon { color: var(--green); }
+    .ui .icon { color: var(--orange); }
+
+    .callout {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1rem;
+      align-items: start;
+      padding: 1.15rem;
+      border: 1px solid #3e3760;
+      border-radius: .85rem;
+      background: linear-gradient(110deg, #211d3d, #15192d);
+    }
+
+    .callout .icon {
+      color: var(--violet);
+      background: #292345;
+      border-color: #514476;
+    }
+
+    .callout h3 { margin: .1rem 0 .35rem; }
+    .callout p { margin: 0; color: #c2c6d8; line-height: 1.65; }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: .85rem;
+    }
+
+    .profile {
+      padding: 1.1rem 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: .85rem;
+      background: var(--panel);
+    }
+
+    .profile h3 { margin: 0 0 .45rem; }
+    .profile p { margin: 0; color: var(--muted); line-height: 1.6; }
+    .profile.core { border-top: 3px solid var(--blue); }
+    .profile.full { border-top: 3px solid var(--orange); }
+
+    .note {
+      margin-top: 1rem;
+      padding: .9rem 1rem;
+      border-left: 3px solid #64748b;
+      color: #aab8cd;
+      background: #111a2d;
+      font-size: .88rem;
+      line-height: 1.6;
+    }
+
+    footer {
+      padding: 1.5rem 1.25rem 2rem;
+      border-top: 1px solid var(--line);
+      color: #8494ad;
+      font-size: .82rem;
+      text-align: center;
+    }
+
+    @media (max-width: 850px) {
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .flow-step:not(:last-child)::after { content: ""; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 560px) {
+      .flow, .grid, .profile-grid { grid-template-columns: 1fr; }
+      .flow-step { min-height: auto; }
+      .section-heading { align-items: start; flex-direction: column; }
+      .callout { grid-template-columns: 1fr; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      .card, .flow-step, .profile {
+        transition: transform 160ms ease, border-color 160ms ease;
+      }
+      .card:hover, .flow-step:hover, .profile:hover {
+        border-color: #536986;
+        transform: translateY(-2px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">AiSOC · System overview</p>
+    <h1>From security events to analyst decisions.</h1>
+    <p class="hero-copy">
+      AiSOC is a security operations platform that accepts events from security
+      tools, normalizes and correlates them, then gives analysts a place to
+      review alerts and AI-assisted triage.
+    </p>
+    <div class="hero-meta" aria-label="Platform characteristics">
+      <span class="pill">Event-driven processing</span>
+      <span class="pill">OCSF-normalized ingestion</span>
+      <span class="pill">Human-governed response</span>
+    </div>
+  </header>
+
+  <main>
+    <section aria-labelledby="journey-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="journey-title">The event journey</h2>
+          <p>Each component has a focused role in moving an event from its source to an analyst-ready alert.</p>
+        </div>
+      </div>
+      <div class="flow">
+        <article class="flow-step">
+          <span class="step-num">01</span>
+          <h3>Collect</h3>
+          <p>Connectors poll external systems, or integrations push events to the Go ingest API.</p>
+        </article>
+        <article class="flow-step">
+          <span class="step-num">02</span>
+          <h3>Normalize</h3>
+          <p>Ingest authenticates the request and maps vendor data into an OCSF-shaped event.</p>
+        </article>
+        <article class="flow-step">
+          <span class="step-num">03</span>
+          <h3>Detect &amp; correlate</h3>
+          <p>Kafka carries events to fusion, which evaluates detections and promotes findings to alerts.</p>
+        </article>
+        <article class="flow-step">
+          <span class="step-num">04</span>
+          <h3>Triage</h3>
+          <p>Agents investigate fused alerts using a routed model, with deterministic triage as fallback.</p>
+        </article>
+        <article class="flow-step">
+          <span class="step-num">05</span>
+          <h3>Review</h3>
+          <p>The web console presents alerts and investigation context for security analysts.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="ingestion-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="ingestion-title">Collection &amp; event processing</h2>
+          <p>These services accept, transport, interpret, and enrich security data.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">SRC</span><h3>Log sources</h3></div>
+          <p>SIEM, EDR, cloud, and application systems provide the security telemetry AiSOC processes.</p>
+          <p class="detail">The adjacent Security-Log-Generator can send synthetic sample events; it is not an AiSOC container.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">CON</span><h3>Connectors</h3></div>
+          <p>Scheduled integrations fetch data from supported vendor APIs and submit event batches to ingest.</p>
+          <p class="detail">They are an integration path, not the event broker or the detection engine.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">IN</span><h3>Go ingest API</h3></div>
+          <p>Provides authenticated HTTP ingestion endpoints, including <code>POST /v1/ingest/batch</code>. It validates credentials and tenant scope before accepting events.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">OCSF</span><h3>Normalizer</h3></div>
+          <p>Applies connector-specific mappings and shapes incoming records into OCSF-compatible events with standard fields and source details.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">K</span><h3>Kafka</h3></div>
+          <p>The event transport backbone. It carries normalized raw events to fusion and fused alerts to downstream consumers such as agents.</p>
+          <p class="detail">It queues and distributes events; Redis serves a different cache/runtime-state role.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">F</span><h3>Fusion &amp; detection</h3></div>
+          <p>Consumes events, applies detection and correlation logic, promotes eligible findings, persists alerts, and publishes fused alerts for triage.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="ai-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="ai-title">AI-assisted analysis</h2>
+          <p>Models support triage, while routing and fallback behavior keep the workflow explicit.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card ai">
+          <div class="card-top"><span class="icon" aria-hidden="true">AG</span><h3>Agents</h3></div>
+          <p>Consume fused alerts and run the auto-triage pipeline. Agents can use threat context and record investigation results.</p>
+          <p class="detail">Auto-triage is read-only; it does not dispatch response actions by itself.</p>
+        </article>
+        <article class="card ai">
+          <div class="card-top"><span class="icon" aria-hidden="true">LLM</span><h3>LiteLLM gateway</h3></div>
+          <p>Routes AiSOC's logical task aliases to the model provider configured for the deployment. It provides a common model API boundary.</p>
+        </article>
+        <article class="card ai">
+          <div class="card-top"><span class="icon" aria-hidden="true">AI</span><h3>Model &amp; fallback</h3></div>
+          <p>Ollama can provide local inference; deployments can instead configure a host or hosted provider. If model triage is unavailable, agents can use deterministic triage.</p>
+          <p class="detail">The model name depends on configuration. The checked-in default is Llama 3.2; a host-Ollama setup may select a different installed model.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">TI</span><h3>Threat intelligence</h3></div>
+          <p>Fetches threat-intelligence data such as the CISA KEV feed and exposes it to the application. Related indicator and actor vectors can be stored in Qdrant.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">MITRE</span><h3>MITRE ATT&amp;CK context</h3></div>
+          <p>Technique metadata supports event normalization and agent context. Optional retrieval-augmented context uses embeddings when configured.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">ACT</span><h3>Governed actions</h3></div>
+          <p>A separate service handles governed response-action workflows, keeping approval and action execution distinct from model-generated triage.</p>
+        </article>
+      </div>
+      <div class="callout" style="margin-top:.85rem">
+        <span class="icon" aria-hidden="true">HITL</span>
+        <div>
+          <h3>Analyst oversight stays in the loop</h3>
+          <p>AI triage helps prioritize and explain findings. Response actions follow a separate governed path; review and operational decisions remain with the organization and its configured workflow.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="data-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="data-title">Data stores: different jobs, one platform</h2>
+          <p>AiSOC uses purpose-specific persistence rather than treating every store as interchangeable.</p>
+        </div>
+      </div>
+      <div class="grid data">
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">PG</span><h3>PostgreSQL</h3></div>
+          <p>Relational application records, promoted alerts, investigation data, and audit-related records.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">RD</span><h3>Redis</h3></div>
+          <p>Cache and runtime state used by services. It is not the primary event queue.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">Q</span><h3>Qdrant</h3></div>
+          <p>Vector storage for threat-intelligence context and configured semantic-memory or ATT&amp;CK retrieval features.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">CH</span><h3>ClickHouse <small>Full profile</small></h3></div>
+          <p>Optional event-lake storage for analytical queries over archived events.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">OS</span><h3>OpenSearch <small>Full profile</small></h3></div>
+          <p>Optional full-text search for indicators of compromise.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">N</span><h3>Neo4j <small>Full profile</small></h3></div>
+          <p>Optional entity graph that supports relationships and contextual queries.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="app-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="app-title">Application &amp; analyst experience</h2>
+          <p>The services that expose the system to analysts and operational integrations.</p>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card ui">
+          <div class="card-top"><span class="icon" aria-hidden="true">WEB</span><h3>Web console</h3></div>
+          <p>Analyst-facing interface. It proxies API, agent, and realtime routes so the browser can use the console's origin.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">API</span><h3>REST API</h3></div>
+          <p>Serves application data and API operations used by the console and other clients, and connects to internal AiSOC services.</p>
+        </article>
+        <article class="card">
+          <div class="card-top"><span class="icon" aria-hidden="true">RT</span><h3>Realtime gateway</h3></div>
+          <p>Provides realtime communication, including WebSocket routes proxied through the web console.</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="profiles-title">
+      <div class="section-heading">
+        <div>
+          <h2 id="profiles-title">Deployment profiles</h2>
+          <p>Compose profiles determine which optional capabilities are started.</p>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <article class="profile core">
+          <h3>Core</h3>
+          <p>The default services for ingestion, event transport, fusion, triage, API, and console, plus their configured model and data services.</p>
+        </article>
+        <article class="profile full">
+          <h3>Full</h3>
+          <p>Adds optional data and analysis services, including the ClickHouse event lake, Neo4j entity graph, OpenSearch, enrichment, and UEBA.</p>
+        </article>
+      </div>
+      <p class="note">
+        Deployment specifics—such as host ports, model names, enabled profiles, and optional integrations—depend on Compose files and environment configuration. This page is a conceptual guide, not a live service-status view.
+      </p>
+    </section>
+  </main>
+  <footer>
+    AiSOC high-level component guide · For exact service configuration, see <a href="./ARCHITECTURE.md">ARCHITECTURE.md</a> and <a href="./docker-compose.yml">docker-compose.yml</a>.
+  </footer>
+</body>
+</html>

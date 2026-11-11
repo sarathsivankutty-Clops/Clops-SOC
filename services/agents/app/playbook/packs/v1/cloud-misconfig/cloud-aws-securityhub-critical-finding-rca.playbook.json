@@ -1,0 +1,110 @@
+{
+  "id": "cloud-aws-securityhub-critical-finding-rca-v1",
+  "name": "AWS Security Hub: Critical Finding RCA & Guarded Containment",
+  "description": "Triggered by HIGH/CRITICAL AWS Security Hub ASFF findings across FSBP, CIS AWS Foundations, or Inspector/Macie integrations. Correlates the affected AWS resource ARN with recent CloudTrail configuration changes to determine root cause, gates automated resource remediation on human approval, and updates Security Hub workflow status.",
+  "version": "1.0.0",
+  "tags": [
+    "cloud-misconfig",
+    "cloud",
+    "aws",
+    "securityhub",
+    "cspm",
+    "asff",
+    "rca",
+    "mitre.t1190",
+    "mitre.t1530"
+  ],
+  "trigger": {
+    "on": "alert",
+    "severity": [
+      "high",
+      "critical"
+    ],
+    "tags": [
+      "cloud-misconfig",
+      "securityhub",
+      "aws-securityhub",
+      "cspm"
+    ]
+  },
+  "author": "AiSOC",
+  "enabled": true,
+  "created_at": "2026-05-03T00:00:00+00:00",
+  "updated_at": "2026-05-03T00:00:00+00:00",
+  "steps": [
+    {
+      "id": "fetch-asff-resource-context",
+      "name": "Fetch AWS Security Hub ASFF finding & resource configuration history",
+      "type": "http",
+      "params": {
+        "url": "${AWS_URL}/securityhub/findings/{{alert.alert_id}}/context",
+        "method": "GET"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    },
+    {
+      "id": "rca-securityhub",
+      "name": "AI Root Cause Analysis: correlate Security Hub finding with CloudTrail change actor & exposure window",
+      "type": "investigate",
+      "params": {
+        "case_id_field": "alert.case_id",
+        "focus": "cloud"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 180
+    },
+    {
+      "id": "approve-sh-remediation",
+      "name": "Wait for human approval",
+      "type": "approval",
+      "params": {
+        "prompt": "Apply automated AWS Config / Security Hub remediation on resource {{alert.resource_arn}}?"
+      },
+      "on_failure": "abort",
+      "retry_max": 0,
+      "timeout_seconds": 920
+    },
+    {
+      "id": "execute-sh-remediation",
+      "name": "Revert non-compliant resource configuration & mark Security Hub finding NOTIFIED",
+      "type": "http",
+      "params": {
+        "url": "${AWS_URL}/securityhub/findings/{{alert.alert_id}}/remediate",
+        "method": "POST",
+        "body_template": "{\"resource_arn\":\"{{alert.resource_arn}}\",\"workflow_status\":\"NOTIFIED\"}"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    },
+    {
+      "id": "notify-secops",
+      "name": "Notify Cloud SecOps with Security Hub RCA report",
+      "type": "notify",
+      "params": {
+        "channel": "slack",
+        "message_template": "AWS Security Hub finding {{alert.title}} on {{alert.resource_arn}} triaged with AI RCA and remediated.",
+        "webhook_env": "SLACK_CLOUD_WEBHOOK"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 10
+    },
+    {
+      "id": "ticket-securityhub",
+      "name": "Open AWS Security Hub RCA remediation ticket",
+      "type": "create_ticket",
+      "params": {
+        "priority": "P1",
+        "title_template": "Security Hub RCA: {{alert.title}}",
+        "queue": "soc"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    }
+  ]
+}

@@ -1,0 +1,325 @@
+'use client';
+
+/**
+ * Global command palette (⌘K / Ctrl+K).
+ *
+ * Consumes navigation metadata from `routeRegistry.ts` (`getCommandPaletteNavigationItems()`),
+ * exposes quick actions (refresh, toggle Copilot dock, copy current URL) and a
+ * section for "recent pages" sourced from `localStorage`. Built on top of `cmdk`
+ * for solid keyboard ergonomics out of the box.
+ */
+
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { Command } from 'cmdk';
+import { AnimatePresence, motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import {
+  getCommandPaletteNavigationItems,
+  resolveRouteMetadata,
+} from '@/config/routeRegistry';
+import { emitNavigationAnalytics } from '@/lib/navigation-analytics';
+
+interface PaletteAction {
+  id: string;
+  label: string;
+  hint?: string;
+  keywords?: readonly string[];
+  shortcut?: string[];
+  perform: () => void | Promise<void>;
+}
+
+interface PaletteGroup {
+  id: string;
+  heading: string;
+  items: PaletteAction[];
+}
+
+const RECENT_STORAGE_KEY = 'aisoc.palette.recent';
+const MAX_RECENT = 5;
+
+function readRecent(): string[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const raw = window.localStorage.getItem(RECENT_STORAGE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((p) => typeof p === 'string').slice(0, MAX_RECENT) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeRecent(path: string) {
+  if (typeof window === 'undefined') return;
+  try {
+    const current = readRecent().filter((p) => p !== path);
+    current.unshift(path);
+    window.localStorage.setItem(
+      RECENT_STORAGE_KEY,
+      JSON.stringify(current.slice(0, MAX_RECENT)),
+    );
+  } catch {
+    // localStorage may be unavailable (private mode) — fail silent.
+  }
+}
+
+export function CommandPalette() {
+  const [open, setOpen] = useState(false);
+  const [recent, setRecent] = useState<string[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // Hotkey: ⌘K / Ctrl+K toggles. Ignore when the user is typing in Monaco
+  // (the inline detection rule editor) so we don't hijack the editor's own
+  // shortcuts. Other inputs are fine — analysts expect ⌘K to open everywhere.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const isToggle = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k';
+      if (!isToggle) return;
+      const target = e.target as Element | null;
+      if (target && typeof (target as Element).closest === 'function') {
+        if ((target as Element).closest('.monaco-editor')) return;
+      }
+      e.preventDefault();
+      setOpen((prev) => {
+        const next = !prev;
+        if (next) {
+          emitNavigationAnalytics({
+            event: 'command_palette_opened',
+            href: pathname ?? '/',
+            source: 'keyboard',
+          });
+        }
+        return next;
+      });
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [pathname]);
+
+  // Refresh "recent" each time we open so the list reflects other tabs / sessions.
+  useEffect(() => {
+    if (open) setRecent(readRecent());
+  }, [open]);
+
+  // Track current page so it appears in recents next time the palette opens.
+  useEffect(() => {
+    if (!pathname) return;
+    if (pathname === '/' || pathname.startsWith('/login')) return;
+    writeRecent(pathname);
+  }, [pathname]);
+
+  const close = useCallback(() => setOpen(false), []);
+
+  const navigate = useCallback(
+    (href: string) => {
+      router.push(href);
+      close();
+    },
+    [router, close],
+  );
+
+  const navItems = useMemo(() => getCommandPaletteNavigationItems(), []);
+
+  const groups = useMemo<PaletteGroup[]>(() => {
+    const navGroup: PaletteGroup = {
+      id: 'navigation',
+      heading: 'Navigation',
+      items: navItems.map((item) => ({
+        id: `nav:${item.path}`,
+        label: item.title,
+        hint: item.path,
+        keywords: item.keywords,
+        perform: () => navigate(item.path),
+      })),
+    };
+
+    const quickGroup: PaletteGroup = {
+      id: 'actions',
+      heading: 'Quick actions',
+      items: [
+        {
+          id: 'action:copilot',
+          label: 'Ask AiSOC Copilot',
+          hint: 'Open the floating Copilot dock',
+          shortcut: ['⌘', 'J'],
+          keywords: ['ai', 'copilot', 'assistant', 'investigate'],
+          perform: () => {
+            window.dispatchEvent(new Event('aisoc:open-copilot'));
+            close();
+          },
+        },
+        {
+          id: 'action:refresh',
+          label: 'Refresh data',
+          hint: 'Reload the current page',
+          keywords: ['reload', 'refresh', 'update'],
+          perform: () => {
+            close();
+            window.location.reload();
+          },
+        },
+        {
+          id: 'action:copy-url',
+          label: 'Copy current URL',
+          hint: 'Useful for sharing a view',
+          keywords: ['share', 'link', 'url'],
+          perform: async () => {
+            try {
+              await navigator.clipboard.writeText(window.location.href);
+              toast.success('URL copied to clipboard');
+            } catch {
+              toast.error('Could not copy URL');
+            }
+            close();
+          },
+        },
+      ],
+    };
+
+    const recentGroup: PaletteGroup | null = recent.length
+      ? {
+          id: 'recent',
+          heading: 'Recent pages',
+          items: recent
+            .filter((href) => href !== pathname)
+            .map((href) => {
+              const resolved = resolveRouteMetadata(href);
+              return {
+                id: `recent:${href}`,
+                label: resolved.title || href,
+                hint: href,
+                perform: () => navigate(href),
+              };
+            }),
+        }
+      : null;
+
+    return recentGroup ? [navGroup, quickGroup, recentGroup] : [navGroup, quickGroup];
+  }, [navItems, recent, pathname, navigate, close]);
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          key="palette"
+          className="fixed inset-0 z-[60] flex items-start justify-center pt-[12vh] px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.12 }}
+          aria-modal="true"
+          role="dialog"
+          aria-label="Command palette"
+        >
+          {/* Backdrop */}
+          <button
+            type="button"
+            aria-label="Close command palette"
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={close}
+          />
+
+          <motion.div
+            initial={{ y: -8, opacity: 0, scale: 0.98 }}
+            animate={{ y: 0, opacity: 1, scale: 1 }}
+            exit={{ y: -8, opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.14, ease: 'easeOut' }}
+            className="relative w-full max-w-xl rounded-xl border border-surface-border/70 bg-[#0d121b] shadow-2xl shadow-black/50 overflow-hidden"
+          >
+            <Command
+              label="AiSOC command palette"
+              loop
+              className="flex flex-col"
+            >
+              <div className="flex items-center gap-2 border-b border-surface-border/80 px-4 py-3">
+                <svg
+                  aria-hidden="true"
+                  className="w-4 h-4 text-fg-subtle shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+                <Command.Input
+                  autoFocus
+                  placeholder="Type a command, search a page, or ask the Copilot…"
+                  className="flex-1 bg-transparent text-sm text-fg-primary placeholder-gray-500 outline-none"
+                />
+                <kbd className="rounded border border-surface-border bg-surface-card/70 px-1.5 py-0.5 text-[10px] font-mono text-fg-subtle">
+                  ESC
+                </kbd>
+              </div>
+
+              <Command.List className="max-h-[60vh] overflow-y-auto py-2">
+                <Command.Empty className="px-4 py-6 text-center text-xs text-fg-subtle">
+                  No matches. Try “alerts”, “hunt”, or “copilot”.
+                </Command.Empty>
+
+                {groups.map((group) => (
+                  <Command.Group
+                    key={group.id}
+                    heading={group.heading}
+                    className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wider text-fg-subtle"
+                  >
+                    {group.items.map((item) => (
+                      <Command.Item
+                        key={item.id}
+                        value={`${item.label} ${item.hint ?? ''} ${(item.keywords ?? []).join(' ')}`}
+                        onSelect={() => {
+                          void item.perform();
+                        }}
+                        className="group flex items-center gap-3 rounded-md px-3 py-2 text-sm text-fg-secondary cursor-pointer aria-selected:bg-blue-600/15 aria-selected:text-blue-200"
+                      >
+                        <span className="flex-1 truncate">{item.label}</span>
+                        {item.hint && (
+                          <span className="text-[11px] text-fg-secondary group-aria-selected:text-blue-300/80 truncate max-w-[40%] text-right">
+                            {item.hint}
+                          </span>
+                        )}
+                        {item.shortcut && (
+                          <span className="flex items-center gap-0.5">
+                            {item.shortcut.map((key) => (
+                              <kbd
+                                key={key}
+                                className="rounded border border-surface-border bg-surface-card/60 px-1 py-0.5 text-[10px] font-mono text-fg-muted"
+                              >
+                                {key}
+                              </kbd>
+                            ))}
+                          </span>
+                        )}
+                      </Command.Item>
+                    ))}
+                  </Command.Group>
+                ))}
+              </Command.List>
+
+              <div className="flex items-center justify-between border-t border-surface-border/80 px-4 py-2 text-[11px] text-fg-secondary">
+                <div className="flex items-center gap-3">
+                  <span className="flex items-center gap-1">
+                    <kbd className="rounded border border-surface-border bg-surface-card/70 px-1 py-0.5 font-mono text-fg-subtle">↑</kbd>
+                    <kbd className="rounded border border-surface-border bg-surface-card/70 px-1 py-0.5 font-mono text-fg-subtle">↓</kbd>
+                    navigate
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <kbd className="rounded border border-surface-border bg-surface-card/70 px-1 py-0.5 font-mono text-fg-subtle">↵</kbd>
+                    select
+                  </span>
+                </div>
+                <span className="hidden sm:inline">AiSOC · ⌘K to toggle</span>
+              </div>
+            </Command>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}

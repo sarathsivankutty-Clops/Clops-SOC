@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<script>try{var t=localStorage.getItem('aisoc-theme')||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.dataset.theme=t}catch(e){}</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AiSOC – UI Design Mockup</title>
+<style>
+:root,[data-theme=dark]{
+  /* Graphite + teal. Neutrals carry a faint green so the surfaces never read as "default blue-grey". */
+  --canvas:#0a0f12; --surface:#10171b; --elev:#172127; --line:#1f2b31; --line2:#2d3d45;
+  --tx:#edf4f3; --tx2:#9bb0b2; --tx3:#687b80; --accent:#2dd4bf; --acc-tx:#5eead4; --acc-soft:rgba(45,212,191,.12); --on-accent:#04201c;
+  --ai:#b79cf7; --ok:#4ade80; --crit:#fb7185; --high:#fb923c; --med:#fbbf24; --low:#38bdf8; --info:#94a3b8;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 10px 28px -14px rgba(0,0,0,.6);
+  --banner-bg:#12201f; --banner-tx:#8fe3d6; --glow:radial-gradient(620px 240px at 88% -25%,rgba(45,212,191,.18),transparent 70%),radial-gradient(520px 220px at 8% -35%,rgba(183,156,247,.14),transparent 70%);
+  --logo:linear-gradient(135deg,#2dd4bf,#0f9d8c); --botbg:linear-gradient(135deg,#8b5cf6,#c084fc); --botglow:rgba(167,139,250,.5);
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace; color-scheme:dark;
+}
+[data-theme=light]{
+  /* Warm stone neutrals + deep teal: reads as calm and professional, not the usual blue-and-white. */
+  --canvas:#f6f5f1; --surface:#ffffff; --elev:#efede7; --line:#e7e4dc; --line2:#d3cfc3;
+  --tx:#14201f; --tx2:#4b5a58; --tx3:#8a9693; --accent:#0f766e; --acc-tx:#0b5f58; --acc-soft:rgba(15,118,110,.09); --on-accent:#ffffff;
+  --ai:#6d28d9; --ok:#15803d; --crit:#be123c; --high:#c2410c; --med:#a16207; --low:#0369a1; --info:#64748b;
+  --shadow:0 1px 2px rgba(20,32,31,.06),0 12px 30px -16px rgba(20,32,31,.2);
+  --banner-bg:#e6f3f0; --banner-tx:#0b5f58; --glow:radial-gradient(620px 240px at 88% -25%,rgba(15,118,110,.14),transparent 70%),radial-gradient(520px 220px at 8% -35%,rgba(109,40,217,.08),transparent 70%);
+  --logo:linear-gradient(135deg,#14b8a6,#0f766e); --botbg:linear-gradient(135deg,#7c3aed,#a855f7); --botglow:rgba(124,58,237,.35);
+  color-scheme:light;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:14px/1.5 Inter,'Segoe UI',system-ui,sans-serif;background:var(--canvas);color:var(--tx);height:100vh;overflow:hidden;display:flex;flex-direction:column}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+input,select,textarea{font:inherit;color:var(--tx);background:var(--canvas);border:1px solid var(--line2);border-radius:8px;padding:8px 12px;outline:none;width:100%}
+input:focus,select:focus,textarea:focus{border-color:rgba(59,130,246,.6)}
+.mono{font-family:var(--mono);font-size:12.5px}
+.muted{color:var(--tx2)} .faint{color:var(--tx3)} .small{font-size:12px}
+svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* sample banner */
+.banner{background:var(--banner-bg);color:var(--banner-tx);font-size:12px;text-align:center;padding:5px;border-bottom:1px solid var(--line)}
+
+.app{flex:1;display:flex;min-height:0}
+/* sidebar */
+.side{width:240px;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;transition:width .2s;flex:none}
+.side.mini{width:64px}
+.brand{height:56px;display:flex;align-items:center;gap:10px;padding:0 20px;font-weight:700;font-size:16px;border-bottom:1px solid var(--line)}
+.logo{width:26px;height:26px;border-radius:8px;background:var(--logo);flex:none}
+.nav{padding:12px 10px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav a{display:flex;align-items:center;gap:12px;padding:9px 12px;border-radius:8px;color:var(--tx2);cursor:pointer;position:relative;white-space:nowrap}
+.nav a:hover{background:var(--elev);color:var(--tx)}
+.nav a.on{background:var(--acc-soft);color:var(--acc-tx);font-weight:600}
+.nav a.on::before{content:"";position:absolute;left:-10px;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--accent)}
+.nav .badge{margin-left:auto;background:var(--crit);color:#fff;font-size:11px;font-weight:700;padding:0 7px;border-radius:99px}
+.side.mini .lbl,.side.mini .brand span{display:none}
+.side.mini .brand,.side.mini .nav a{justify-content:center;padding-left:0;padding-right:0}
+.side.mini .badge{position:absolute;top:2px;right:8px;margin:0}
+.side-foot{padding:10px;border-top:1px solid var(--line)}
+.tenant{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;background:var(--canvas);border:1px solid var(--line)}
+.side.mini .tenant div{display:none}
+
+/* main */
+.main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{height:56px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;padding:0 20px;flex:none}
+.search{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 12px;width:360px;color:var(--tx3)}
+.search kbd{margin-left:auto;font:11px var(--mono);border:1px solid var(--line2);border-radius:4px;padding:0 5px}
+.sp{flex:1}
+.top select{width:auto;padding:6px 10px;background:var(--surface)}
+.live{display:flex;align-items:center;gap:7px;color:var(--tx2);font-size:12.5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(52,211,153,.15)}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--elev);display:grid;place-items:center;font-size:12px;font-weight:600}
+.iconbtn{width:34px;height:34px;display:grid;place-items:center;border-radius:8px;color:var(--tx2);position:relative}
+.iconbtn:hover{background:var(--elev);color:var(--tx)}
+
+.page{flex:1;overflow:auto;padding:24px 28px;display:none}
+.page.on{display:block}
+.page.flush{padding:0;overflow:hidden}
+.page.flush.on{display:flex}
+h1{font-size:22px;font-weight:650;letter-spacing:-.01em}
+.ph{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px}
+.ph p{color:var(--tx2);margin-top:2px}
+
+/* generic */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.card h3{font-size:13px;font-weight:600;color:var(--tx2);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:2fr 1fr}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;background:var(--elev);border:1px solid var(--line2);font-weight:500;white-space:nowrap}
+.btn:hover{border-color:#475569}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600;box-shadow:0 4px 14px -6px var(--accent)}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.ai{background:var(--botbg);border:0;color:#fff;font-weight:600}
+.btn.ai:hover{filter:brightness(1.1)}
+.btn.danger{color:var(--crit);border-color:rgba(251,113,133,.35)}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:500;border:1px solid;white-space:nowrap}
+.s-critical{background:rgba(244,63,94,.1);color:var(--crit);border-color:rgba(244,63,94,.25)}
+.s-high{background:rgba(249,115,22,.1);color:var(--high);border-color:rgba(249,115,22,.25)}
+.s-medium{background:rgba(245,158,11,.1);color:var(--med);border-color:rgba(245,158,11,.25)}
+.s-low{background:rgba(59,130,246,.1);color:var(--low);border-color:rgba(59,130,246,.25)}
+.s-info,.s-neutral{background:rgba(100,116,139,.1);color:var(--info);border-color:rgba(100,116,139,.25)}
+.s-ok{background:rgba(52,211,153,.1);color:var(--ok);border-color:rgba(52,211,153,.25)}
+.s-ai{background:rgba(167,139,250,.1);color:var(--ai);border-color:rgba(167,139,250,.28)}
+.tag{display:inline-flex;gap:6px;align-items:center;background:var(--canvas);border:1px solid var(--line2);border-radius:6px;padding:2px 8px;font-size:12px;color:var(--tx2)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px}
+.tabs button{padding:9px 14px;color:var(--tx2);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button:hover{color:var(--tx)}
+.tabs button.on{color:var(--tx);border-color:var(--accent)}
+.seg{display:inline-flex;background:var(--canvas);border:1px solid var(--line);border-radius:8px;padding:2px}
+.seg button{padding:4px 11px;border-radius:6px;font-size:12.5px;color:var(--tx2)}
+.seg button.on{background:var(--elev);color:var(--tx)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:12px;font-weight:500;color:var(--tx3);padding:8px 12px;border-bottom:1px solid var(--line)}
+td{padding:11px 12px;border-bottom:1px solid var(--line)}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody tr:last-child td{border-bottom:0}
+.switch{width:36px;height:20px;border-radius:99px;background:var(--line2);position:relative;transition:.15s;flex:none}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.15s}
+.switch.on{background:var(--accent)} .switch.on::after{left:18px}
+.empty{padding:40px;text-align:center;color:var(--tx3)}
+
+/* dashboard */
+.kpi .v{font-size:30px;font-weight:700;letter-spacing:-.02em;margin:4px 0}
+.kpi .l{font-size:12.5px;color:var(--tx2)}
+.kpi .d{font-size:12px}
+.up{color:var(--crit)} .down{color:var(--ok)}
+.chart{width:100%;height:190px}
+.bar{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:13px}
+.bar .n{width:130px;color:var(--tx2)} .bar .t{flex:1;height:8px;background:var(--canvas);border-radius:99px;overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.bar .c{width:34px;text-align:right;color:var(--tx2)}
+
+/* split incidents */
+.split{display:flex;width:100%;min-height:0}
+.list{width:35%;min-width:340px;border-right:1px solid var(--line);display:flex;flex-direction:column}
+.list-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.list-body{overflow:auto;flex:1}
+.inc{padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;border-left:3px solid transparent}
+.inc:hover{background:rgba(255,255,255,.02)}
+.inc.on{background:rgba(59,130,246,.08);border-left-color:var(--accent)}
+.inc .t{font-weight:550;margin:6px 0 4px;line-height:1.35}
+.inc .m{display:flex;gap:10px;align-items:center;font-size:12px;color:var(--tx3)}
+.sla.warn{color:var(--med)} .sla.bad{color:var(--crit)}
+.detail{flex:1;overflow:auto;padding:22px 28px;min-width:0}
+.dh{display:flex;gap:14px;align-items:flex-start;margin-bottom:14px}
+.dh h2{font-size:19px;font-weight:650;line-height:1.3}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.aibar{border:1px solid rgba(167,139,250,.3);background:linear-gradient(135deg,rgba(109,40,217,.12),rgba(59,130,246,.07));border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;margin:16px 0}
+.aibar .info{flex:1;min-width:0}
+.pulse{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--ai);animation:pl 1.2s infinite}
+@keyframes pl{0%,100%{opacity:.3;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+.prog{height:4px;background:var(--canvas);border-radius:99px;overflow:hidden;margin-top:8px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--ai),var(--accent));width:0;transition:width .5s}
+.report{border:1px solid var(--line);border-radius:12px;margin-bottom:16px;overflow:hidden}
+.report .rh{padding:12px 16px;background:var(--elev);display:flex;gap:10px;align-items:center;font-weight:600}
+.report .rb{padding:16px}
+.verdict{font-size:15px;line-height:1.6}
+.coll{border:1px solid var(--line);border-radius:8px;margin-top:10px}
+.coll>button{width:100%;display:flex;align-items:center;gap:8px;padding:10px 14px;font-weight:550;text-align:left}
+.coll>div{display:none;padding:0 14px 12px}
+.coll.open>div{display:block}
+.coll.open>button svg.chev{transform:rotate(90deg)}
+.timeline{position:relative;margin-left:8px;padding-left:22px;border-left:2px solid var(--line2)}
+.tl{position:relative;padding-bottom:18px}
+.tl::before{content:"";position:absolute;left:-29px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--canvas);border:2px solid var(--accent)}
+.tl.bad::before{border-color:var(--crit)}
+.tl .tm{font:12px var(--mono);color:var(--tx3)}
+.action{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;margin-bottom:10px}
+.action .i{flex:1}
+.copy{cursor:pointer;border-bottom:1px dashed var(--tx3)}
+.copy:hover{color:var(--accent)}
+.step-run{display:flex;gap:10px;align-items:center;padding:8px 0;color:var(--tx3)}
+.step-run.done{color:var(--tx)} .step-run.now{color:var(--ai)}
+.menu{position:absolute;background:var(--elev);border:1px solid var(--line2);border-radius:10px;padding:6px;min-width:280px;z-index:30;box-shadow:0 12px 32px rgba(0,0,0,.5);display:none}
+.menu.on{display:block}
+.menu button{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:6px}
+.menu button:hover{background:var(--surface)}
+
+/* hunting */
+.hunt-q{display:flex;gap:10px}
+.graph{height:360px;background:var(--canvas);border:1px solid var(--line);border-radius:10px;position:relative}
+
+/* connectors */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.conn{display:flex;flex-direction:column;gap:12px}
+.conn .top2{display:flex;gap:12px;align-items:center}
+.cico{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-weight:700;font-size:13px;background:var(--elev);flex:none}
+.conn .stats{display:flex;gap:18px;font-size:12px;color:var(--tx3)} .conn .stats b{display:block;color:var(--tx);font-size:14px;font-weight:600}
+.conn .foot{display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:10px;border-top:1px solid var(--line)}
+
+/* drawer / modal */
+.scrim{position:fixed;inset:0;background:rgba(2,6,23,.65);display:none;z-index:40}
+.scrim.on{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:560px;max-width:100%;background:var(--surface);border-left:1px solid var(--line2);z-index:41;transform:translateX(100%);transition:transform .22s;display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.drawer header{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+.drawer header h2{font-size:17px;flex:1}
+.drawer .body{flex:1;overflow:auto;padding:22px}
+.drawer footer{padding:14px 22px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+.fld{margin-bottom:16px} .fld label{display:block;font-size:12.5px;color:var(--tx2);margin-bottom:6px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.steps{display:flex;gap:8px;margin-bottom:20px}
+.steps i{flex:1;height:4px;border-radius:99px;background:var(--line2)} .steps i.on{background:var(--accent)}
+.rstep{display:flex;gap:10px;align-items:center;background:var(--canvas);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.rstep .grip{color:var(--tx3);cursor:grab}
+.rstep .num{width:22px;height:22px;border-radius:50%;background:var(--elev);display:grid;place-items:center;font-size:12px;flex:none}
+.rstep .nm{flex:1;min-width:0}
+pre.yaml{background:var(--canvas);border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;font:12.5px/1.6 var(--mono);color:var(--tx2);white-space:pre}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--elev);border:1px solid var(--line2);padding:10px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.2s;z-index:60}
+.toast.on{opacity:1;transform:translateX(-50%)}
+.side-sub{padding:2px 0 8px}
+.pal{position:fixed;top:14vh;left:50%;transform:translateX(-50%);width:560px;max-width:92vw;background:var(--surface);border:1px solid var(--line2);border-radius:14px;z-index:50;display:none;overflow:hidden}
+.pal.on{display:block}
+.pal input{border:0;border-bottom:1px solid var(--line);border-radius:0;padding:16px 18px;font-size:15px}
+.pal .it{padding:10px 18px;cursor:pointer;display:flex;gap:10px;color:var(--tx2)}
+.pal .it:hover{background:var(--elev);color:var(--tx)}
+
+/* ---- polish layer ---- */
+/* ---- dual-ring spinner (AI activity indicator) ---- */
+:root,[data-theme=dark]{--spin-a:#fb6b7b;--spin-b:#fb9468}
+[data-theme=light]{--spin-a:#e4566a;--spin-b:#f77f5d}
+.spin{width:22px;height:22px;flex:none;overflow:visible}
+.spin circle{fill:none;stroke-width:3.6;stroke-linecap:round}
+.spin .o circle{stroke:var(--spin-a)} .spin .i circle{stroke:var(--spin-b)}
+.spin g{transform-origin:24px 24px;animation:spcw 9s linear infinite}
+.spin .i{animation:spccw 7s linear infinite}
+.botbadge.busy .spin .o{animation-duration:1.3s}.botbadge.busy .spin .i{animation-duration:1s}
+.botbadge.done .spin g{animation:none}
+.botbadge.busy::after{display:none}
+.btn.ai .spin,.pill.s-ai .spin{--spin-a:currentColor;--spin-b:currentColor}
+.btn.ai .spin .i{opacity:.7}
+.btn.ai:hover .spin .o{animation-duration:1.6s}.btn.ai:hover .spin .i{animation-duration:1.2s}
+@keyframes spcw{to{transform:rotate(360deg)}}
+@keyframes spccw{to{transform:rotate(-360deg)}}
+@media (prefers-reduced-motion:reduce){.spin g{animation-duration:30s!important}}
+.bot{width:20px;height:20px}
+.botbadge{width:42px;height:42px;border-radius:13px;background:var(--surface);border:1px solid var(--line2);color:var(--tx);display:grid;place-items:center;flex:none;box-shadow:var(--shadow);position:relative}
+.botbadge .spin{width:26px;height:26px}
+.botbadge.sm{width:30px;height:30px;border-radius:10px}.botbadge.sm .spin{width:19px;height:19px}
+.botbadge.busy::after{content:"";position:absolute;inset:-5px;border-radius:16px;border:2px solid var(--ai);opacity:.0;animation:ring 1.4s infinite}
+@keyframes ring{0%{opacity:.7;transform:scale(.9)}100%{opacity:0;transform:scale(1.25)}}
+.btn .spin{width:18px;height:18px}
+.aibar{border-color:color-mix(in srgb,var(--ai) 35%,transparent)}
+.s-ai{background:color-mix(in srgb,var(--ai) 12%,transparent);color:var(--ai);border-color:color-mix(in srgb,var(--ai) 30%,transparent)}
+body{transition:background .25s,color .25s;-webkit-font-smoothing:antialiased}
+.side,.top,.card,.drawer,.pal,input,select,textarea,.btn,.inc,.action{transition:background-color .25s,border-color .25s,color .25s}
+.top{background:color-mix(in srgb,var(--surface) 85%,transparent);backdrop-filter:blur(10px)}
+.logo{box-shadow:0 4px 14px -4px var(--accent)}
+.nav-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx3);padding:14px 12px 6px}
+.side.mini .nav-label{visibility:hidden;height:8px;padding:0}
+.nav a{font-weight:500}
+.nav a svg{width:19px;height:19px}
+.card:hover{border-color:var(--line2)}
+.kpi{position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--k,var(--accent));opacity:.9}
+.kpi .v{font-size:32px}
+.kpi .ic{position:absolute;right:16px;top:16px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:color-mix(in srgb,var(--k,var(--accent)) 14%,transparent);color:var(--k,var(--accent))}
+.hero{position:relative;border-radius:18px;padding:26px 28px;margin-bottom:20px;border:1px solid var(--line);background:var(--glow),var(--surface);box-shadow:var(--shadow);display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.hero h1{font-size:24px}
+.hero .sub{color:var(--tx2);margin-top:4px}
+.hero .qa{margin-left:auto;display:flex;gap:10px;flex-wrap:wrap}
+.hero .stat{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.btn{border-radius:10px;background:var(--surface)}
+.btn:hover{background:var(--elev)}
+.btn.pri:hover{background:var(--accent)}.btn.ai:hover{background:var(--botbg)}
+.btn.ai{background:var(--botbg);box-shadow:0 8px 20px -10px var(--botglow)}
+.pill{font-weight:600}
+.seg{background:var(--elev);border-color:transparent}
+.seg button.on{background:var(--surface);color:var(--tx);box-shadow:0 1px 3px rgba(0,0,0,.18)}
+.tabs button.on{color:var(--acc-tx);font-weight:600}
+.inc{border-radius:0}
+.inc.on{background:var(--acc-soft)}
+.action{background:var(--surface)}
+.action:hover{border-color:var(--line2)}
+.aibar{background:linear-gradient(135deg,color-mix(in srgb,var(--ai) 12%,transparent),color-mix(in srgb,var(--accent) 8%,transparent))}
+.report .rh{background:var(--elev)}
+.cico{background:var(--acc-soft);color:var(--acc-tx)}
+.conn{transition:transform .15s,box-shadow .15s}
+.conn:hover{transform:translateY(-2px)}
+tbody tr:hover{background:var(--acc-soft)}
+th{text-transform:uppercase;letter-spacing:.05em;font-size:11px}
+.help{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--elev);color:var(--tx3);font-size:10px;font-weight:700;cursor:help;margin-left:4px}
+.crumb{font-size:12.5px;color:var(--tx3);margin-bottom:6px}
+.crumb b{color:var(--tx2);font-weight:500}
+.themebtn svg{width:19px;height:19px}
+.th-moon{display:none}[data-theme=light] .th-moon{display:block}[data-theme=light] .th-sun{display:none}
+::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:var(--line2);border-radius:99px;border:2px solid var(--canvas)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="banner">Design mockup · every number, name and event below is sample data for layout review only — nothing here is measured or connected.</div>
+
+<div class="app">
+  <aside class="side" id="side">
+    <div class="brand"><div class="logo"></div><span>AiSOC</span></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="tenant"><div class="avatar">AC</div><div><div style="font-weight:550;line-height:1.2">Acme Corp</div><div class="small faint">Production</div></div></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <button class="iconbtn" id="collapse" title="Collapse sidebar"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <div class="search" id="openPal"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Search incidents, hosts, IPs, users…<kbd>Ctrl K</kbd></div>
+      <div class="sp"></div>
+      <select id="tw"><option>Last 24 hours</option><option>Last 7 days</option><option>Last 30 days</option></select>
+      <div class="live"><span class="dot"></span>All pipelines healthy</div>
+      <button class="btn sm" id="openCop" style="border-color:color-mix(in srgb,var(--ai) 45%,transparent);color:var(--ai)"><svg class="spin" viewBox="0 0 48 48" aria-hidden="true"><g class="o"><circle cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="36 14"/></g><g class="i"><circle cx="24" cy="24" r="11" pathLength="100" stroke-dasharray="32 18"/></g></svg> AI Copilot</button>
+      <button class="iconbtn themebtn" id="themeBtn" title="Switch light / dark theme" aria-label="Switch theme"><svg class="th-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="th-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></button>
+      <button class="iconbtn" title="Notifications"><svg viewBox="0 0 24 24"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></button>
+      <div class="avatar">SS</div>
+    </header>
+
+    <!-- ============ DASHBOARD ============ -->
+    <section class="page on" id="p-dashboard">
+      <div class="hero"><div><div class="crumb">Dashboard</div><h1 id="greet">Welcome back</h1><p class="sub">Here is what needs attention right now.</p>
+        <div class="stat"><span class="pill s-critical">12 critical open</span><span class="pill s-ai"><svg class="spin" viewBox="0 0 48 48" aria-hidden="true"><g class="o"><circle cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="36 14"/></g><g class="i"><circle cx="24" cy="24" r="11" pathLength="100" stroke-dasharray="32 18"/></g></svg> AI handled 87% on its own</span><span class="pill s-ok">All pipelines healthy</span></div></div>
+        <div class="qa"><button class="btn ai" data-go="incidents">Review critical incidents</button><button class="btn" data-go="hunting">Start a hunt</button><button class="btn" data-go="runbooks">Runbooks</button></div></div>
+      <div class="grid g4" style="margin-bottom:16px">
+        <div class="card kpi" style="--k:var(--crit)"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/></svg></span><div class="l">Active critical threats</div><div class="v" style="color:var(--crit)">12</div><div class="d up">▲ 3 vs yesterday</div></div>
+        <div class="card kpi" style="--k:var(--accent)"><span class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div class="l">Mean time to respond <span class="help" title="Average time from alert to resolution">?</span></div><div class="v">18m</div><div class="d down">▼ 4m vs last week</div></div>
+        <div class="card kpi" style="--k:var(--ai)"><span class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span><div class="l">AI-triaged without review <span class="help" title="Alerts the AI closed or classified without an analyst">?</span></div><div class="v" style="color:var(--ai)">87%</div><div class="d faint">1,082 of 1,247 alerts</div></div>
+        <div class="card kpi" style="--k:var(--ok)"><span class="ic"><svg viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></svg></span><div class="l">Sources reporting</div><div class="v" style="color:var(--ok)">6 / 7</div><div class="d" style="color:var(--med)">1 degraded</div></div>
+      </div>
+      <div class="grid g2" style="margin-bottom:16px">
+        <div class="card"><h3>Alert volume <span class="faint" style="font-weight:400">· ingested vs. AI-triaged</span></h3><svg class="chart" id="trend" viewBox="0 0 600 190" preserveAspectRatio="none" style="stroke:none"></svg></div>
+        <div class="card"><h3>Severity mix</h3>
+          <div class="bar"><span class="n">Critical</span><span class="t"><i style="width:8%;background:var(--crit)"></i></span><span class="c">12</span></div>
+          <div class="bar"><span class="n">High</span><span class="t"><i style="width:28%;background:var(--high)"></i></span><span class="c">43</span></div>
+          <div class="bar"><span class="n">Medium</span><span class="t"><i style="width:100%;background:var(--med)"></i></span><span class="c">156</span></div>
+          <div class="bar"><span class="n">Low</span><span class="t"><i style="width:60%;background:var(--low)"></i></span><span class="c">289</span></div>
+          <div class="bar"><span class="n">Info</span><span class="t"><i style="width:35%;background:var(--info)"></i></span><span class="c">–</span></div>
+        </div>
+      </div>
+      <div class="grid g2">
+        <div class="card"><h3>Needs your attention <button class="btn sm" style="margin-left:auto" data-go="incidents">Open all incidents</button></h3>
+          <table><tbody id="dashInc"></tbody></table></div>
+        <div class="card"><h3>Top ATT&amp;CK tactics</h3>
+          <div class="bar"><span class="n">Execution</span><span class="t"><i style="width:100%"></i></span><span class="c">89</span></div>
+          <div class="bar"><span class="n">Defense Evasion</span><span class="t"><i style="width:75%"></i></span><span class="c">67</span></div>
+          <div class="bar"><span class="n">Command &amp; Control</span><span class="t"><i style="width:60%"></i></span><span class="c">54</span></div>
+          <div class="bar"><span class="n">Credential Access</span><span class="t"><i style="width:48%"></i></span><span class="c">43</span></div>
+          <div class="bar"><span class="n">Lateral Movement</span><span class="t"><i style="width:42%"></i></span><span class="c">38</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INCIDENTS ============ -->
+    <section class="page flush" id="p-incidents">
+      <div class="split">
+        <div class="list">
+          <div class="list-head">
+            <div style="display:flex;align-items:center;gap:10px"><h1 style="font-size:18px">Incidents</h1><span class="pill s-neutral" id="incCount"></span><div class="sp"></div><div class="seg" id="viewSeg"></div></div>
+            <input id="incSearch" placeholder="Search title, host, user…">
+            <div class="seg" id="statusSeg"></div>
+            <div class="seg" id="sevSeg"></div>
+          </div>
+          <div class="list-body" id="incList"></div>
+        </div>
+        <div class="detail" id="incDetail"></div>
+      </div>
+    </section>
+
+    <!-- ============ HUNTING ============ -->
+    <section class="page" id="p-hunting">
+      <div class="ph"><div><h1>Threat Hunting</h1><p>Search every connected source at once, ask in plain English, and pivot through entities.</p></div></div>
+      <div class="tabs" id="huntTabs"><button class="on" data-t="logs">Log explorer</button><button data-t="graph">Entity graph</button><button data-t="ioc">IOC lookup</button><button data-t="intel">Threat intel</button></div>
+      <div id="hunt-logs">
+        <div class="hunt-q"><input id="huntQ" value="Show failed sign-ins followed by a success from a new country in the last 24h"><button class="btn pri" id="huntGo">Run hunt</button><button class="btn">Save</button></div>
+        <div class="small faint" style="margin:8px 2px 16px">Natural language is translated to a query you can inspect: <span class="mono">action = "login" AND outcome IN ("failure","success") GROUP BY actor.user</span></div>
+        <div class="card"><table><thead><tr><th>Time (UTC)</th><th>Source</th><th>User</th><th>Event</th><th>Location</th><th>Result</th></tr></thead><tbody id="huntRows"></tbody></table></div>
+      </div>
+      <div id="hunt-graph" style="display:none"><div class="card"><div class="graph"><svg viewBox="0 0 700 360" style="width:100%;height:100%;stroke:none" id="gsvg"></svg></div>
+        <div style="display:flex;gap:14px;margin-top:12px" class="small muted"><span>● User</span><span style="color:#22d3ee">● Host</span><span style="color:var(--med)">● Process</span><span style="color:var(--crit)">● External IP</span></div></div></div>
+      <div id="hunt-ioc" style="display:none"><div class="card"><div class="hunt-q"><input placeholder="IP, domain, file hash or URL"><button class="btn pri">Look up</button></div><div class="empty">Enter an indicator to see reputation across your intel feeds.</div></div></div>
+      <div id="hunt-intel" style="display:none"><div class="card"><div class="empty">Feed status and matched indicators appear here.</div></div></div>
+    </section>
+
+    <!-- ============ RUNBOOKS ============ -->
+    <section class="page" id="p-runbooks">
+      <div class="ph"><div><h1>Runbooks &amp; Automation</h1><p>Response procedures that run automatically or wait for an analyst's approval.</p></div><div class="sp"></div>
+        <button class="btn">Import YAML / JSON</button><button class="btn pri" id="newRb">+ New runbook</button></div>
+      <div class="tabs" id="rbTabs"><button class="on" data-t="lib">Library</button><button data-t="runs">Recent runs</button><button data-t="appr">Approvals <span class="pill s-high" style="margin-left:4px">2</span></button><button data-t="det">Detection rules</button><button data-t="cov">ATT&amp;CK coverage</button></div>
+      <div id="rb-lib"><div class="card" style="padding:0"><table><thead><tr><th>Runbook</th><th>Trigger</th><th>Mode</th><th>Success</th><th>Last run</th><th>Enabled</th><th></th></tr></thead><tbody id="rbRows"></tbody></table></div></div>
+      <div id="rb-runs" style="display:none"><div class="card"><table><thead><tr><th>Runbook</th><th>Incident</th><th>Started</th><th>Result</th></tr></thead><tbody>
+        <tr><td>Ransomware: Host Isolation &amp; Snapshot</td><td>INC-2041</td><td class="muted">12 min ago</td><td><span class="pill s-ok">Completed</span></td></tr>
+        <tr><td>Compromised User Session Revocation</td><td>INC-2037</td><td class="muted">1 h ago</td><td><span class="pill s-ok">Completed</span></td></tr>
+        <tr><td>Malicious C2 Domain Blocklist</td><td>INC-2029</td><td class="muted">3 h ago</td><td><span class="pill s-high">Failed at step 2</span></td></tr></tbody></table></div></div>
+      <div id="rb-det" style="display:none"><div style="display:flex;gap:10px;margin-bottom:14px"><input id="detQ" placeholder="Search detection rules…" style="max-width:300px"><div class="seg" id="detSeg"></div><div class="sp"></div><button class="btn sm">Tune noisy rules</button><button class="btn sm pri">+ New rule</button></div>
+        <div class="card" style="padding:0"><table><thead><tr><th>Rule</th><th>Severity</th><th>Technique</th><th>Fires (7d)</th><th>False-positive rate</th><th>Enabled</th></tr></thead><tbody id="detRows"></tbody></table></div></div>
+      <div id="rb-cov" style="display:none"><div class="card"><h3>Detection coverage by tactic <span class="faint" style="font-weight:400">· techniques with at least one enabled rule</span></h3><div id="covGrid"></div></div></div>
+      <div id="rb-appr" style="display:none"><div class="card">
+        <div class="action"><div class="i"><b>Isolate host WS-FIN-07</b><div class="small muted">Requested by AI triage · INC-2041 · blast radius: 1 host</div></div><button class="btn sm danger">Reject</button><button class="btn sm pri">Approve</button></div>
+        <div class="action" style="margin:0"><div class="i"><b>Disable account j.rivera</b><div class="small muted">Requested by runbook · INC-2037 · blast radius: 1 user</div></div><button class="btn sm danger">Reject</button><button class="btn sm pri">Approve</button></div></div></div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="page" id="p-settings">
+      <div class="ph"><div><h1>Settings &amp; Integrations</h1><p>Connect your tools, manage who can do what, and review every change.</p></div></div>
+      <div class="tabs" id="setTabs"><button class="on" data-t="conn">Connectors <span class="pill s-neutral" style="margin-left:4px">6 active</span></button><button data-t="users">Team &amp; roles</button><button data-t="keys">API keys</button><button data-t="ai">AI &amp; response policy</button><button data-t="sla">SLA &amp; shifts</button><button data-t="comp">Compliance &amp; reports</button><button data-t="audit">Audit log</button></div>
+      <div id="set-sla" style="display:none"></div>
+      <div id="set-comp" style="display:none"></div>
+
+      <div id="set-conn">
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px"><div class="seg" id="cFilter"></div><input id="cSearch" placeholder="Search 87 connectors…" style="max-width:280px"><div class="sp"></div><button class="btn pri" id="addConn">+ Connect new source</button></div>
+        <div class="cgrid" id="cGrid"></div>
+      </div>
+      <div id="set-users" style="display:none"><div class="card" style="padding:0"><table><thead><tr><th>Member</th><th>Role</th><th>Two-factor</th><th>Last active</th></tr></thead><tbody>
+        <tr><td>Sarath S<div class="small faint">sarath@acme.example</div></td><td><span class="pill s-ai">Administrator</span></td><td><span class="pill s-ok">On</span></td><td class="muted">Now</td></tr>
+        <tr><td>Maya Patel<div class="small faint">maya@acme.example</div></td><td><span class="pill s-low">Analyst</span></td><td><span class="pill s-ok">On</span></td><td class="muted">5 min ago</td></tr>
+        <tr><td>Tom Becker<div class="small faint">tom@acme.example</div></td><td><span class="pill s-neutral">Viewer</span></td><td><span class="pill s-med">Off</span></td><td class="muted">2 days ago</td></tr></tbody></table></div></div>
+      <div id="set-keys" style="display:none"><div class="card"><div style="display:flex;margin-bottom:12px"><span class="muted">Keys let scripts and other tools call AiSOC.</span><div class="sp"></div><button class="btn sm pri">+ Create key</button></div>
+        <table><thead><tr><th>Name</th><th>Prefix</th><th>Created</th><th></th></tr></thead><tbody><tr><td>SIEM export</td><td class="mono">aisoc_8f3a…</td><td class="muted">12 Oct</td><td><button class="btn sm danger">Revoke</button></td></tr></tbody></table></div></div>
+      <div id="set-ai" style="display:none"><div class="card"><h3>How much can the AI do on its own?</h3>
+        <div class="action"><div class="i"><b>Auto-triage new alerts</b><div class="small muted">AI assigns a verdict and confidence to every alert.</div></div><span class="switch on" data-sw></span></div>
+        <div class="action"><div class="i"><b>Auto-run low-risk response</b><div class="small muted">e.g. enrich, notify, tag. Never isolates or disables.</div></div><span class="switch on" data-sw></span></div>
+        <div class="action"><div class="i"><b>Require approval for high-risk response</b><div class="small muted">Isolate host, disable account, block at firewall.</div></div><span class="switch on" data-sw></span></div>
+        <div class="action" style="border-color:rgba(251,113,133,.35)"><div class="i"><b style="color:var(--crit)">Kill switch</b><div class="small muted">Stop all automated response immediately.</div></div><span class="switch" data-sw></span></div></div></div>
+      <div id="set-audit" style="display:none"><div class="card" style="padding:0"><table><thead><tr><th>When</th><th>Who</th><th>Action</th></tr></thead><tbody>
+        <tr><td class="muted">12:04</td><td>Maya Patel</td><td>Approved isolate host WS-FIN-07</td></tr>
+        <tr><td class="muted">11:48</td><td>AI triage</td><td>Marked INC-2036 as false positive (confidence 94)</td></tr>
+        <tr><td class="muted">10:12</td><td>Sarath S</td><td>Edited runbook “Phishing Response”</td></tr></tbody></table></div></div>
+    </section>
+  </div>
+</div>
+
+<!-- drawers / overlays -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="rbDrawer"></aside>
+<aside class="drawer" id="connDrawer"></aside>
+<aside class="drawer" id="copDrawer">
+  <header><h2 style="display:flex;align-items:center;gap:10px"><span class="botbadge sm"><svg class="spin" viewBox="0 0 48 48" aria-hidden="true"><g class="o"><circle cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="36 14"/></g><g class="i"><circle cx="24" cy="24" r="11" pathLength="100" stroke-dasharray="32 18"/></g></svg></span> AI Copilot</h2><span class="small faint" id="copCtx"></span><button class="iconbtn" id="copX"></button></header>
+  <div class="body" id="copBody"></div>
+  <footer style="flex-direction:column;align-items:stretch">
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="copChips"></div>
+    <div style="display:flex;gap:8px"><input id="copIn" placeholder="Ask about this incident, a host, a user…"><button class="btn pri" id="copSend">Send</button></div>
+  </footer>
+</aside>
+<div class="pal" id="pal"><input placeholder="Jump to a page, incident or host…"><div id="palItems"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const ico={
+ dash:'<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
+ inc:'<svg viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/></svg>',
+ hunt:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>',
+ rb:'<svg viewBox="0 0 24 24"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg>',
+ set:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+ chev:'<svg class="chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>',
+ grip:'<svg viewBox="0 0 24 24"><path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/></svg>',
+ x:'<svg viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>'
+};
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('on'),2200)};
+const sev=s=>`<span class="pill s-${s}">${s[0].toUpperCase()+s.slice(1)}</span>`;
+const tabsWire=(id,prefix)=>$$(`#${id} button`).forEach(b=>b.onclick=()=>{$$(`#${id} button`).forEach(x=>x.classList.toggle('on',x===b));$$(`[id^=${prefix}-]`).forEach(p=>p.style.display=p.id===`${prefix}-${b.dataset.t}`?'':'none')});
+const seg=(el,opts,cur,cb)=>{el.innerHTML=opts.map(o=>`<button class="${o===cur?'on':''}">${o}</button>`).join('');$$('button',el).forEach(b=>b.onclick=()=>{cb(b.textContent);$$('button',el).forEach(x=>x.classList.toggle('on',x===b))})};
+document.addEventListener('click',e=>{const sw=e.target.closest('[data-sw]');if(sw)sw.classList.toggle('on');const g=e.target.closest('[data-go]');if(g)go(g.dataset.go)});
+
+/* ---------- navigation ---------- */
+const pages=[['dashboard','Dashboard',ico.dash],['incidents','Incidents & Triage',ico.inc,'12'],['hunting','Threat Hunting',ico.hunt],['runbooks','Runbooks & Automation',ico.rb],['settings','Settings & Integrations',ico.set]];
+$('#nav').innerHTML=pages.map((p,k)=>`${k===0?'<div class="nav-label">Monitor</div>':k===1?'<div class="nav-label">Investigate</div>':k===3?'<div class="nav-label">Respond &amp; configure</div>':''}<a data-p="${p[0]}" title="${p[1]}">${p[2]}<span class="lbl">${p[1]}</span>${p[3]?`<span class="badge lbl">${p[3]}</span>`:''}</a>`).join('');
+const hr=new Date().getHours();$('#greet').textContent=(hr<12?'Good morning':hr<18?'Good afternoon':'Good evening')+', Sarath';
+const applyTheme=t=>{document.documentElement.dataset.theme=t;try{localStorage.setItem('aisoc-theme',t)}catch(e){}};
+$('#themeBtn').onclick=()=>{applyTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');toast('Switched to '+document.documentElement.dataset.theme+' mode')};
+function go(p){$$('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.p===p));$$('.page').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));location.hash=p}
+$$('#nav a').forEach(a=>a.onclick=()=>go(a.dataset.p));
+$('#collapse').onclick=()=>$('#side').classList.toggle('mini');
+go((location.hash||'#dashboard').slice(1)||'dashboard');
+
+/* command palette */
+const pal=$('#pal');
+function palOpen(o){pal.classList.toggle('on',o);$('#scrim').classList.toggle('on',o);if(o){$('input',pal).value='';renderPal('');$('input',pal).focus()}}
+function renderPal(q){const items=[...pages.map(p=>['Go to '+p[1],()=>go(p[0])]),...INC.map(i=>[i.id+' · '+i.title,()=>{go('incidents');pick(i.id)}])].filter(i=>i[0].toLowerCase().includes(q.toLowerCase())).slice(0,8);
+ $('#palItems').innerHTML=items.map((x,i)=>`<div class="it" data-i="${i}">${x[0]}</div>`).join('')||'<div class="empty">No matches</div>';
+ $$('#palItems .it').forEach((el,i)=>el.onclick=()=>{items[i][1]();palOpen(false)})}
+$('#openPal').onclick=()=>palOpen(true);$('input',pal).oninput=e=>renderPal(e.target.value);
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();palOpen(true)}if(e.key==='Escape'){palOpen(false);closeDrawers()}});
+$('#scrim').onclick=()=>{palOpen(false);closeDrawers()};
+function closeDrawers(){$$('.drawer').forEach(d=>d.classList.remove('on'));$('#scrim').classList.remove('on')}
+function openDrawer(id){$('#scrim').classList.add('on');$('#'+id).classList.add('on')}
+
+/* ---------- data (SAMPLE) ---------- */
+const INC=[
+ {id:'INC-2041',sev:'critical',status:'Open',title:'Ransomware behaviour: mass file encryption on WS-FIN-07',host:'WS-FIN-07',user:'j.rivera',ip:'185.220.101.45',ago:'6 min',sla:'12m',slac:'bad',conf:96,src:'CrowdStrike EDR',tactic:'Impact · T1486'},
+ {id:'INC-2040',sev:'high',status:'AI-Triaged',title:'Impossible travel: sign-in from Lagos then Frankfurt in 9 minutes',host:'—',user:'m.okafor',ip:'41.203.72.18',ago:'22 min',sla:'48m',slac:'warn',conf:88,src:'Okta Identity',tactic:'Initial Access · T1078'},
+ {id:'INC-2039',sev:'high',status:'Open',title:'Encoded PowerShell downloading payload from rare domain',host:'SRV-APP-02',user:'svc-deploy',ip:'91.92.240.11',ago:'41 min',sla:'1h 10m',slac:'',conf:91,src:'Microsoft Sentinel',tactic:'Execution · T1059.001'},
+ {id:'INC-2038',sev:'medium',status:'In Review',title:'AWS access key used from a new region outside business hours',host:'—',user:'ci-bot',ip:'52.14.8.201',ago:'2 h',sla:'3h',slac:'',conf:72,src:'AWS CloudTrail',tactic:'Credential Access · T1552'},
+ {id:'INC-2037',sev:'medium',status:'Resolved',title:'Suspicious OAuth app granted mailbox read access',host:'—',user:'a.chen',ip:'—',ago:'5 h',sla:'—',slac:'',conf:83,src:'Google Workspace',tactic:'Persistence · T1098'},
+ {id:'INC-2036',sev:'low',status:'Resolved',title:'Repeated failed logins from internal scanner',host:'SCAN-01',user:'—',ip:'10.4.1.20',ago:'7 h',sla:'—',slac:'',conf:94,src:'Okta Identity',tactic:'Credential Access · T1110'}
+];
+const CONNS=[
+ ['CrowdStrike EDR','CS','Endpoint / EDR','Active','2.4k EPS','1.8M',true],['AWS CloudTrail','AW','Cloud & IAM','Active','640 EPS','310k',true],
+ ['Microsoft Sentinel','MS','Network / SIEM','Active','1.1k EPS','920k',true],['Okta Identity','OK','Cloud & IAM','Active','95 EPS','74k',true],
+ ['Google Workspace','GW','Cloud & IAM','Degraded','Delayed 14m','41k',true],['GitHub Audit','GH','Cloud & IAM','Active','12 EPS','9k',true],
+ ['Zeek','ZK','Network / SIEM','Disconnected','—','—',false],['Suricata','SU','Network / SIEM','Disconnected','—','—',false],
+ ['SentinelOne','S1','Endpoint / EDR','Disconnected','—','—',false],['Azure Entra','AE','Cloud & IAM','Disconnected','—','—',false]
+];
+const RB=[
+ {n:'Ransomware: Host Isolation & Snapshot',d:'Isolate host, snapshot disk, enrich hash, page on-call',trig:'Critical · ransomware',mode:'Requires approval',ok:'98%',last:'12 min ago',on:true},
+ {n:'Compromised User Session Revocation',d:'Revoke sessions, force MFA reset, notify user',trig:'High+ · suspicious sign-in',mode:'Automatic',ok:'100%',last:'1 h ago',on:true},
+ {n:'Malicious C2 Domain Blocklist',d:'Block domain at DNS/firewall, hunt for other hosts',trig:'High+ · command & control',mode:'Requires approval',ok:'82%',last:'3 h ago',on:true},
+ {n:'Phishing Investigation',d:'Pull message, detonate URL, search mailboxes, purge',trig:'Medium+ · phishing',mode:'Automatic',ok:'96%',last:'Yesterday',on:true},
+ {n:'Insider: Mass Download',d:'Snapshot activity, notify manager, restrict access',trig:'Medium+ · insider',mode:'Requires approval',ok:'—',last:'Never',on:false}
+];
+const STEP_TYPES=[['isolate_host','Isolate host'],['enrich','Enrich indicator'],['http','HTTP request'],['notify','Send notification'],['approval','Request approval'],['disable_user','Disable account'],['block_ip','Block IP at firewall']];
+
+/* ---------- dashboard ---------- */
+(function(){
+ const a=[],b=[];for(let i=0;i<24;i++){a.push(40+((i*37+13)%50)+(i>16?25:0));b.push(a[i]*(.8+((i*7)%10)/60))}
+ const pts=(d,m)=>d.map((v,i)=>`${i*600/23},${190-v/m*170}`).join(' ');const m=Math.max(...a)*1.1;
+ $('#trend').innerHTML=[0,1,2,3].map(i=>`<line x1="0" x2="600" y1="${20+i*50}" y2="${20+i*50}" style="stroke:var(--line)"/>`).join('')+
+ `<polygon points="0,190 ${pts(a,m)} 600,190" style="fill:var(--accent);fill-opacity:.14"/><polyline points="${pts(a,m)}" fill="none" style="stroke:var(--accent)" stroke-width="2.5"/><polyline points="${pts(b,m)}" fill="none" style="stroke:var(--ai)" stroke-width="2.5" stroke-dasharray="5 4"/>`;
+ $('#dashInc').innerHTML=INC.filter(i=>i.status!=='Resolved').slice(0,4).map(i=>`<tr style="cursor:pointer" onclick="go('incidents');pick('${i.id}')"><td>${sev(i.sev)}</td><td>${i.title}</td><td class="faint small" style="white-space:nowrap">${i.ago} ago</td></tr>`).join('');
+})();
+
+/* ---------- incidents ---------- */
+let fStatus='All',fSev='All',fQ='',cur=INC[0].id,view='Alerts',curCase='CASE-118';
+seg($('#statusSeg'),['All','Open','AI-Triaged','In Review','Resolved'],'All',v=>{fStatus=v;renderList()});
+seg($('#sevSeg'),['All','Critical','High','Medium','Low'],'All',v=>{fSev=v;renderList()});
+$('#incSearch').oninput=e=>{fQ=e.target.value.toLowerCase();renderList()};
+function renderList(){
+ if(view==='Cases')return renderCases();
+ $('#statusSeg').style.display=$('#sevSeg').style.display=$('#incSearch').style.display='';
+ const l=INC.filter(i=>(fStatus==='All'||i.status===fStatus)&&(fSev==='All'||i.sev===fSev.toLowerCase())&&(i.title+i.host+i.user+i.id).toLowerCase().includes(fQ));
+ $('#incCount').textContent=l.length;
+ $('#incList').innerHTML=l.map(i=>`<div class="inc ${i.id===cur?'on':''}" data-id="${i.id}"><div style="display:flex;gap:8px;align-items:center">${sev(i.sev)}<span class="pill s-neutral">${i.status}</span><span class="sp"></span><span class="small mono faint">${i.id}</span></div><div class="t">${i.title}</div><div class="m"><span>${i.host!=='—'?i.host:i.user}</span><span>·</span><span>${i.ago} ago</span><span class="sp"></span><span class="sla ${i.slac}">SLA ${i.sla}</span></div></div>`).join('')||'<div class="empty">No incidents match these filters.</div>';
+ $$('#incList .inc').forEach(el=>el.onclick=()=>pick(el.dataset.id));
+}
+const BOT='<svg class="spin" viewBox="0 0 48 48" aria-hidden="true"><g class="o"><circle cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="36 14"/></g><g class="i"><circle cx="24" cy="24" r="11" pathLength="100" stroke-dasharray="32 18"/></g></svg>';
+const ai={};  // per-incident AI state: idle | running | done
+function pick(id){cur=id;renderList();renderDetail()}
+function renderDetail(){
+ if(view==='Cases')return renderCaseDetail();
+ const i=INC.find(x=>x.id===cur);if(!i){$('#incDetail').innerHTML='<div class="empty">Select an incident</div>';return}
+ const st=ai[i.id]||(i.status==='AI-Triaged'||i.status==='Resolved'?'done':'idle');
+ $('#incDetail').innerHTML=`
+ <div class="dh"><div style="flex:1"><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">${sev(i.sev)}<span class="pill s-neutral">${i.status}</span><span class="mono faint">${i.id}</span></div>
+   <h2>${i.title}</h2><div class="tags">${i.host!=='—'?`<span class="tag">Host · ${i.host}</span>`:''}${i.user!=='—'?`<span class="tag">User · ${i.user}</span>`:''}${i.ip!=='—'?`<span class="tag mono">IP · ${i.ip}</span>`:''}<span class="tag">${i.src}</span><span class="tag">${i.tactic}</span></div></div>
+   <div style="display:flex;gap:8px;position:relative"><button class="btn sm" onclick="toast('Assigned to you')">Assign to me</button><button class="btn sm" onclick="toast('Escalated to senior analyst')">Escalate</button><button class="btn sm" onclick="toast('Marked resolved')">Resolve</button></div></div>
+ <div class="aibar" id="aibar"></div>
+ <div id="aiReport"></div>
+ <div class="tabs" id="dTabs"><button class="on" data-t="tl">Timeline</button><button data-t="raw">Raw telemetry &amp; IOCs</button><button data-t="resp">Response &amp; runbooks</button><button data-t="notes">Notes</button></div>
+ <div id="d-tl">${timeline(i)}</div>
+ <div id="d-raw" style="display:none">${raw(i)}</div>
+ <div id="d-resp" style="display:none">${resp(i)}</div>
+ <div id="d-notes" style="display:none"><textarea rows="5" placeholder="Add a note for the next analyst…"></textarea><div style="margin-top:10px"><button class="btn sm pri" onclick="toast('Note saved')">Save note</button></div></div>`;
+ tabsWire('dTabs','d');paintAI(i,st);wireDetail(i);
+}
+function paintAI(i,st){
+ const bar=$('#aibar'),rep=$('#aiReport');
+ if(st==='idle'){bar.innerHTML=`<span class="botbadge">${BOT}</span><div class="info"><b>AI has not investigated this incident in depth yet</b><div class="small muted">Initial triage confidence ${i.conf}/100. A deep dive correlates entities, queries history and drafts a verdict.</div></div><button class="btn ai" id="aiGo"><svg class="spin" viewBox="0 0 48 48" aria-hidden="true"><g class="o"><circle cx="24" cy="24" r="20" pathLength="100" stroke-dasharray="36 14"/></g><g class="i"><circle cx="24" cy="24" r="11" pathLength="100" stroke-dasharray="32 18"/></g></svg> Trigger manual AI deep dive</button>`;rep.innerHTML='';$('#aiGo').onclick=()=>runAI(i)}
+ if(st==='running'){bar.innerHTML=`<span class="botbadge busy">${BOT}</span><div class="info"><b id="aiStep">Analyzing entity relationships…</b><div class="prog"><i id="aiProg"></i></div></div><button class="btn sm" disabled>Running…</button>`}
+ if(st==='done'){
+  bar.innerHTML=`<span class="botbadge done">${BOT}</span><div class="info"><b>AI deep dive complete</b> <span class="pill s-ai">Confidence ${i.conf}%</span><div class="small muted">Completed just now · 14 evidence items checked across 4 sources</div></div><button class="btn sm" id="aiRe">Re-run</button><button class="btn sm" onclick="toast('Report downloaded (sample)')">Download report</button>`;
+  $('#aiRe').onclick=()=>runAI(i);
+  rep.innerHTML=`<div class="report"><div class="rh"><span class="botbadge sm">${BOT}</span> Executive verdict</div><div class="rb">
+   <p class="verdict">${i.sev==='critical'?'<b>True positive — act now.</b> ':'<b>Likely true positive.</b> '}Account <b>${i.user!=='—'?i.user:'the affected identity'}</b> triggered this activity on <b>${i.host!=='—'?i.host:'a cloud resource'}</b>. Behaviour matches a known attack pattern and the destination <span class="mono">${i.ip!=='—'?i.ip:'(none)'}</span> has poor reputation. Business impact: finance file shares may be affected if not contained.</p>
+   <div class="coll open"><button>${ico.chev}Evidence chain <span class="pill s-neutral">4 verified</span></button><div>
+     <div class="step-run done">✓ Parent process <span class="mono">winword.exe → powershell.exe -enc …</span></div>
+     <div class="step-run done">✓ Destination ${i.ip} flagged by 3 of 5 intel feeds</div>
+     <div class="step-run done">✓ Same user had a failed MFA prompt 11 min earlier</div>
+     <div class="step-run done">✓ No matching change ticket or maintenance window</div></div></div>
+   <div class="coll"><button>${ico.chev}Why the AI is confident</button><div class="muted small">Three independent signals agree, none are contradicted, and the sequence matches the ATT&amp;CK technique ${i.tactic.split('· ')[1]}.</div></div>
+   <div style="margin-top:16px"><div class="small faint" style="margin-bottom:8px">RECOMMENDED ACTIONS</div>
+     <div class="action"><div class="i"><b>Isolate host</b> <span class="pill s-high">High risk</span><div class="small muted">Cuts network access for 1 host · needs approval · reversible</div></div><button class="btn sm pri" onclick="toast('Approval requested')">Request approval</button></div>
+     <div class="action" style="margin:0"><div class="i"><b>Reset sessions &amp; require MFA</b> <span class="pill s-low">Low risk</span><div class="small muted">Signs the user out everywhere · reversible</div></div><button class="btn sm" onclick="toast('Action queued')">Run now</button></div></div>
+  </div></div>`;
+  $$('.coll>button',rep).forEach(b=>b.onclick=()=>b.parentElement.classList.toggle('open'));
+ }
+}
+function runAI(i){
+ ai[i.id]='running';paintAI(i,'running');$('#aiReport').innerHTML='';
+ const steps=['Analyzing entity relationships…','Querying historic telemetry…','Checking threat intel…','Synthesizing root cause…'];let n=0;
+ const h=setInterval(()=>{if(cur!==i.id){clearInterval(h);return}
+  n++;const s=$('#aiStep'),p=$('#aiProg');if(!s){clearInterval(h);return}
+  if(n>=steps.length){clearInterval(h);ai[i.id]='done';paintAI(i,'done');return}
+  s.textContent=steps[n];p.style.width=(n/steps.length*100)+'%'},900);
+ setTimeout(()=>{const p=$('#aiProg');if(p)p.style.width='12%'},50);
+}
+function timeline(i){return `<div class="timeline">
+ <div class="tl"><div class="tm">11:58:02</div><b>Initial access</b><div class="muted small">User opened a document from an external email</div></div>
+ <div class="tl"><div class="tm">11:58:41</div><b>Execution</b><div class="muted small mono">winword.exe → powershell.exe -enc JABz…</div></div>
+ <div class="tl bad"><div class="tm">11:59:15</div><b>Command &amp; control</b><div class="muted small">Outbound connection to ${i.ip!=='—'?i.ip:'rare domain'}</div></div>
+ <div class="tl bad"><div class="tm">12:02:30</div><b>Alert raised</b><div class="muted small">${i.src} · ${i.title}</div></div></div>`}
+function raw(i){return `<div class="hunt-q" style="margin-bottom:12px"><input placeholder="Filter events…" oninput="$$('#rawT tbody tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(this.value.toLowerCase())?'':'none')"></div>
+ <div class="card" style="padding:0"><table id="rawT"><thead><tr><th>Time</th><th>Event</th><th>Indicator</th></tr></thead><tbody>
+ <tr><td class="mono faint">11:58:41</td><td>Process created</td><td><span class="copy mono" data-c="4f2a9c1e77b0d3e5a8">sha256 4f2a9c1e…a8</span></td></tr>
+ <tr><td class="mono faint">11:59:15</td><td>Network connection</td><td><span class="copy mono" data-c="${i.ip}">${i.ip}</span></td></tr>
+ <tr><td class="mono faint">11:59:40</td><td>File written</td><td><span class="copy mono" data-c="C:\\Users\\Public\\upd.dll">C:\\Users\\Public\\upd.dll</span></td></tr></tbody></table></div><div class="small faint" style="margin-top:8px">Click any indicator to copy.</div>`}
+function resp(i){return `
+ <div class="action"><div class="i"><b>Isolate host</b> <span class="pill s-high">High risk</span><div class="small muted">Requires approval</div></div><button class="btn sm" onclick="toast('Approval requested')">Request</button></div>
+ <div class="action"><div class="i"><b>Reset Okta session</b> <span class="pill s-low">Low risk</span><div class="small muted">Signs user out everywhere</div></div><button class="btn sm" onclick="toast('Session reset queued')">Run</button></div>
+ <div class="action"><div class="i"><b>Block IP at firewall</b> <span class="pill s-medium">Medium risk</span></div><button class="btn sm" onclick="toast('Block requested')">Run</button></div>
+ <div style="position:relative;margin-top:18px"><button class="btn pri" id="rbRun">▶ Run runbook ▾</button>
+  <div class="menu" id="rbMenu">${RB.filter(r=>r.on).map((r,k)=>`<button data-k="${k}"><b>${r.n}</b><div class="small faint">${r.mode}</div></button>`).join('')}</div></div>
+ <div id="rbProgress" style="margin-top:16px"></div>`}
+function wireDetail(i){
+ $$('.copy').forEach(c=>c.onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(c.dataset.c);toast('Copied')});
+ const b=$('#rbRun');if(!b)return;
+ b.onclick=e=>{e.stopPropagation();$('#rbMenu').classList.toggle('on')};
+ $$('#rbMenu button').forEach(m=>m.onclick=()=>{$('#rbMenu').classList.remove('on');runRunbook(RB.filter(r=>r.on)[m.dataset.k])});
+}
+document.addEventListener('click',()=>{const m=$('#rbMenu');if(m)m.classList.remove('on')});
+function runRunbook(r){
+ const steps=['Verify host status','Enrich file hash','Request analyst approval','Isolate host','Notify on-call'];let n=0;const box=$('#rbProgress');
+ const paint=()=>box.innerHTML=`<div class="card"><h3>${r.n} <span class="pill s-ai">${n>=steps.length?'Completed':'Running'}</span></h3>`+steps.map((s,k)=>`<div class="step-run ${k<n?'done':k===n?'now':''}">${k<n?'✓':k===n?'<span class="pulse"></span>':'○'} ${s}</div>`).join('')+'</div>';
+ paint();const h=setInterval(()=>{n++;paint();if(n>=steps.length){clearInterval(h);toast('Runbook completed (sample)')}},900);
+}
+renderList();renderDetail();
+
+/* ---------- hunting ---------- */
+tabsWire('huntTabs','hunt');
+const HR=[['11:41:08','Okta','m.okafor','Sign-in failed (x6)','Lagos, NG','<span class="pill s-high">Failure</span>'],['11:44:52','Okta','m.okafor','Sign-in succeeded','Frankfurt, DE','<span class="pill s-ok">Success</span>'],['11:45:10','Google Workspace','m.okafor','Mailbox rule created','Frankfurt, DE','<span class="pill s-medium">Suspicious</span>'],['10:02:33','AWS CloudTrail','ci-bot','ConsoleLogin','Ohio, US','<span class="pill s-ok">Success</span>']];
+function huntRender(){$('#huntRows').innerHTML=HR.map(r=>`<tr><td class="mono faint">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td class="muted">${r[4]}</td><td>${r[5]}</td></tr>`).join('')}
+huntRender();$('#huntGo').onclick=()=>{$('#huntRows').innerHTML='<tr><td colspan="6" class="empty"><span class="pulse"></span> Searching 7 sources…</td></tr>';setTimeout(huntRender,800)};
+(function(){const N=[['j.rivera',350,180,'#60a5fa'],['WS-FIN-07',200,100,'#22d3ee'],['powershell.exe',200,260,'#fbbf24'],['185.220.101.45',50,180,'#fb7185'],['SRV-FILE-01',500,100,'#22d3ee'],['svc-backup',500,260,'#60a5fa'],['91.92.240.11',50,300,'#fb7185']];
+ const E=[[0,1],[1,2],[2,3],[1,4],[0,5],[5,4],[2,6]];
+ $('#gsvg').innerHTML=E.map(e=>`<line x1="${N[e[0]][1]+60}" y1="${N[e[0]][2]}" x2="${N[e[1]][1]+60}" y2="${N[e[1]][2]}" style="stroke:var(--line2)" stroke-width="1.5"/>`).join('')+N.map(n=>`<g><circle cx="${n[1]+60}" cy="${n[2]}" r="14" fill="${n[3]}" opacity=".18"/><circle cx="${n[1]+60}" cy="${n[2]}" r="7" fill="${n[3]}"/><text x="${n[1]+60}" y="${n[2]+28}" style="fill:var(--tx2)" font-size="11" text-anchor="middle">${n[0]}</text></g>`).join('')})();
+
+/* ---------- runbooks ---------- */
+tabsWire('rbTabs','rb');
+function rbRender(){$('#rbRows').innerHTML=RB.map((r,k)=>`<tr><td><b>${r.n}</b><div class="small faint">${r.d}</div></td><td class="muted">${r.trig}</td><td><span class="pill ${r.mode==='Automatic'?'s-ai':'s-medium'}">${r.mode}</span></td><td>${r.ok}</td><td class="muted">${r.last}</td><td><span class="switch ${r.on?'on':''}" data-sw></span></td><td><button class="btn sm" data-edit="${k}">Edit</button></td></tr>`).join('')}
+rbRender();
+document.addEventListener('click',e=>{const b=e.target.closest('[data-edit]');if(b)openRb(RB[b.dataset.edit])});
+$('#newRb').onclick=()=>openRb(null);
+let draft;
+function openRb(r){
+ draft=r?{name:r.n,desc:r.d,mode:r.mode,sev:'Critical',steps:[{t:'isolate_host',n:'Isolate host'},{t:'enrich',n:'Enrich file hash'},{t:'notify',n:'Notify on-call'}]}:{name:'',desc:'',mode:'Requires approval',sev:'High',steps:[]};
+ draft.view='builder';drawRb();openDrawer('rbDrawer');
+}
+function toYaml(){const d=draft;return `name: ${d.name||'untitled-runbook'}\ndescription: ${d.desc||''}\ntrigger:\n  on: alert\n  severity: [${d.sev.toLowerCase()}]\nmode: ${d.mode==='Automatic'?'automatic':'requires_approval'}\nsteps:\n`+(d.steps.length?d.steps.map((s,k)=>`  - id: step${k+1}\n    name: ${s.n}\n    type: ${s.t}\n    on_failure: ${s.t==='notify'?'continue':'abort'}\n    timeout_seconds: 30`).join('\n'):'  []')}
+function drawRb(){
+ const d=draft,el=$('#rbDrawer');
+ el.innerHTML=`<header><h2>${d.name?'Edit runbook':'Create new runbook'}</h2><div class="seg" id="rbView"><button class="${d.view==='builder'?'on':''}">Builder</button><button class="${d.view==='yaml'?'on':''}">YAML</button></div><button class="iconbtn" id="rbX">${ico.x}</button></header>
+ <div class="body">${d.view==='yaml'?`<pre class="yaml">${toYaml().replace(/</g,'&lt;')}</pre><div class="small faint" style="margin-top:8px">Read-only preview of what will be saved. Use <b>Import</b> to paste your own YAML or JSON.</div>`:`
+  <div class="fld"><label>Name</label><input id="rbName" value="${d.name}" placeholder="e.g. Phishing response"></div>
+  <div class="fld"><label>Description</label><input id="rbDesc" value="${d.desc}" placeholder="What does this runbook do?"></div>
+  <div class="row2"><div class="fld"><label>Run when severity is at least</label><select id="rbSev">${['Critical','High','Medium','Low'].map(s=>`<option ${s===d.sev?'selected':''}>${s}</option>`).join('')}</select></div>
+   <div class="fld"><label>Execution</label><select id="rbMode"><option ${d.mode==='Automatic'?'selected':''}>Automatic</option><option ${d.mode!=='Automatic'?'selected':''}>Requires approval</option></select></div></div>
+  <div class="fld"><label>Steps</label>${d.steps.length?d.steps.map((s,k)=>`<div class="rstep"><span class="grip">${ico.grip}</span><span class="num">${k+1}</span><span class="nm"><b>${s.n}</b><div class="small faint mono">${s.t}</div></span><button class="iconbtn" data-up="${k}" title="Move up" style="width:26px;height:26px">↑</button><button class="iconbtn" data-rm="${k}" style="width:26px;height:26px">${ico.x}</button></div>`).join(''):'<div class="empty" style="border:1px dashed var(--line2);border-radius:10px;padding:22px">No steps yet. Add the first one below.</div>'}
+   <div style="display:flex;gap:8px;margin-top:10px"><select id="stType">${STEP_TYPES.map(s=>`<option value="${s[0]}">${s[1]}</option>`).join('')}</select><button class="btn" id="stAdd">+ Add step</button></div></div>`}
+ </div>
+ <footer><button class="btn" id="rbCancel">Cancel</button><button class="btn" id="rbTest">Test run</button><button class="btn pri" id="rbSave">Save runbook</button></footer>`;
+ const sync=()=>{if(draft.view!=='builder')return;draft.name=$('#rbName').value;draft.desc=$('#rbDesc').value;draft.sev=$('#rbSev').value;draft.mode=$('#rbMode').value};
+ $$('#rbView button').forEach((b,k)=>b.onclick=()=>{sync();draft.view=k?'yaml':'builder';drawRb()});
+ const close=()=>closeDrawers();$('#rbX').onclick=close;$('#rbCancel').onclick=close;
+ $('#rbTest').onclick=()=>toast('Dry run: '+d.steps.length+' steps validated (sample)');
+ $('#rbSave').onclick=()=>{sync();if(!draft.name){toast('Give the runbook a name first');return}RB.unshift({n:draft.name,d:draft.desc||'—',trig:draft.sev+'+ · alert',mode:draft.mode,ok:'—',last:'Never',on:true});rbRender();close();toast('Runbook saved')};
+ if(d.view==='builder'){
+  $('#stAdd').onclick=()=>{sync();const sel=$('#stType');d.steps.push({t:sel.value,n:sel.options[sel.selectedIndex].text});drawRb()};
+  $$('[data-rm]').forEach(b=>b.onclick=()=>{sync();d.steps.splice(+b.dataset.rm,1);drawRb()});
+  $$('[data-up]').forEach(b=>b.onclick=()=>{sync();const k=+b.dataset.up;if(k>0){[d.steps[k-1],d.steps[k]]=[d.steps[k],d.steps[k-1]]}drawRb()});
+ }
+}
+
+/* ---------- connectors ---------- */
+tabsWire('setTabs','set');
+let cf='All',cq='';
+seg($('#cFilter'),['All','Cloud & IAM','Endpoint / EDR','Network / SIEM'],'All',v=>{cf=v;cRender()});
+$('#cSearch').oninput=e=>{cq=e.target.value.toLowerCase();cRender()};
+function cRender(){
+ const l=CONNS.filter(c=>(cf==='All'||c[2]===cf)&&c[0].toLowerCase().includes(cq));
+ $('#cGrid').innerHTML=l.map((c,k)=>{const cls={Active:'s-ok',Degraded:'s-medium',Disconnected:'s-neutral'}[c[3]];
+  return `<div class="card conn"><div class="top2"><div class="cico">${c[1]}</div><div style="flex:1;min-width:0"><b>${c[0]}</b><div class="small faint">${c[2]}</div></div><button class="iconbtn" title="Configure" data-cfg="${c[0]}"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/></svg></button></div>
+  <div><span class="pill ${cls}">${c[3]}${c[3]==='Active'?' · '+c[4]:c[3]==='Degraded'?' · '+c[4]:''}</span></div>
+  <div class="stats"><div><b>${c[5]}</b>events / 24h</div><div><b>${c[6]?'2 min ago':'—'}</b>last sync</div></div>
+  <div class="foot">${c[6]?`<button class="btn sm" data-test="${c[0]}">Test connection</button><div class="sp"></div><span class="small faint">Streaming</span><span class="switch on" data-sw></span>`:`<button class="btn sm pri" data-conn="${c[0]}">Connect</button>`}</div></div>`}).join('')||'<div class="empty">No connectors match.</div>';
+ $$('[data-test]').forEach(b=>b.onclick=()=>{b.textContent='Testing…';b.disabled=true;setTimeout(()=>{b.textContent='Test connection';b.disabled=false;toast('Connection healthy · 212 ms (sample)')},900)});
+ $$('[data-conn],[data-cfg]').forEach(b=>b.onclick=()=>openConn(b.dataset.conn||b.dataset.cfg));
+}
+cRender();$('#addConn').onclick=()=>openConn(null);
+let cs=0,cName='';
+function openConn(n){cs=n?1:0;cName=n||'';drawConn();openDrawer('connDrawer')}
+function drawConn(){
+ const el=$('#connDrawer'),titles=['Choose a source','Credentials','Ingestion filters','Review & connect'];
+ let body='';
+ if(cs===0)body=`<input id="cpick" placeholder="Search 87 connectors…" style="margin-bottom:14px">`+CONNS.concat([['Auth0','A0'],['Datadog','DD'],['Cloudflare','CF'],['Duo Security','DU']]).map(c=>`<div class="action" style="cursor:pointer" data-pick="${c[0]}"><div class="cico">${c[1]}</div><div class="i"><b>${c[0]}</b></div></div>`).join('');
+ if(cs===1)body=`<div class="fld"><label>Connection name</label><input value="${cName} – Production"></div><div class="fld"><label>API endpoint</label><input class="mono" placeholder="https://api.example.com"></div><div class="row2"><div class="fld"><label>Client ID</label><input></div><div class="fld"><label>Client secret</label><input type="password" placeholder="••••••••"></div></div><div class="small faint">Secrets are encrypted before they are stored and are never shown again.</div>
+ <div style="margin-top:16px"><button class="btn" id="ctest">Test connection</button> <span id="cres" class="small"></span></div>`;
+ if(cs===2)body=`<div class="fld"><label>Event types to ingest</label>${['Authentication','Process & endpoint','Network flow','Admin / audit'].map(t=>`<div class="action"><div class="i">${t}</div><span class="switch on" data-sw></span></div>`).join('')}</div><div class="fld"><label>Poll interval</label><select><option>1 minute</option><option>5 minutes</option><option>15 minutes</option></select></div>`;
+ if(cs===3)body=`<div class="card"><b>${cName}</b><div class="small muted" style="margin-top:6px">Credentials verified · 4 event types · polling every 1 minute</div></div><div class="small faint" style="margin-top:12px">Events normally appear in Incidents within a few minutes.</div>`;
+ el.innerHTML=`<header><h2>${cName||'Connect new source'}</h2><button class="iconbtn" id="cx">${ico.x}</button></header><div class="body"><div class="steps">${titles.map((t,k)=>`<i class="${k<=cs?'on':''}"></i>`).join('')}</div><div class="faint small" style="margin-bottom:14px">Step ${cs+1} of 4 · ${titles[cs]}</div>${body}</div>
+ <footer>${cs>0?'<button class="btn" id="cb">Back</button>':''}<button class="btn pri" id="cn" ${cs===0?'disabled':''}>${cs===3?'Connect':'Continue'}</button></footer>`;
+ $('#cx').onclick=closeDrawers;
+ if($('#cb'))$('#cb').onclick=()=>{cs--;drawConn()};
+ $('#cn').onclick=()=>{if(cs===3){closeDrawers();toast(cName+' connected (sample)');return}cs++;drawConn()};
+ $$('[data-pick]').forEach(p=>p.onclick=()=>{cName=p.dataset.pick;cs=1;drawConn()});
+ if($('#ctest'))$('#ctest').onclick=()=>{$('#cres').textContent='Testing…';setTimeout(()=>{$('#cres').innerHTML='<span style="color:var(--ok)">✓ Connected · 184 ms (sample)</span>'},800)};
+}
+/* ---------- cases ---------- */
+const CASES=[
+ {id:'CASE-118',title:'FIN workstation ransomware outbreak',sev:'critical',status:'In progress',owner:'Maya Patel',inc:['INC-2041','INC-2039'],due:'Today 18:00',tasks:[['Contain affected hosts',true],['Collect forensic snapshot',true],['Reset credentials for affected users',false],['Notify legal & compliance',false],['Write post-incident review',false]]},
+ {id:'CASE-117',title:'Okta account takeover — Operations',sev:'high',status:'Open',owner:'Unassigned',inc:['INC-2040'],due:'Tomorrow',tasks:[['Revoke sessions',false],['Review mailbox rules',false]]},
+ {id:'CASE-116',title:'Leaked CI key rotation',sev:'medium',status:'Resolved',owner:'Sarath S',inc:['INC-2038'],due:'—',tasks:[['Rotate key',true],['Audit usage',true]]}
+];
+seg($('#viewSeg'),['Alerts','Cases'],'Alerts',v=>{view=v;renderList();renderDetail()});
+function renderCases(){
+ $('#statusSeg').style.display=$('#sevSeg').style.display=$('#incSearch').style.display='none';
+ $('#incCount').textContent=CASES.length;
+ $('#incList').innerHTML=CASES.map(c=>`<div class="inc ${c.id===curCase?'on':''}" data-c="${c.id}"><div style="display:flex;gap:8px;align-items:center">${sev(c.sev)}<span class="pill s-neutral">${c.status}</span><span class="sp"></span><span class="small mono faint">${c.id}</span></div><div class="t">${c.title}</div><div class="m"><span>${c.owner}</span><span>·</span><span>${c.inc.length} incident${c.inc.length>1?'s':''}</span><span class="sp"></span><span>Due ${c.due}</span></div></div>`).join('');
+ $$('#incList .inc').forEach(el=>el.onclick=()=>{curCase=el.dataset.c;renderCases();renderCaseDetail()});
+}
+function renderCaseDetail(){
+ const c=CASES.find(x=>x.id===curCase),done=c.tasks.filter(t=>t[1]).length;
+ $('#incDetail').innerHTML=`<div class="dh"><div style="flex:1"><div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">${sev(c.sev)}<span class="pill s-neutral">${c.status}</span><span class="mono faint">${c.id}</span></div><h2>${c.title}</h2><div class="tags"><span class="tag">Owner · ${c.owner}</span><span class="tag">Due ${c.due}</span></div></div><button class="btn sm" onclick="toast('Case exported (sample)')">Export report</button></div>
+ <div class="card" style="margin-bottom:16px"><h3>Progress <span class="faint" style="font-weight:400">${done} of ${c.tasks.length} tasks</span></h3><div class="prog" style="height:6px;margin:0 0 14px"><i style="width:${done/c.tasks.length*100}%"></i></div>
+  ${c.tasks.map((t,k)=>`<label class="action" style="cursor:pointer;margin-bottom:8px"><input type="checkbox" style="width:auto" ${t[1]?'checked':''} data-t="${k}"><div class="i" style="${t[1]?'text-decoration:line-through;color:var(--tx3)':''}">${t[0]}</div></label>`).join('')}</div>
+ <div class="card"><h3>Linked incidents</h3>${c.inc.map(id=>{const i=INC.find(x=>x.id===id);return `<div class="action" style="cursor:pointer" data-i="${id}">${sev(i.sev)}<div class="i">${i.title}</div><span class="mono faint small">${id}</span></div>`}).join('')}</div>`;
+ $$('#incDetail input[type=checkbox]').forEach(b=>b.onchange=()=>{c.tasks[b.dataset.t][1]=b.checked;renderCaseDetail()});
+ $$('#incDetail [data-i]').forEach(a=>a.onclick=()=>{view='Alerts';$$('#viewSeg button').forEach(x=>x.classList.toggle('on',x.textContent==='Alerts'));pick(a.dataset.i)});
+}
+
+/* ---------- copilot ---------- */
+$('#copX').innerHTML=ico.x;
+const COPREPLY={
+ 'Summarize this incident':'This looks like a hands-on-keyboard intrusion that started with a malicious document and escalated to file encryption within about 4 minutes. Two other hosts talked to the same external IP. I would contain WS-FIN-07 first, then review the other two. (Sample reply.)',
+ 'Is this IP seen elsewhere?':'Yes. The IP appears in 3 events across 2 other hosts in the last 7 days, all from the same user group. None triggered alerts on their own. (Sample reply.)',
+ 'What should I do first?':'1) Isolate WS-FIN-07 (needs approval). 2) Reset sessions for the affected user. 3) Run the ransomware runbook to snapshot the disk. (Sample reply.)'
+};
+let copMsgs=[];
+function copDraw(){
+ const i=INC.find(x=>x.id===cur);$('#copCtx').textContent=view==='Alerts'&&i?'Context: '+i.id:'';
+ $('#copBody').innerHTML=copMsgs.length?copMsgs.map(m=>`<div style="margin-bottom:14px;display:flex;gap:10px;align-items:flex-start;${m.u?'justify-content:flex-end':''}">${m.u?'':'<span class="botbadge sm">'+BOT+'</span>'}<div style="max-width:88%;padding:10px 14px;border-radius:12px;${m.u?'background:var(--accent);color:var(--on-accent)':'background:var(--elev);border:1px solid var(--line2)'}">${m.t}</div></div>`).join(''):`<div class="empty">Ask anything about the incident you're viewing.<br>Copilot only reads your data; it can't take action on its own.</div>`;
+ $('#copChips').innerHTML=Object.keys(COPREPLY).map(q=>`<button class="tag" style="cursor:pointer">${q}</button>`).join('');
+ $$('#copChips button').forEach(b=>b.onclick=()=>ask(b.textContent));
+ $('#copBody').scrollTop=1e6;
+}
+function ask(q){if(!q.trim())return;copMsgs.push({u:1,t:q});copMsgs.push({t:'<span class="pulse"></span> Thinking…'});copDraw();$('#copIn').value='';
+ setTimeout(()=>{copMsgs.pop();copMsgs.push({t:COPREPLY[q]||'I would check related events for the same user and host in the last 24 hours. (Sample reply.)'});copDraw()},900)}
+$('#openCop').onclick=()=>{copDraw();openDrawer('copDrawer')};
+$('#copX').onclick=closeDrawers;$('#copSend').onclick=()=>ask($('#copIn').value);$('#copIn').onkeydown=e=>{if(e.key==='Enter')ask(e.target.value)};
+
+/* ---------- detections ---------- */
+const DET=[
+ ['Mass file rename with new extension','critical','T1486 Impact',14,'2%',true],['Encoded PowerShell with network download','high','T1059.001 Execution',31,'6%',true],
+ ['Impossible travel sign-in','high','T1078 Initial Access',22,'11%',true],['New AWS region for access key','medium','T1552 Credential Access',9,'18%',true],
+ ['Repeated failed logins (internal scanner)','low','T1110 Credential Access',188,'71%',true],['OAuth app granted mailbox read','medium','T1098 Persistence',4,'5%',false]];
+let detF='All',detQ='';
+seg($('#detSeg'),['All','Critical','High','Noisy'],'All',v=>{detF=v;detRender()});$('#detQ').oninput=e=>{detQ=e.target.value.toLowerCase();detRender()};
+function detRender(){
+ const l=DET.filter(d=>d[0].toLowerCase().includes(detQ)&&(detF==='All'||(detF==='Noisy'?parseInt(d[4])>=15:d[1]===detF.toLowerCase())));
+ $('#detRows').innerHTML=l.map(d=>`<tr><td>${d[0]}</td><td>${sev(d[1])}</td><td class="mono muted">${d[2]}</td><td>${d[3]}</td><td><span class="pill ${parseInt(d[4])>=15?'s-medium':'s-neutral'}">${d[4]}</span></td><td><span class="switch ${d[5]?'on':''}" data-sw></span></td></tr>`).join('')||'<tr><td colspan="6" class="empty">No rules match.</td></tr>';
+}
+detRender();
+(function(){const T=[['Initial Access',7,9],['Execution',11,12],['Persistence',8,19],['Privilege Escalation',6,13],['Defense Evasion',14,42],['Credential Access',9,17],['Lateral Movement',5,9],['Command & Control',6,16],['Exfiltration',3,9],['Impact',8,13]];
+ $('#covGrid').innerHTML=T.map(t=>{const p=Math.round(t[1]/t[2]*100);return `<div class="bar"><span class="n" style="width:160px">${t[0]}</span><span class="t"><i style="width:${p}%;background:${p<50?'var(--med)':'var(--ok)'}"></i></span><span class="c" style="width:80px">${t[1]}/${t[2]} · ${p}%</span></div>`}).join('')+'<div class="small faint" style="margin-top:12px">Amber = under 50% of techniques covered. Coverage means a rule exists and is enabled, not that it has been proven against a real attack.</div>'})();
+
+/* ---------- SLA & shifts, compliance ---------- */
+$('#set-sla').innerHTML=`<div class="grid g2"><div class="card"><h3>Response targets</h3><table><thead><tr><th>Severity</th><th>Acknowledge within</th><th>Resolve within</th></tr></thead><tbody>${[['critical','5 min','1 h'],['high','15 min','4 h'],['medium','1 h','1 day'],['low','4 h','3 days']].map(r=>`<tr><td>${sev(r[0])}</td><td><input value="${r[1]}" style="max-width:120px"></td><td><input value="${r[2]}" style="max-width:120px"></td></tr>`).join('')}</tbody></table><div style="margin-top:12px"><button class="btn sm pri" onclick="toast('SLA targets saved (sample)')">Save targets</button></div></div>
+ <div class="card"><h3>On call this week</h3>${[['Mon–Wed','Maya Patel'],['Thu–Fri','Sarath S'],['Weekend','Tom Becker']].map(r=>`<div class="action"><div class="i"><b>${r[1]}</b><div class="small muted">${r[0]}</div></div></div>`).join('')}<button class="btn sm" onclick="toast('Shift editor opens here')">Edit schedule</button></div></div>`;
+$('#set-comp').innerHTML=`<div class="grid g3">${[['SOC 2','Generate evidence pack'],['ISO 27001','Generate evidence pack'],['Executive digest','Weekly summary for leadership']].map(r=>`<div class="card"><b>${r[0]}</b><div class="small muted" style="margin:6px 0 14px">${r[1]}</div><button class="btn sm" onclick="toast('${r[0]} report queued (sample)')">Generate</button></div>`).join('')}</div>`;
+</script>
+</body>
+</html>
