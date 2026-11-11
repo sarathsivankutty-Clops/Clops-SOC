@@ -228,9 +228,11 @@ export function AttackStory({
                       >
                         {index + 1}
                       </span>
-                      {index < stages.length - 1 && (
+                      {/* [HIDDEN-UI D2 CHR-AD-02 secondary vertical divider creating double-border clutter]
+                      index < stages.length - 1 && (
                         <span className="my-1 w-px grow bg-surface-elevated" aria-hidden="true" />
-                      )}
+                      )
+                      */}
                     </div>
                     <div className="pb-4">
                       <p className="text-sm font-medium text-fg-primary">{stage.label}</p>
