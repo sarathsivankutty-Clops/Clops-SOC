@@ -81,6 +81,7 @@ export function ContributorLeaderboard() {
           className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-400"
         >
           Contribute a rule
+          {/* [HIDDEN-UI D2 ICN-DT-06 decorative arrow glyph duplicated beside text label]
           <svg
             viewBox="0 0 20 20"
             className="h-3.5 w-3.5"
@@ -89,6 +90,7 @@ export function ContributorLeaderboard() {
           >
             <path d="M5.22 14.78a.75.75 0 001.06 0l7.22-7.22v3.69a.75.75 0 001.5 0v-5.5a.75.75 0 00-.75-.75h-5.5a.75.75 0 000 1.5h3.69L5.22 13.72a.75.75 0 000 1.06z" />
           </svg>
+          */}
         </a>
       </div>
 

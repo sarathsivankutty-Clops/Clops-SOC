@@ -192,7 +192,7 @@ function DetectionCard({ rule }: { rule: DetectionRule }) {
               : 'bg-surface-elevated text-fg-primary hover:bg-surface-elevated'
           )}
         >
-          {installed ? '✓ Installed' : installing ? '…' : 'Install Rule'}
+          {installed ? 'Installed' /* [HIDDEN-UI D2 ICN-DT-04 removed check glyph] */ : installing ? '…' : 'Install Rule'}
         </button>
       </div>
 
