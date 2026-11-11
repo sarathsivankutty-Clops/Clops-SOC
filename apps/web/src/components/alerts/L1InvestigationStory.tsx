@@ -115,7 +115,7 @@ export function L1InvestigationStory({
   const primaryAction = isBenign
     ? {
         type: 'no_action',
-        label: '✓ No Action Required — Close as Legitimate VPN Roaming',
+        label: 'No Action Required — Close as Legitimate VPN Roaming', /* [HIDDEN-UI D2 ICN-AL-02 removed check glyph] */
         summary: 'Close alert as verified benign corporate VPN activity and update 7-day travel baseline.',
         businessImpact: 'Zero operational disruption — user continues working normally.',
         whatHappens: [
@@ -126,7 +126,7 @@ export function L1InvestigationStory({
       }
     : {
         type: 'containment',
-        label: '🛡 Approve Containment: Lock Account & Remove Forwarding Rule',
+        label: 'Approve Containment: Lock Account & Remove Forwarding Rule', /* [HIDDEN-UI D2 ICN-AL-03 removed shield emoji] */
         summary: `Lock ${capitalizedUser}'s account immediately, revoke all active sessions, and remove unauthorized mail rules.`,
         businessImpact: `Low impact — affects only ${capitalizedUser}'s account; 0 shared production servers or databases impacted.`,
         whatHappens: [
@@ -320,7 +320,7 @@ export function L1InvestigationStory({
 
             {actionExecuted ? (
               <div className="rounded-lg border border-emerald-500/35 bg-emerald-500/10 p-2.5 text-emerald-300 text-[11.5px] flex items-center justify-between">
-                <span>✓ {actionExecuted}</span>
+                {/* [HIDDEN-UI D2 ICN-AL-05 removed check glyph] */}<span>{actionExecuted}</span>
                 <button
                   type="button"
                   onClick={() => setActionExecuted(null)}
@@ -360,14 +360,14 @@ export function L1InvestigationStory({
                     type="button"
                     className="flex-1 py-1 px-2 rounded-md border border-surface-border bg-surface-base text-[11px] text-fg-secondary hover:text-fg-primary hover:bg-surface-elevated transition-colors text-center"
                   >
-                    💬 Ask User on Slack
+                    Ask User on Slack /* [HIDDEN-UI D2 ICN-AL-06 removed speech bubble emoji] */
                   </button>
                   <button
                     type="button"
                     onClick={() => setUiMode('expert')}
                     className="flex-1 py-1 px-2 rounded-md border border-surface-border bg-surface-base text-[11px] text-fg-secondary hover:text-fg-primary hover:bg-surface-elevated transition-colors text-center"
                   >
-                    🔍 Deep Inspection
+                    Deep Inspection /* [HIDDEN-UI D2 ICN-AL-07 removed search emoji] */
                   </button>
                 </div>
               </div>
@@ -498,7 +498,7 @@ export function L1InvestigationStory({
                     <span className="font-mono">91/100</span>
                   </div>
                   <div className="font-mono text-[10px] text-fg-muted mt-1">
-                    Wave 0 (35) ──► Wave 1 (75) ──► Wave 2 (91 ★)
+                    Wave 0 (35) ──► Wave 1 (75) ──► Wave 2 (91) /* [HIDDEN-UI D2 ICN-AL-08 removed star glyph] */
                   </div>
                 </div>
                 <div className="p-2 rounded border border-surface-border bg-surface-base">

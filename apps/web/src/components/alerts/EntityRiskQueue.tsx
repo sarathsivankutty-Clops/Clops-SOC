@@ -313,9 +313,11 @@ function EntityRow({
       onClick={onSelect}
       className="w-full flex items-center gap-4 px-4 py-3 hover:bg-surface-elevated/20 transition-colors border-b border-surface-border/70 last:border-0 text-left"
     >
+      {/* [HIDDEN-UI D2 ICN-AL-09 hide decorative entity type emoji, keep text label]
       <span className="text-base shrink-0" aria-hidden>
         {cfg.icon}
       </span>
+      */}
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
