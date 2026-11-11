@@ -125,6 +125,7 @@ export function TimeWindowSelector({
           variant === 'compact' ? 'px-2.5 py-1 text-xs' : 'px-3 py-2 text-sm',
         )}
       >
+        {/* [HIDDEN-UI D2 ICN-SH-10 decorative clock icon beside window label]
         <svg
           className="h-3.5 w-3.5 text-fg-subtle"
           fill="none"
@@ -139,6 +140,7 @@ export function TimeWindowSelector({
             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
           />
         </svg>
+        */}
         {variant === 'full' && (
           <span className="text-fg-muted">Window:</span>
         )}

@@ -190,7 +190,8 @@ export function TopBar({ demoOffset = false }: TopBarProps) {
           className="inline-flex items-center gap-2 rounded-[9px] border border-violet-500/35 bg-violet-500/10 px-3 py-1.5 text-[12.5px] font-medium text-violet-400 transition-colors hover:bg-violet-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
           title="Open AI Copilot (⌘J)"
         >
-          <AiSpinner size="xs" state="idle" />
+          {/* [HIDDEN-UI D2 ICN-SH-03 decorative spinner next to AI Copilot label]
+          <AiSpinner size="xs" state="idle" /> */}
           <span>AI Copilot</span>
         </button>
 
@@ -199,6 +200,7 @@ export function TopBar({ demoOffset = false }: TopBarProps) {
 
         {/* Cluster 3: account */}
         <div className="flex items-center gap-2.5">
+        {/* [HIDDEN-UI D2 ICN-SH-05 / DUP-SH-01 bell is a plain link to /alerts, redundant with primary sidebar Alerts item]
         <Link
           href="/alerts"
           aria-label="Open notifications"
@@ -224,6 +226,7 @@ export function TopBar({ demoOffset = false }: TopBarProps) {
             className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full"
           />
         </Link>
+        */}
 
         {/* User avatar (matches mockup .ava) */}
         <div

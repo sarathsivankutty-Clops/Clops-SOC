@@ -270,20 +270,6 @@ export function TenantSwitcher({ className }: TenantSwitcherProps) {
 }
 
 function TenantIcon() {
-  return (
-    <svg
-      className="h-3.5 w-3.5 text-fg-subtle"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      aria-hidden
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2m-2 0V9m-7 12V9m0 0h7M5 21h2m-2 0V9m0 0h7"
-      />
-    </svg>
-  );
+  // [HIDDEN-UI D2 ICN-SH-09 decorative building icon beside tenant label]
+  return null;
 }
