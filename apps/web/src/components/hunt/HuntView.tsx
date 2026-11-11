@@ -261,12 +261,15 @@ interface NLHeroProps {
 function NLHero({ value, onChange, onSubmit, pending }: NLHeroProps) {
   const trimmed = value.trim();
 
+  // [HIDDEN-UI D2 CHR-HT-01 calm border and background instead of neon glow gradient]
   return (
-    <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-gradient-to-br from-brand-500/10 via-surface-card to-surface-card p-6 shadow-[0_0_60px_-30px_rgba(16,185,129,0.4)]">
+    <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card p-6">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
+        {/* [HIDDEN-UI D2 ICN-HT-01 decorative logo SVG beside heading]
         <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
           <path d="M10 3.5a.75.75 0 01.75.75v.578l4.97 1.243a.75.75 0 01.531.97l-1.5 5.25a.75.75 0 01-.5.51l-3.501 1.167V16h2.5a.75.75 0 010 1.5h-6.5a.75.75 0 010-1.5h2.5v-2.032l-3.5-1.166a.75.75 0 01-.5-.51l-1.5-5.25a.75.75 0 01.53-.971l4.97-1.243V4.25A.75.75 0 0110 3.5z" />
         </svg>
+        */}
         AiSOC Hunt
       </div>
       <h1 className="mt-2 text-2xl font-semibold tracking-tight text-fg-primary sm:text-3xl">
@@ -422,9 +425,11 @@ function SavedHuntsPanel({
                   className="inline-flex items-center gap-1 rounded border border-amber-500/30 bg-amber-500/10 px-1.5 py-0.5 text-[10px] text-amber-300"
                   title={`Scheduled: ${h.schedule}`}
                 >
+                  {/* [HIDDEN-UI D2 ICN-HT-03 decorative clock icon beside schedule text]
                   <svg className="h-2.5 w-2.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-13a.75.75 0 00-1.5 0v5c0 .2.08.39.22.53l3 3a.75.75 0 101.06-1.06l-2.78-2.78V5z" clipRule="evenodd" />
                   </svg>
+                  */}
                   {h.schedule}
                 </span>
               )}
@@ -447,7 +452,7 @@ function SavedHuntsPanel({
               className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[11px] font-medium text-emerald-300 transition-colors hover:border-emerald-500/60 hover:bg-emerald-500/20"
               title="Re-run this hunt"
             >
-              ▶ Run
+              Run /* [HIDDEN-UI D2 ICN-HT-04 removed decorative arrow glyph] */
             </button>
             <button
               onClick={() => onDelete(h)}
@@ -1070,7 +1075,7 @@ export function HuntView() {
               onClick={() => setHeroDismissed(false)}
               className="rounded-md border border-surface-border-strong bg-surface-sunken/70 px-2.5 py-1 text-xs text-fg-primary transition-colors hover:border-emerald-500/40 hover:text-emerald-300"
             >
-              ✦ Ask another question
+              Ask another question /* [HIDDEN-UI D2 ICN-HT-07 removed sparkle glyph] */
             </button>
             <span
               className={clsx(
@@ -1190,9 +1195,11 @@ export function HuntView() {
 
               {/* Time range */}
               <div className="ml-2 flex items-center gap-1.5 text-xs text-fg-secondary">
+                {/* [HIDDEN-UI D2 ICN-HT-08 decorative clock icon beside preset dropdown]
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
+                */}
                 <select
                   value={preset}
                   onChange={(e) => setPreset(e.target.value)}
@@ -1235,7 +1242,7 @@ export function HuntView() {
                       Running…
                     </>
                   ) : (
-                    <>▶ Run hunt</>
+                    <>Run hunt{/* [HIDDEN-UI D2 ICN-HT-09 removed arrow glyph] */}</>
                   )}
                 </button>
               </div>
