@@ -348,11 +348,8 @@ export function DashboardView() {
 
         {/* Row 1: Hero Greeting Banner (matches mockup .hero) */}
         <div
-          className="rounded-[14px] border border-surface-border p-[22px] flex flex-wrap items-center justify-between gap-5"
-          style={{
-            background:
-              'linear-gradient(135deg, rgba(20, 184, 166, 0.10), rgba(167, 139, 250, 0.07) 60%, var(--surface-card))',
-          }}
+          className="rounded-[14px] border border-surface-border bg-surface-card p-[22px] flex flex-wrap items-center justify-between gap-5"
+          /* [HIDDEN-UI D2 CHR-DB-02 removed marketing gradient background in favor of calm bg-surface-card; confirmed banner holds no unique CTA: all point to sidebar routes] */
         >
           <div>
             <h2 className="text-[19px] font-semibold tracking-[-0.02em] text-fg-primary">
