@@ -224,7 +224,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
         action={
           <Link
             href="/detection"
-            className="rounded-md border border-gray-700 px-4 py-2 text-sm text-gray-300 hover:bg-gray-800"
+            className="rounded-md border border-surface-border px-4 py-2 text-sm text-fg-secondary hover:bg-surface-elevated"
           >
             Back to rules
           </Link>
@@ -503,12 +503,12 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
         <div className="flex items-center gap-3">
           <Link
             href="/detection"
-            className="text-sm text-gray-500 hover:text-gray-300"
+            className="text-sm text-fg-muted hover:text-fg-secondary"
           >
             ← Detection rules
           </Link>
-          <span className="text-gray-700">/</span>
-          <h1 className="truncate text-xl font-semibold text-gray-100">
+          <span className="text-fg-faint">/</span>
+          <h1 className="truncate text-xl font-semibold text-fg-primary">
             {mode === 'create' ? 'New rule' : (data?.name ?? 'Editing…')}
           </h1>
         </div>
@@ -598,10 +598,10 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
           {(evalVerdict.candidateMitre !== undefined ||
             evalVerdict.baselineMitre !== undefined ||
             evalVerdict.dropPp !== undefined) && (
-            <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-gray-200 sm:grid-cols-4">
+            <div className="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-xs text-fg-primary sm:grid-cols-4">
               {evalVerdict.candidateMitre !== undefined && (
                 <div>
-                  <span className="text-gray-400">Candidate MITRE</span>{' '}
+                  <span className="text-fg-muted">Candidate MITRE</span>{' '}
                   <span className="font-mono">
                     {(evalVerdict.candidateMitre * 100).toFixed(1)}%
                   </span>
@@ -609,7 +609,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               )}
               {evalVerdict.baselineMitre !== undefined && (
                 <div>
-                  <span className="text-gray-400">Baseline MITRE</span>{' '}
+                  <span className="text-fg-muted">Baseline MITRE</span>{' '}
                   <span className="font-mono">
                     {(evalVerdict.baselineMitre * 100).toFixed(1)}%
                   </span>
@@ -617,7 +617,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               )}
               {evalVerdict.dropPp !== undefined && (
                 <div>
-                  <span className="text-gray-400">Δ pp</span>{' '}
+                  <span className="text-fg-muted">Δ pp</span>{' '}
                   <span className="font-mono">
                     {evalVerdict.dropPp >= 0 ? '+' : ''}
                     {(-evalVerdict.dropPp).toFixed(2)}
@@ -626,7 +626,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               )}
               {evalVerdict.maxRegressionPp !== undefined && (
                 <div>
-                  <span className="text-gray-400">Gate</span>{' '}
+                  <span className="text-fg-muted">Gate</span>{' '}
                   <span className="font-mono">
                     ≤ {evalVerdict.maxRegressionPp.toFixed(2)} pp
                   </span>
@@ -634,7 +634,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               )}
               {evalVerdict.durationSeconds !== undefined && (
                 <div>
-                  <span className="text-gray-400">Runtime</span>{' '}
+                  <span className="text-fg-muted">Runtime</span>{' '}
                   <span className="font-mono">
                     {evalVerdict.durationSeconds.toFixed(1)}s
                   </span>
@@ -647,7 +647,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               so the analyst can jump to the PR without leaving the editor. */}
           {evalVerdict.githubPrUrl && (
             <div className="mt-2 flex items-center gap-1.5 text-xs">
-              <span className="text-gray-400">GitHub PR</span>
+              <span className="text-fg-muted">GitHub PR</span>
               <a
                 href={evalVerdict.githubPrUrl}
                 target="_blank"
@@ -705,7 +705,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
                   'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
                   language === l.id
                     ? 'border-blue-500/60 bg-blue-500/10 text-blue-300'
-                    : 'border-gray-800 bg-gray-900/40 text-gray-400 hover:bg-gray-800',
+                    : 'border-surface-border bg-surface-card/40 text-fg-muted hover:bg-surface-elevated',
                 )}
               >
                 {l.label}
@@ -718,7 +718,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
             <button
               type="button"
               onClick={() => setShowBuilder((v) => !v)}
-              className="rounded-md border border-gray-800 bg-gray-900/40 px-3 py-1.5 text-xs font-medium text-gray-300 hover:border-blue-500/60"
+              className="rounded-md border border-surface-border bg-surface-card/40 px-3 py-1.5 text-xs font-medium text-fg-secondary hover:border-blue-500/60"
             >
               {showBuilder ? 'Hide no-code builder' : 'No-code builder'}
             </button>
@@ -757,8 +757,8 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
           )}
 
           {/* Editor */}
-          <div className="overflow-hidden rounded-lg border border-gray-800 bg-[#0d1117]">
-            <div className="flex items-center justify-between border-b border-gray-800 px-3 py-2 text-xs text-gray-500">
+          <div className="overflow-hidden rounded-lg border border-surface-border bg-surface-sunken">
+            <div className="flex items-center justify-between border-b border-surface-border px-3 py-2 text-xs text-fg-muted">
               <span>
                 {LANGS.find((l) => l.id === language)?.label ?? 'Engine'} •
                 detection logic
@@ -793,15 +793,15 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               "Unsupported rule language" on every click, which is a dead
               control wearing a working one's clothes. */}
           <div
-            className="rounded-lg border border-gray-800 bg-gray-900/40"
+            className="rounded-lg border border-surface-border bg-surface-card/40"
             hidden={logicIsReadOnly}
           >
-            <div className="flex items-center justify-between border-b border-gray-800 px-4 py-2.5">
+            <div className="flex items-center justify-between border-b border-surface-border px-4 py-2.5">
               <div>
-                <h3 className="text-sm font-semibold text-gray-200">
+                <h3 className="text-sm font-semibold text-fg-primary">
                   Test against a sample event
                 </h3>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-fg-muted">
                   Paste a JSON event and evaluate this rule before going live.
                 </p>
               </div>
@@ -817,8 +817,8 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               </button>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="border-b border-gray-800 lg:border-b-0 lg:border-r">
-                <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider text-gray-500">
+              <div className="border-b border-surface-border lg:border-b-0 lg:border-r">
+                <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider text-fg-muted">
                   Sample event (JSON)
                 </div>
                 <div className="h-56">
@@ -837,12 +837,12 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
                 </div>
               </div>
               <div>
-                <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider text-gray-500">
+                <div className="px-3 py-1.5 text-[11px] uppercase tracking-wider text-fg-muted">
                   Result
                 </div>
                 <div className="h-56 overflow-y-auto px-4 py-3 text-sm">
                   {!testResult ? (
-                    <div className="flex h-full items-center justify-center text-xs text-gray-600">
+                    <div className="flex h-full items-center justify-center text-xs text-fg-faint">
                       Click &ldquo;Run test&rdquo; to evaluate the rule.
                     </div>
                   ) : testResult.matches > 0 ? (
@@ -852,25 +852,25 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
                         Matched {testResult.matches} event
                         {testResult.matches > 1 ? 's' : ''}
                       </div>
-                      <pre className="max-h-40 overflow-auto rounded-md bg-gray-950 px-3 py-2 font-mono text-[11px] text-gray-300">
+                      <pre className="max-h-40 overflow-auto rounded-md bg-surface-sunken px-3 py-2 font-mono text-[11px] text-fg-secondary">
                         {JSON.stringify(testResult.preview[0] ?? {}, null, 2)}
                       </pre>
                     </div>
                   ) : (
-                    <div className="inline-flex items-center gap-2 rounded-md bg-gray-800 px-2 py-1 text-xs text-gray-300 ring-1 ring-gray-700">
+                    <div className="inline-flex items-center gap-2 rounded-md bg-surface-elevated px-2 py-1 text-xs text-fg-secondary ring-1 ring-surface-border">
                       <span className="h-1.5 w-1.5 rounded-full bg-gray-500" />
                       No match — rule did not fire on this sample.
                     </div>
                   )}
                 </div>
                 {/* Wave 2 (W2.3) — backtest a saved rule over historical lake events */}
-                <div className="mt-3 rounded-lg border border-gray-800 bg-gray-900/40 p-3">
+                <div className="mt-3 rounded-lg border border-surface-border bg-surface-card/40 p-3">
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-xs font-medium text-gray-300">
+                    <span className="text-xs font-medium text-fg-secondary">
                       Backtest over history
                     </span>
                     <div className="flex items-center gap-2">
-                      <label className="text-[11px] text-gray-500">days</label>
+                      <label className="text-[11px] text-fg-muted">days</label>
                       <input
                         type="number"
                         min={1}
@@ -884,7 +884,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
                             ),
                           )
                         }
-                        className="w-16 rounded-md border border-gray-800 bg-gray-950 px-2 py-1 text-xs text-gray-200 outline-none focus:border-blue-500/60"
+                        className="w-16 rounded-md border border-surface-border bg-surface-sunken px-2 py-1 text-xs text-fg-primary outline-none focus:border-brand-500/60"
                       />
                       <button
                         type="button"
@@ -898,12 +898,12 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
                   </div>
                   <div className="mt-2">
                     {!data?.id ? (
-                      <p className="text-[11px] text-gray-600">
+                      <p className="text-[11px] text-fg-faint">
                         Save the rule to backtest it against real historical
                         events.
                       </p>
                     ) : !backtestResult ? (
-                      <p className="text-[11px] text-gray-600">
+                      <p className="text-[11px] text-fg-faint">
                         Run a backtest to see how many past events this rule
                         would have fired on.
                       </p>
@@ -912,7 +912,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
                         {backtestResult.error}
                       </p>
                     ) : (
-                      <p className="text-[11px] text-gray-300">
+                      <p className="text-[11px] text-fg-secondary">
                         Would fire on{' '}
                         <span className="font-semibold text-emerald-300">
                           {backtestResult.wouldFire}
@@ -937,7 +937,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Suspicious PowerShell Encoded Command"
-              className="w-full rounded-md border border-gray-800 bg-gray-950 px-3 py-2 text-sm text-gray-200 outline-none focus:border-blue-500/60"
+              className="w-full rounded-md border border-surface-border bg-surface-sunken px-3 py-2 text-sm text-fg-primary outline-none focus:border-brand-500/60"
             />
           </FormSection>
 
@@ -947,7 +947,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               onChange={(e) => setDescription(e.target.value)}
               rows={3}
               placeholder="What does this rule catch? Why does it matter? Link to threat intel if useful."
-              className="w-full resize-none rounded-md border border-gray-800 bg-gray-950 px-3 py-2 text-sm text-gray-200 outline-none focus:border-blue-500/60"
+              className="w-full resize-none rounded-md border border-surface-border bg-surface-sunken px-3 py-2 text-sm text-fg-primary outline-none focus:border-brand-500/60"
             />
           </FormSection>
 
@@ -962,7 +962,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
                     'rounded-md px-2 py-1.5 text-xs font-medium capitalize ring-1 transition-colors',
                     severity === sev
                       ? severityActive(sev)
-                      : 'bg-gray-900/40 text-gray-400 ring-gray-800 hover:bg-gray-800',
+                      : 'bg-surface-card/40 text-fg-muted ring-surface-border hover:bg-surface-elevated',
                   )}
                 >
                   {sev}
@@ -979,7 +979,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
                 'flex w-full items-center justify-between rounded-md border px-3 py-2 text-sm transition-colors',
                 enabled
                   ? 'border-emerald-500/40 bg-emerald-500/5 text-emerald-300'
-                  : 'border-gray-800 bg-gray-900/40 text-gray-400',
+                  : 'border-surface-border bg-surface-card/40 text-fg-muted',
               )}
             >
               <span>
@@ -988,7 +988,7 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               <span
                 className={clsx(
                   'relative inline-flex h-5 w-9 items-center rounded-full transition-colors',
-                  enabled ? 'bg-emerald-500/70' : 'bg-gray-700',
+                  enabled ? 'bg-emerald-500/70' : 'bg-surface-hover',
                 )}
               >
                 <span
@@ -1028,27 +1028,27 @@ export function RuleEditor({ mode, ruleId }: RuleEditorProps) {
               placeholder="windows, lolbin, cloud"
               chips={tags}
               onRemove={(t) => setTags(tags.filter((x) => x !== t))}
-              chipClassName="bg-gray-800 text-gray-300 ring-gray-700"
+              chipClassName="bg-surface-elevated text-fg-secondary ring-surface-border"
             />
           </FormSection>
 
           {mode === 'edit' && data && (
-            <div className="rounded-md border border-gray-800 bg-gray-900/40 p-3 text-xs text-gray-500">
+            <div className="rounded-md border border-surface-border bg-surface-card/40 p-3 text-xs text-fg-muted">
               <div>
                 Created{' '}
-                <span className="text-gray-400" suppressHydrationWarning>
+                <span className="text-fg-muted" suppressHydrationWarning>
                   {new Date(data.createdAt).toLocaleString()}
                 </span>
               </div>
               <div className="mt-0.5">
                 Updated{' '}
-                <span className="text-gray-400" suppressHydrationWarning>
+                <span className="text-fg-muted" suppressHydrationWarning>
                   {new Date(data.updatedAt).toLocaleString()}
                 </span>
               </div>
               {data.hitCount != null && (
                 <div className="mt-0.5">
-                  <span className="font-mono text-gray-300">
+                  <span className="font-mono text-fg-secondary">
                     {data.hitCount}
                   </span>{' '}
                   total hits
@@ -1077,12 +1077,12 @@ function FormSection({
 }) {
   return (
     <div>
-      <label className="flex items-baseline gap-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+      <label className="flex items-baseline gap-1 text-xs font-medium uppercase tracking-wider text-fg-muted">
         <span>{label}</span>
         {required && <span className="text-red-400">*</span>}
       </label>
       <div className="mt-1.5">{children}</div>
-      {hint && <p className="mt-1 text-[11px] text-gray-600">{hint}</p>}
+      {hint && <p className="mt-1 text-[11px] text-fg-faint">{hint}</p>}
     </div>
   );
 }
@@ -1119,7 +1119,7 @@ function ChipInput({
         }}
         onBlur={() => value.trim() && onCommit()}
         placeholder={placeholder}
-        className="w-full rounded-md border border-gray-800 bg-gray-950 px-3 py-2 text-sm text-gray-200 outline-none focus:border-blue-500/60"
+        className="w-full rounded-md border border-surface-border bg-surface-sunken px-3 py-2 text-sm text-fg-primary outline-none focus:border-brand-500/60"
       />
       {chips.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
@@ -1130,11 +1130,11 @@ function ChipInput({
               onClick={() => onRemove(chip)}
               className={clsx(
                 'group inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[11px] font-mono ring-1',
-                chipClassName ?? 'bg-gray-800 text-gray-300 ring-gray-700',
+                chipClassName ?? 'bg-surface-elevated text-fg-secondary ring-surface-border',
               )}
             >
               {chip}
-              <span className="text-gray-500 opacity-0 transition-opacity group-hover:opacity-100">
+              <span className="text-fg-muted opacity-0 transition-opacity group-hover:opacity-100">
                 ×
               </span>
             </button>
@@ -1156,7 +1156,7 @@ function severityActive(sev: AlertSeverity): string {
     case 'low':
       return 'bg-blue-500/15 text-blue-300 ring-blue-500/40';
     case 'info':
-      return 'bg-slate-500/15 text-slate-300 ring-slate-500/40';
+      return 'bg-slate-500/15 text-fg-secondary ring-surface-border-strong/40';
   }
 }
 

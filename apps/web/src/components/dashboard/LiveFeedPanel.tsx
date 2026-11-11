@@ -71,7 +71,7 @@ const SEVERITY_COLORS: Record<Severity, string> = {
   high: 'bg-orange-500/20 text-orange-300 border border-orange-500/30',
   medium: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
   low: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
-  info: 'bg-gray-500/20 text-gray-300 border border-gray-500/30',
+  info: 'bg-gray-500/20 text-fg-secondary border border-surface-border-strong/30',
 };
 
 // Deterministic base — no Date.now() to avoid SSR hydration mismatches.
@@ -262,9 +262,9 @@ export function LiveFeedPanel() {
   const pill = statusToLabel(status, hasReal, showingDemo);
 
   return (
-    <div className="bg-[#111620] border border-gray-800/60 rounded-lg p-4">
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-lg p-4">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-medium text-gray-200 flex items-center gap-2">
+        <h3 className="text-sm font-medium text-fg-secondary flex items-center gap-2">
           <span
             className={clsx(
               'w-2 h-2 rounded-full',
@@ -282,7 +282,7 @@ export function LiveFeedPanel() {
             pill.tone === 'live' && 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
             pill.tone === 'reconnect' && 'bg-amber-500/10 text-amber-300 border-amber-500/30',
             (pill.tone === 'demo' || pill.tone === 'idle') &&
-              'bg-gray-500/10 text-gray-400 border-gray-700',
+              'bg-gray-500/10 text-fg-muted border-surface-border',
           )}
           title={
             pill.tone === 'demo'
@@ -296,7 +296,7 @@ export function LiveFeedPanel() {
 
       <div className="space-y-2.5 overflow-y-auto max-h-52 pr-1">
         {visible.length === 0 && (
-          <p data-testid="live-feed-empty" className="text-xs text-gray-500 leading-relaxed">
+          <p data-testid="live-feed-empty" className="text-xs text-fg-subtle leading-relaxed">
             {status === 'open'
               ? 'No alerts yet. Fused alerts stream in here as your connectors poll and detections fire.'
               : 'Not receiving events. This panel streams fused alerts from the realtime service; check that it is running and reachable.'}
@@ -314,17 +314,17 @@ export function LiveFeedPanel() {
             </span>
             <div className="min-w-0 flex-1">
               {event.isDemo ? (
-                <p className="text-xs text-gray-300 leading-tight truncate">{event.text}</p>
+                <p className="text-xs text-fg-secondary leading-tight truncate">{event.text}</p>
               ) : (
                 <Link
                   href={`/alerts/${event.id}`}
-                  className="text-xs text-gray-300 leading-tight truncate hover:text-brand-400 hover:underline block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-500/50 rounded"
+                  className="text-xs text-fg-secondary leading-tight truncate hover:text-brand-400 hover:underline block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-500/50 rounded"
                   title={`Open alert ${event.id}`}
                 >
                   {event.text}
                 </Link>
               )}
-              <p className="text-[11px] text-gray-600 mt-0.5">
+              <p className="text-[11px] text-fg-subtle mt-0.5">
                 {event.source} · {relativeTime(event.receivedAt, now)}
               </p>
             </div>

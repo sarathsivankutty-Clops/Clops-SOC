@@ -42,7 +42,7 @@ const SEVERITY_STYLES: Record<string, string> = {
   high: 'bg-orange-500/15 text-orange-300 border-orange-500/30',
   medium: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
   low: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
-  info: 'bg-slate-500/15 text-slate-300 border-slate-500/30',
+  info: 'bg-slate-500/15 text-fg-secondary border-surface-border-strong/30',
 };
 
 export function AccessReviewView() {
@@ -119,8 +119,8 @@ export function AccessReviewView() {
   return (
     <div className="space-y-6 p-6">
       <header className="space-y-2">
-        <h1 className="text-2xl font-semibold">Access review</h1>
-        <p className="max-w-3xl text-sm text-slate-400">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-semibold */>Access review</h1>
+        <p className="max-w-3xl text-sm text-fg-muted">
           What each principal was granted, through which object, and whether it was used.
           This page is read-only: every finding names the object to change and nothing here
           changes it for you.
@@ -128,12 +128,12 @@ export function AccessReviewView() {
       </header>
 
       <div className="flex flex-wrap items-center gap-3">
-        <label className="text-sm text-slate-400" htmlFor="access-review-provider">
+        <label className="text-sm text-fg-muted" htmlFor="access-review-provider">
           Provider
         </label>
         <select
           id="access-review-provider"
-          className="rounded border border-slate-700 bg-slate-900 px-3 py-1.5 text-sm"
+          className="rounded border border-surface-border bg-surface-card px-3 py-1.5 text-sm"
           value={provider}
           onChange={(event) => setProvider(event.target.value)}
         >
@@ -150,7 +150,7 @@ export function AccessReviewView() {
             type="button"
             disabled={running}
             onClick={() => void runFor(p)}
-            className="rounded border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-500 disabled:opacity-50"
+            className="rounded border border-surface-border px-3 py-1.5 text-xs text-fg-secondary hover:border-surface-border-strong disabled:opacity-50"
           >
             {running ? 'Running…' : `Review ${p}`}
           </button>
@@ -163,12 +163,12 @@ export function AccessReviewView() {
         </div>
       ) : null}
 
-      {loading ? <p className="text-sm text-slate-400">Loading…</p> : null}
+      {loading ? <p className="text-sm text-fg-muted">Loading…</p> : null}
 
       {!loading && !error && summary?.state === 'never_run' ? (
-        <div className="rounded border border-slate-700 bg-slate-900/60 p-5">
+        <div className="rounded border border-surface-border bg-surface-card/60 p-5">
           <h2 className="text-base font-medium">Nothing has been reviewed yet</h2>
-          <p className="mt-2 max-w-2xl text-sm text-slate-400">{summary.note}</p>
+          <p className="mt-2 max-w-2xl text-sm text-fg-muted">{summary.note}</p>
         </div>
       ) : null}
 
@@ -177,12 +177,12 @@ export function AccessReviewView() {
           <h2 className="text-base font-medium">Coverage</h2>
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
             {summary.providers.map((row) => (
-              <article key={row.provider} className="rounded border border-slate-700 bg-slate-900/60 p-4">
+              <article key={row.provider} className="rounded border border-surface-border bg-surface-card/60 p-4">
                 <div className="flex items-baseline justify-between">
-                  <h3 className="text-sm font-medium uppercase tracking-wide text-slate-300">
+                  <h3 className="text-sm font-medium uppercase tracking-wide text-fg-secondary">
                     {row.provider}
                   </h3>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-fg-subtle">
                     {row.last_run_at ? new Date(row.last_run_at).toLocaleString() : 'never'}
                   </span>
                 </div>
@@ -193,18 +193,18 @@ export function AccessReviewView() {
                     not a clean bill of health.
                   </p>
                 ) : (
-                  <dl className="mt-3 space-y-1 text-sm text-slate-400">
+                  <dl className="mt-3 space-y-1 text-sm text-fg-muted">
                     <div className="flex justify-between">
                       <dt>Principals reviewed</dt>
-                      <dd className="text-slate-200">{row.reviewed_principals}</dd>
+                      <dd className="text-fg-primary">{row.reviewed_principals}</dd>
                     </div>
                     <div className="flex justify-between">
                       <dt>Open findings</dt>
-                      <dd className="text-slate-200">{row.finding_count}</dd>
+                      <dd className="text-fg-primary">{row.finding_count}</dd>
                     </div>
                     <div className="flex justify-between">
                       <dt>Usage measured for</dt>
-                      <dd className="text-slate-200">
+                      <dd className="text-fg-primary">
                         {row.usage_measured_for} / {row.reviewed_principals}
                       </dd>
                     </div>
@@ -231,7 +231,7 @@ export function AccessReviewView() {
           </h2>
 
           {findings.length === 0 ? (
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-fg-muted">
               No open findings for the selected provider. Check the coverage cards above for
               whether that is because nothing was wrong or because nothing could be reviewed.
             </p>
@@ -240,7 +240,7 @@ export function AccessReviewView() {
               {findings.map((finding) => (
                 <li
                   key={finding.id}
-                  className="rounded border border-slate-700 bg-slate-900/60 p-4 space-y-2"
+                  className="rounded border border-surface-border bg-surface-card/60 p-4 space-y-2"
                 >
                   <div className="flex flex-wrap items-center gap-2">
                     <span
@@ -250,24 +250,24 @@ export function AccessReviewView() {
                     >
                       {finding.severity}
                     </span>
-                    <span className="text-xs uppercase tracking-wide text-slate-500">
+                    <span className="text-xs uppercase tracking-wide text-fg-subtle">
                       {finding.provider}
                     </span>
-                    <h3 className="text-sm font-medium text-slate-100">{finding.title}</h3>
+                    <h3 className="text-sm font-medium text-fg-primary">{finding.title}</h3>
                   </div>
 
-                  <p className="font-mono text-xs text-slate-400">{finding.principal_id}</p>
-                  <p className="text-sm text-slate-300">{finding.detail}</p>
+                  <p className="font-mono text-xs text-fg-muted">{finding.principal_id}</p>
+                  <p className="text-sm text-fg-secondary">{finding.detail}</p>
 
-                  <div className="rounded bg-slate-950/60 p-3 text-sm">
-                    <p className="text-slate-400">
-                      <span className="text-slate-500">Change: </span>
+                  <div className="rounded bg-surface-base/60 p-3 text-sm">
+                    <p className="text-fg-muted">
+                      <span className="text-fg-subtle">Change: </span>
                       {finding.object_hint}
                     </p>
-                    <p className="mt-1 text-slate-300">{finding.recommendation}</p>
+                    <p className="mt-1 text-fg-secondary">{finding.recommendation}</p>
                     {finding.best_fit_role ? (
-                      <p className="mt-1 text-slate-300">
-                        <span className="text-slate-500">Smallest role covering what was used: </span>
+                      <p className="mt-1 text-fg-secondary">
+                        <span className="text-fg-subtle">Smallest role covering what was used: </span>
                         <code>{finding.best_fit_role}</code>
                       </p>
                     ) : null}
@@ -283,7 +283,7 @@ export function AccessReviewView() {
                   <button
                     type="button"
                     onClick={() => void acknowledge(finding)}
-                    className="rounded border border-slate-700 px-3 py-1 text-xs text-slate-300 hover:border-slate-500"
+                    className="rounded border border-surface-border px-3 py-1 text-xs text-fg-secondary hover:border-surface-border-strong"
                   >
                     Acknowledge
                   </button>

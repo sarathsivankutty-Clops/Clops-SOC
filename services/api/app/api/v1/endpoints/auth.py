@@ -14,11 +14,13 @@ from app.api.v1.deps import AuthUser, DBSession, get_current_user
 
 __all__ = ["router", "get_current_user"]
 from app.core.config import settings
+from app.core.logging import safe_log_value
 from app.core.role_grants import wildcard_roles as WILDCARD_ROLES
 from app.core.security import (
     create_access_token,
     create_refresh_token,
     decode_token,
+    record_auth_metric,
     token_is_revoked,
     verify_password,
 )
@@ -92,8 +94,11 @@ async def login(request: LoginRequest, http_request: Request, db: DBSession) -> 
     """Authenticate with email/password, return JWT tokens."""
     throttle = get_login_throttle()
     source = client_ip(http_request)
+    record_auth_metric("password", "login_started", "initiated")
     decision = await throttle.check(email=request.email, source_ip=source)
     if not decision.allowed:
+        logger.warning("auth.login_throttled ip=%s", safe_log_value(source, 64))
+        record_auth_metric("password", "login_completed", "throttled")
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail=decision.detail,
@@ -105,6 +110,8 @@ async def login(request: LoginRequest, http_request: Request, db: DBSession) -> 
 
     if user is None or not verify_password(request.password, user.hashed_password):
         locked = await throttle.record_failure(email=request.email, source_ip=source)
+        logger.warning("auth.login_failed reason=invalid_credentials ip=%s", safe_log_value(source, 64))
+        record_auth_metric("password", "login_completed", "invalid_credentials")
         if locked.locked_out:
             logger.warning(
                 "login lockout: %s principal locked after %d failures (ip=%s)",
@@ -127,6 +134,12 @@ async def login(request: LoginRequest, http_request: Request, db: DBSession) -> 
     sso_enabled = (settings_dict().get("SSO_ENABLED") or "false").strip().lower() in {"1", "true", "yes", "on"}
     local_admin_only = (settings_dict().get("SSO_LOCAL_ADMIN_ONLY") or "false").strip().lower() in {"1", "true", "yes", "on"}
     if sso_enabled and local_admin_only and user.role not in WILDCARD_ROLES():
+        logger.warning(
+            "auth.login_failed reason=sso_required user_id=%s role=%s",
+            safe_log_value(user.id, 64),
+            safe_log_value(user.role, 40),
+        )
+        record_auth_metric("password", "login_completed", "sso_policy_denied")
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Password sign-in is disabled for this account. Use single sign-on.",
@@ -141,6 +154,12 @@ async def login(request: LoginRequest, http_request: Request, db: DBSession) -> 
     # either optional is a break for every generated client.
     challenge = await mfa_challenge_for(db, user_id=user.id, tenant_id=user.tenant_id, role=user.role)
     if challenge is not None:
+        logger.info(
+            "auth.login_mfa_challenge user_id=%s tenant_id=%s",
+            safe_log_value(user.id, 64),
+            safe_log_value(user.tenant_id, 64),
+        )
+        record_auth_metric("password", "login_completed", "mfa_challenged")
         return JSONResponse(status_code=status.HTTP_202_ACCEPTED, content=challenge)
 
     # Update last login
@@ -154,6 +173,14 @@ async def login(request: LoginRequest, http_request: Request, db: DBSession) -> 
     }
     access_token = create_access_token(token_data)
     refresh_token = create_refresh_token(token_data)
+
+    logger.info(
+        "auth.login_succeeded user_id=%s tenant_id=%s role=%s",
+        safe_log_value(user.id, 64),
+        safe_log_value(user.tenant_id, 64),
+        safe_log_value(user.role, 40),
+    )
+    record_auth_metric("password", "login_completed", "succeeded")
 
     return TokenResponse(
         access_token=access_token,
@@ -245,20 +272,30 @@ async def refresh_token(request: RefreshRequest, db: DBSession) -> TokenResponse
     try:
         payload = decode_token(request.refresh_token)
         if payload.get("type") != "refresh":
+            logger.warning("auth.token_refresh_failed reason=invalid_token_type")
+            record_auth_metric("session", "token_refresh", "invalid_token_type")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token type")
         user_id = payload.get("sub")
+    except HTTPException:
+        raise
     except Exception as e:
+        logger.warning("auth.token_refresh_failed reason=invalid_token")
+        record_auth_metric("session", "token_refresh", "invalid_token")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token") from e
 
     result = await db.execute(select(User).where(User.id == uuid.UUID(user_id), User.is_active.is_(True)))
     user = result.scalar_one_or_none()
     if user is None:
+        logger.warning("auth.token_refresh_failed reason=user_not_found")
+        record_auth_metric("session", "token_refresh", "user_not_found")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
     # A refresh token outlives an access token by days, so without this a
     # deprovisioned principal who is later re-activated could mint a fresh
     # session from a token issued before the revocation.
     if token_is_revoked(payload.get("iat"), user.sessions_revoked_at):
+        logger.warning("auth.token_refresh_failed reason=session_revoked user_id=%s", safe_log_value(user.id, 64))
+        record_auth_metric("session", "token_refresh", "session_revoked")
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Session revoked")
 
     token_data = {
@@ -267,6 +304,12 @@ async def refresh_token(request: RefreshRequest, db: DBSession) -> TokenResponse
         "role": user.role,
         "email": user.email,
     }
+    logger.info(
+        "auth.token_refresh_succeeded user_id=%s tenant_id=%s",
+        safe_log_value(user.id, 64),
+        safe_log_value(user.tenant_id, 64),
+    )
+    record_auth_metric("session", "token_refresh", "succeeded")
     return TokenResponse(
         access_token=create_access_token(token_data),
         refresh_token=create_refresh_token(token_data),

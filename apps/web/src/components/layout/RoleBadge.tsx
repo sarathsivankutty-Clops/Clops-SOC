@@ -30,7 +30,7 @@ const ROLE_STYLES: Record<string, { label: string; classes: string }> = {
   viewer: {
     label: 'Viewer',
     classes:
-      'bg-slate-500/10 text-slate-200 border-slate-500/30 dark:bg-slate-500/15',
+      'bg-slate-500/10 text-fg-primary border-surface-border-strong/30 dark:bg-slate-500/15',
   },
   auditor: {
     label: 'Auditor',
@@ -41,7 +41,7 @@ const ROLE_STYLES: Record<string, { label: string; classes: string }> = {
 
 const FALLBACK = {
   label: 'User',
-  classes: 'bg-slate-500/10 text-slate-300 border-slate-500/30',
+  classes: 'bg-slate-500/10 text-fg-secondary border-surface-border-strong/30',
 };
 
 interface RoleBadgeProps {

@@ -32,26 +32,26 @@ export function RejectedEventsPanel() {
   return (
     <section
       aria-labelledby="ops-dlq-heading"
-      className="rounded-xl border border-gray-800/60 bg-gray-900/40"
+      className="rounded-xl border border-surface-border/60 bg-surface-card/40"
     >
       <div className="flex items-baseline justify-between px-4 py-3">
         <div>
-          <h2 id="ops-dlq-heading" className="text-sm font-medium text-gray-300">
+          <h2 id="ops-dlq-heading" className="text-sm font-medium text-fg-secondary">
             Rejected events
           </h2>
-          <p className="mt-0.5 text-[11px] text-gray-500">
+          <p className="mt-0.5 text-[11px] text-fg-subtle">
             Last {WINDOW_HOURS} hours, grouped by reason.
           </p>
         </div>
         {data && (
-          <span className="shrink-0 text-sm font-medium text-gray-200">
+          <span className="shrink-0 text-sm font-medium text-fg-primary">
             {data.total.toLocaleString()}
           </span>
         )}
       </div>
 
       {isLoading && !data ? (
-        <div className="m-4 h-20 animate-pulse rounded bg-gray-800/40" />
+        <div className="m-4 h-20 animate-pulse rounded bg-surface-elevated/40" />
       ) : error ? (
         <ErrorState
           title="Dead-letter counts unavailable"
@@ -72,12 +72,12 @@ export function RejectedEventsPanel() {
           {byReason.map((row) => (
             <li key={row.reason}>
               <div className="mb-1 flex items-baseline justify-between gap-3">
-                <span className="truncate text-xs text-gray-300">{row.reason}</span>
-                <span className="shrink-0 text-xs text-gray-500">
+                <span className="truncate text-xs text-fg-secondary">{row.reason}</span>
+                <span className="shrink-0 text-xs text-fg-subtle">
                   {row.count.toLocaleString()}
                 </span>
               </div>
-              <div className="h-1 rounded-full bg-gray-800">
+              <div className="h-1 rounded-full bg-surface-elevated">
                 <div
                   className="h-1 rounded-full bg-amber-500/60"
                   style={{ width: `${Math.round((row.count / maxCount) * 100)}%` }}
@@ -86,7 +86,7 @@ export function RejectedEventsPanel() {
             </li>
           ))}
           {data?.truncated && (
-            <li className="pt-1 text-[11px] text-gray-600">
+            <li className="pt-1 text-[11px] text-fg-secondary">
               Sample capped; counts above are complete for the window.
             </li>
           )}

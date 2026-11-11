@@ -35,6 +35,7 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import useSWR from 'swr';
 import { clsx } from 'clsx';
+import { AiSpinner } from '@/components/ui/AiSpinner';
 import {
   contextualApi,
   type ContextualActionDescriptor,
@@ -250,7 +251,7 @@ export function ContextualActions({
   return (
     <div className={clsx('space-y-2', className)}>
       {eyebrow ? (
-        <div className="text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+        <div className="text-[11px] font-semibold uppercase tracking-wider text-fg-muted">
           {eyebrow}
         </div>
       ) : null}
@@ -268,13 +269,13 @@ export function ContextualActions({
               className={clsx(
                 'inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors',
                 active
-                  ? 'border-violet-500/50 bg-violet-500/15 text-violet-100'
-                  : 'border-slate-700/70 bg-slate-900/40 text-slate-200 hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-violet-100',
+                  ? 'border-violet-500/50 bg-violet-500/15 text-violet-400'
+                  : 'border-surface-border bg-surface-card text-fg-primary hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-violet-400',
                 streaming && active && 'cursor-progress',
                 variant === 'compact' && 'px-2.5 py-1',
               )}
             >
-              <SparklesIcon className="h-3 w-3" />
+              <AiSpinner size="xs" state={streaming && active ? "busy" : "idle"} />
               <span>{descriptor.label}</span>
               {streaming && active ? (
                 <span className="ml-0.5 inline-flex h-2 w-2 animate-pulse rounded-full bg-violet-400" />
@@ -348,7 +349,7 @@ function ContextualPanel({
   return (
     <div
       className={clsx(
-        'rounded-xl border bg-slate-900/60 backdrop-blur-sm',
+        'rounded-xl border bg-surface-card backdrop-blur-sm',
         error
           ? 'border-rose-500/40'
           : fallback
@@ -357,10 +358,10 @@ function ContextualPanel({
       )}
     >
       {/* Header */}
-      <div className="flex items-center justify-between gap-3 border-b border-slate-800/60 px-4 py-2.5">
+      <div className="flex items-center justify-between gap-3 border-b border-surface-border px-4 py-2.5">
         <div className="flex min-w-0 items-center gap-2">
-          <SparklesIcon className="h-3.5 w-3.5 shrink-0 text-violet-300" />
-          <span className="truncate text-sm font-semibold text-slate-100">
+          <AiSpinner size="xs" state={streaming ? "busy" : "done"} />
+          <span className="truncate text-sm font-semibold text-fg-primary">
             {title}
           </span>
           {streaming ? (
@@ -380,7 +381,7 @@ function ContextualPanel({
         </div>
         <div className="flex shrink-0 items-center gap-1">
           {model ? (
-            <span className="hidden text-[10px] font-mono text-slate-500 sm:inline">
+            <span className="hidden text-[10px] font-mono text-fg-muted sm:inline">
               {model}
             </span>
           ) : null}
@@ -389,7 +390,7 @@ function ContextualPanel({
             onClick={handleCopy}
             disabled={!content}
             title="Copy response"
-            className="rounded-md p-1 text-slate-500 hover:bg-slate-800/60 hover:text-slate-200 disabled:opacity-30"
+            className="rounded-md p-1 text-fg-muted hover:bg-surface-elevated hover:text-fg-primary disabled:opacity-30"
           >
             {copied ? <CheckIcon className="h-3.5 w-3.5" /> : <CopyIcon className="h-3.5 w-3.5" />}
           </button>
@@ -397,7 +398,7 @@ function ContextualPanel({
             type="button"
             onClick={onClose}
             title="Close"
-            className="rounded-md p-1 text-slate-500 hover:bg-slate-800/60 hover:text-slate-200"
+            className="rounded-md p-1 text-fg-muted hover:bg-surface-elevated hover:text-fg-primary"
           >
             <XIcon className="h-3.5 w-3.5" />
           </button>
@@ -427,10 +428,10 @@ function ContextualPanel({
 
       {/* Footer: confidence + suggestions */}
       {(suggestions.length > 0 || confidence !== undefined) && !error ? (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-slate-800/60 px-4 py-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-surface-border px-4 py-2.5">
           <div className="flex flex-wrap items-center gap-1.5">
             {suggestions.length > 0 ? (
-              <span className="text-[11px] uppercase tracking-wider text-slate-500">
+              <span className="text-[11px] uppercase tracking-wider text-fg-muted">
                 Try next:
               </span>
             ) : null}
@@ -440,7 +441,7 @@ function ContextualPanel({
                 type="button"
                 onClick={() => onChainAction(suggestion)}
                 disabled={!suggestion.action}
-                className="rounded-full border border-slate-700/70 bg-slate-900/60 px-2.5 py-0.5 text-[11px] text-slate-200 hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-violet-100 disabled:opacity-50"
+                className="rounded-full border border-surface-border bg-surface-card px-2.5 py-0.5 text-[11px] text-fg-primary hover:border-violet-500/40 hover:bg-violet-500/10 hover:text-violet-400 disabled:opacity-50"
               >
                 {suggestion.label}
               </button>
@@ -448,7 +449,7 @@ function ContextualPanel({
           </div>
           {confidence !== undefined ? (
             <span
-              className="text-[11px] text-slate-500"
+              className="text-[11px] text-fg-muted"
               title="Confidence the agent has in this response"
             >
               Confidence: {Math.round(confidence * 100)}%
@@ -470,7 +471,7 @@ function ContextualPanel({
 function Markdown({ text }: { text: string }) {
   const blocks = useMemo(() => parseMarkdownBlocks(text), [text]);
   return (
-    <div className="space-y-3 text-sm leading-relaxed text-slate-200">
+    <div className="space-y-3 text-sm leading-relaxed text-fg-primary">
       {blocks.map((block, idx) => {
         switch (block.type) {
           case 'h2':
@@ -481,7 +482,7 @@ function Markdown({ text }: { text: string }) {
             );
           case 'h3':
             return (
-              <h4 key={idx} className="text-xs font-semibold uppercase tracking-wider text-slate-300">
+              <h4 key={idx} className="text-xs font-semibold uppercase tracking-wider text-fg-secondary">
                 {renderInline(block.text)}
               </h4>
             );
@@ -489,7 +490,7 @@ function Markdown({ text }: { text: string }) {
             return (
               <pre
                 key={idx}
-                className="overflow-auto rounded-md border border-slate-800 bg-slate-950/80 p-3 text-xs leading-relaxed text-slate-200"
+                className="overflow-auto rounded-md border border-surface-border bg-surface-base p-3 text-xs leading-relaxed text-fg-primary"
               >
                 <code className={clsx('font-mono', block.language && `language-${block.language}`)}>
                   {block.text}
@@ -498,7 +499,7 @@ function Markdown({ text }: { text: string }) {
             );
           case 'list':
             return (
-              <ul key={idx} className="list-disc space-y-1 pl-5 text-sm text-slate-200">
+              <ul key={idx} className="list-disc space-y-1 pl-5 text-sm text-fg-primary">
                 {block.items.map((item, i) => (
                   <li key={i}>{renderInline(item)}</li>
                 ))}
@@ -506,7 +507,7 @@ function Markdown({ text }: { text: string }) {
             );
           case 'numbered':
             return (
-              <ol key={idx} className="list-decimal space-y-1 pl-5 text-sm text-slate-200">
+              <ol key={idx} className="list-decimal space-y-1 pl-5 text-sm text-fg-primary">
                 {block.items.map((item, i) => (
                   <li key={i}>{renderInline(item)}</li>
                 ))}
@@ -515,7 +516,7 @@ function Markdown({ text }: { text: string }) {
           case 'p':
           default:
             return (
-              <p key={idx} className="text-sm text-slate-200">
+              <p key={idx} className="text-sm text-fg-primary">
                 {renderInline(block.text)}
               </p>
             );
@@ -655,14 +656,14 @@ function renderInline(text: string): ReactNode {
             return (
               <code
                 key={i}
-                className="rounded bg-slate-800/80 px-1 py-0.5 font-mono text-[12px] text-violet-200"
+                className="rounded bg-surface-elevated px-1 py-0.5 font-mono text-[12px] text-violet-200"
               >
                 {token.value}
               </code>
             );
           case 'bold':
             return (
-              <strong key={i} className="font-semibold text-slate-100">
+              <strong key={i} className="font-semibold text-fg-primary">
                 {token.value}
               </strong>
             );
@@ -762,7 +763,7 @@ function XIcon({ className }: { className?: string }) {
 function SkeletonBar({ width }: { width: string }) {
   return (
     <div
-      className="h-3 animate-pulse rounded bg-slate-800/70"
+      className="h-3 animate-pulse rounded bg-surface-elevated"
       style={{ width }}
     />
   );

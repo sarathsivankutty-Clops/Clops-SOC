@@ -52,32 +52,56 @@ The shipped aliases mirror AiSOC's workloads. They live in
 
 | Alias                 | Workload                                   | Shipped default   |
 | --------------------- | ------------------------------------------ | ----------------- |
-| `aisoc-triage`        | Auto-triage of fused alerts (high volume)  | `gpt-4o-mini`     |
-| `aisoc-recon`         | Recon / enrichment reasoning               | `gpt-4o-mini`     |
-| `aisoc-investigation` | Deep multi-step investigation              | `gpt-4o`          |
-| `aisoc-copilot`       | Contextual analyst copilot                 | `gpt-4o-mini`     |
-| `aisoc-summary`       | Alert / incident summaries                 | `gpt-4o-mini`     |
-| `aisoc-report`        | Analyst-facing report write-ups            | `gpt-4o`          |
-| `aisoc-nl`            | NL→query / NL→detection translation        | `gpt-4o-mini`     |
-| `aisoc-hunt`          | Hypothesis → structured hunt plan          | `gpt-4o-mini`     |
-| `aisoc-detection`     | Sigma rewrite from an analyst note         | `gpt-4o-mini`     |
+| `aisoc-triage`        | Auto-triage of fused alerts (high volume)  | `llama3.2:3b-instruct-q4_K_M` |
+| `aisoc-recon`         | Recon / enrichment reasoning               | `llama3.2:3b-instruct-q4_K_M` |
+| `aisoc-investigation` | Deep multi-step investigation              | `llama3.2:3b-instruct-q4_K_M` |
+| `aisoc-copilot`       | Contextual analyst copilot                 | `llama3.2:3b-instruct-q4_K_M` |
+| `aisoc-summary`       | Alert / incident summaries                 | `llama3.2:3b-instruct-q4_K_M` |
+| `aisoc-report`        | Analyst-facing report write-ups            | `llama3.2:3b-instruct-q4_K_M` |
+| `aisoc-nl`            | NL→query / NL→detection translation        | `llama3.2:3b-instruct-q4_K_M` |
+| `aisoc-hunt`          | Hypothesis → structured hunt plan          | `llama3.2:3b-instruct-q4_K_M` |
+| `aisoc-detection`     | Sigma rewrite from an analyst note         | `llama3.2:3b-instruct-q4_K_M` |
 
-The "shipped default" is only the *example* mapping in the config — the whole
-point is that you change it. The alias names stay constant.
+The "shipped default" is the bundled Ollama model. The alias names stay
+constant when you switch to Groq or another hosted provider.
 
 ## Enable the gateway
 
 The `litellm` service is in the **CORE** profile, so `make up` and a plain
 `docker compose up -d` already start it and routing to it is already wired.
-Supplying a key is the only step:
+To use a hosted provider, set its key and the model aliases. For OpenAI:
 
-```bash
-OPENAI_API_KEY=<your-real-provider-key>    # the gateway uses this to reach the upstream model
-LITELLM_MASTER_KEY=<a-strong-key>          # AiSOC authenticates to the gateway with this
+```dotenv
+OPENAI_API_KEY=<your-real-provider-key>
+AISOC_LLM_MODEL_FAST=openai/gpt-4o-mini
+AISOC_LLM_MODEL_DEEP=openai/gpt-4o
+AISOC_LLM_API_BASE=
 ```
+
+`LITELLM_MASTER_KEY` is for AiSOC-to-gateway authentication and is configured
+separately in `.env`.
 
 ```bash
 docker compose up -d        # or: make up
+```
+
+### Use Groq
+
+The gateway accepts Groq's OpenAI-compatible API. Set the Groq key and model
+aliases in `.env`; keep the API base empty so LiteLLM uses Groq's endpoint:
+
+```dotenv
+GROQ_API_KEY=<your Groq API key>
+AISOC_LLM_MODEL_FAST=groq/openai/gpt-oss-20b
+AISOC_LLM_MODEL_DEEP=groq/openai/gpt-oss-20b
+AISOC_LLM_API_BASE=
+```
+
+If `OPENAI_API_KEY` is also set, it takes precedence for the gateway. Recreate
+the gateway after changing its environment:
+
+```bash
+docker compose up -d
 ```
 
 It was a `full`-profile service until 2026-09, which meant a CORE deployment
@@ -139,12 +163,13 @@ treated as overrides, so an environment default cannot displace an alias.
 
 ### Embeddings
 
-The MITRE RAG path calls an embedding endpoint, and `infra/litellm/config.yaml`
-declares chat aliases only — so embeddings deliberately do **not** follow chat
-traffic to the gateway. They have their own pair of variables,
-`AISOC_EMBEDDING_BASE_URL` and `AISOC_EMBEDDING_MODEL` (default
-`text-embedding-3-large`), and default to the provider. The routing gate checks
-that exclusion in both directions.
+The MITRE ATT&CK RAG path uses the local Ollama embedding model configured by
+`AISOC_EMBEDDING_MODEL` (default `nomic-embed-text`). It does not use Groq or
+another hosted provider key. The bundled `ollama-pull` service downloads this
+model; it downloads a local chat model only when a chat alias is configured
+for Ollama. Ollama returns the vector dimensions, and the ATT&CK Qdrant
+collection is recreated and re-indexed if those dimensions change. Chat
+completion roles continue to route through LiteLLM to Groq.
 
 ## Re-point a task to a local model
 

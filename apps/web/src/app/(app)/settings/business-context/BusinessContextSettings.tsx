@@ -25,7 +25,7 @@ import { PreviewTable } from "./PreviewTable";
 const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
-    <div className="flex h-full items-center justify-center text-sm text-slate-500">
+    <div className="flex h-full items-center justify-center text-sm text-fg-subtle">
       Loading editor...
     </div>
   ),
@@ -162,10 +162,10 @@ export function BusinessContextSettings() {
     <div className="flex h-full flex-col gap-4 p-6">
       <header className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-slate-100">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-semibold text-slate-100 */>
             Business Context Rules
           </h1>
-          <p className="max-w-2xl text-sm text-slate-400">
+          <p className="max-w-2xl text-sm text-fg-muted">
             Encode your operational reality between fusion and the triage
             agent — bump severity for prod, route AWS alerts to the cloud
             team, suppress alerts during a known maintenance window. Rules
@@ -174,7 +174,7 @@ export function BusinessContextSettings() {
         </div>
         <div className="flex items-center gap-3">
           {envelope ? (
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-fg-subtle">
               version {envelope.version} · saved{" "}
               {new Date(envelope.updated_at).toLocaleTimeString()}
             </span>
@@ -200,8 +200,8 @@ export function BusinessContextSettings() {
       ) : null}
 
       <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-3">
-        <section className="col-span-2 flex min-h-[420px] flex-col rounded-md border border-slate-700 bg-slate-950">
-          <div className="border-b border-slate-800 px-3 py-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+        <section className="col-span-2 flex min-h-[420px] flex-col rounded-md border border-surface-border bg-surface-base">
+          <div className="border-b border-surface-border px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle">
             YAML editor
           </div>
           <div className="flex-1">
@@ -223,8 +223,8 @@ export function BusinessContextSettings() {
           </div>
         </section>
 
-        <section className="flex min-h-[420px] flex-col rounded-md border border-slate-700 bg-slate-950">
-          <div className="border-b border-slate-800 px-3 py-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+        <section className="flex min-h-[420px] flex-col rounded-md border border-surface-border bg-surface-base">
+          <div className="border-b border-surface-border px-3 py-2 text-xs font-medium uppercase tracking-wide text-fg-subtle">
             Rule builder
           </div>
           <div className="flex-1 overflow-auto p-3">
@@ -233,12 +233,12 @@ export function BusinessContextSettings() {
         </section>
       </div>
 
-      <section className="rounded-md border border-slate-700 bg-slate-950">
-        <header className="flex items-center justify-between border-b border-slate-800 px-3 py-2">
-          <div className="text-xs font-medium uppercase tracking-wide text-slate-500">
+      <section className="rounded-md border border-surface-border bg-surface-base">
+        <header className="flex items-center justify-between border-b border-surface-border px-3 py-2">
+          <div className="text-xs font-medium uppercase tracking-wide text-fg-subtle">
             Live preview
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-400">
+          <div className="flex items-center gap-2 text-xs text-fg-muted">
             {previewing ? "Recomputing..." : summaryLine}
           </div>
         </header>
@@ -248,7 +248,7 @@ export function BusinessContextSettings() {
           ) : preview ? (
             <PreviewTable rows={preview.rows} />
           ) : (
-            <div className="p-3 text-sm text-slate-500">
+            <div className="p-3 text-sm text-fg-subtle">
               Edit the YAML above to see a before/after diff against your last
               50 alerts.
             </div>

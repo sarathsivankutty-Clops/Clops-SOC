@@ -124,7 +124,7 @@ function Header({ window, clamped, onWindowChange, generatedAt, manualMinutes }:
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">SOC Insights</h1>
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-semibold tracking-tight */>SOC Insights</h1>
         <p className="mt-1 max-w-prose text-sm text-muted-foreground">
           Seven operational tiles for the SOC, refreshed every 30 seconds and
           on case changes. Deltas compare against the immediately preceding

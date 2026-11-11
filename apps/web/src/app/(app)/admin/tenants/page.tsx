@@ -98,10 +98,10 @@ export default function AdminTenantsPage() {
   return (
     <div className="space-y-6 p-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-white">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-semibold tracking-tight text-white */>
           Tenants
         </h1>
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="mt-1 text-sm text-fg-muted">
           Read-only directory of every tenant in this AiSOC deployment.
           Managed tenants — provisioned through the waitlist flow — are
           tagged in the list so the support team can scope their attention.
@@ -123,21 +123,21 @@ export default function AdminTenantsPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search slug or name…"
-          className="w-72 rounded-md border border-white/10 bg-white/[0.03] px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-brand-500/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+          className="w-72 rounded-md border border-surface-border bg-white/[0.03] px-3 py-2 text-sm text-fg-primary placeholder:text-fg-subtle focus:border-brand-500/50 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
           aria-label="Search tenants"
         />
-        <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-gray-300">
+        <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-fg-secondary">
           <input
             type="checkbox"
             checked={managedOnly}
             onChange={(e) => setManagedOnly(e.target.checked)}
-            className="h-4 w-4 rounded border-white/20 bg-white/[0.03]"
+            className="h-4 w-4 rounded border-surface-border bg-white/[0.03]"
           />
           Managed only
         </label>
         <button
           onClick={() => fetchTenants()}
-          className="ml-auto rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-gray-300 transition hover:border-white/20 hover:text-white"
+          className="ml-auto rounded-md border border-surface-border bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-fg-secondary transition hover:border-surface-border hover:text-fg-primary"
         >
           Refresh
         </button>
@@ -152,10 +152,10 @@ export default function AdminTenantsPage() {
         </div>
       )}
 
-      <section className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02]">
+      <section className="overflow-x-auto rounded-2xl border border-surface-border bg-white/[0.02]">
         <table className="w-full min-w-[840px] border-collapse text-sm">
           <thead>
-            <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+            <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-fg-subtle">
               <th className="px-5 py-3">Tenant</th>
               <th className="px-5 py-3">Slug</th>
               <th className="px-5 py-3">Plan</th>
@@ -167,14 +167,14 @@ export default function AdminTenantsPage() {
           <tbody>
             {loading && tenants.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-sm text-gray-400">
+                <td colSpan={6} className="px-5 py-8 text-center text-sm text-fg-muted">
                   Loading…
                 </td>
               </tr>
             )}
             {!loading && tenants.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-sm text-gray-500">
+                <td colSpan={6} className="px-5 py-8 text-center text-sm text-fg-subtle">
                   No tenants matched your filter.
                 </td>
               </tr>
@@ -183,7 +183,7 @@ export default function AdminTenantsPage() {
               <tr
                 key={tenant.id}
                 className={
-                  'border-t border-white/5 transition ' +
+                  'border-t border-surface-border transition ' +
                   (i % 2 === 0 ? '' : 'bg-white/[0.015]') +
                   ' hover:bg-white/[0.03]'
                 }
@@ -191,7 +191,7 @@ export default function AdminTenantsPage() {
                 <td className="px-5 py-3">
                   <Link
                     href={`/admin/tenants/${tenant.slug}`}
-                    className="font-medium text-white hover:text-brand-300"
+                    className="font-medium text-fg-primary hover:text-brand-300"
                   >
                     {tenant.name}
                   </Link>
@@ -204,24 +204,24 @@ export default function AdminTenantsPage() {
                 <td className="px-5 py-3 font-mono text-xs text-brand-300">
                   {tenant.slug}
                 </td>
-                <td className="px-5 py-3 text-xs text-gray-300">{tenant.plan}</td>
+                <td className="px-5 py-3 text-xs text-fg-secondary">{tenant.plan}</td>
                 <td className="px-5 py-3 text-xs">
                   {tenant.is_active ? (
                     <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300">
                       Active
                     </span>
                   ) : (
-                    <span className="rounded-full border border-gray-500/30 bg-gray-500/10 px-2 py-0.5 text-[10px] font-medium text-gray-400">
+                    <span className="rounded-full border border-surface-border-strong/30 bg-gray-500/10 px-2 py-0.5 text-[10px] font-medium text-fg-muted">
                       Inactive
                     </span>
                   )}
                 </td>
-                <td className="px-5 py-3 text-xs text-gray-400">
+                <td className="px-5 py-3 text-xs text-fg-muted">
                   {tenant.provisioned_at
                     ? formatDate(tenant.provisioned_at)
                     : '—'}
                 </td>
-                <td className="px-5 py-3 text-xs text-gray-400">
+                <td className="px-5 py-3 text-xs text-fg-muted">
                   {formatDate(tenant.created_at)}
                 </td>
               </tr>
@@ -239,9 +239,9 @@ export default function AdminTenantsPage() {
 
 function SummaryCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3">
-      <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
-      <div className="mt-1 text-2xl font-semibold text-white">{value}</div>
+    <div className="rounded-xl border border-surface-border bg-white/[0.02] px-4 py-3">
+      <div className="text-xs uppercase tracking-wide text-fg-subtle">{label}</div>
+      <div className="mt-1 text-2xl font-semibold text-fg-primary">{value}</div>
     </div>
   );
 }

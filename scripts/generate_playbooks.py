@@ -1100,6 +1100,171 @@ def build_cloud_misconfig() -> list[dict[str, Any]]:
                 ticket("t1", "Open cross-account ticket", "P1", "Cross-account trust: {{alert.role}}"),
             ],
         ),
+        make_playbook(
+            pid="cloud-aws-cloudtrail-iam-privesc-rca-v1",
+            name="AWS CloudTrail: IAM Privilege Escalation & AssumeRole RCA",
+            description=(
+                "Triggered by suspicious AWS CloudTrail IAM/STS events (AttachUserPolicy, PutRolePolicy, "
+                "UpdateAssumeRolePolicy, CreateAccessKey). Enriches source IP & principal ARN, pivots across "
+                "CloudTrail API history for root-cause analysis (RCA), gates destructive IAM rollback on "
+                "human approval, and revokes active STS sessions."
+            ),
+            category=cat,
+            severity=["high", "critical"],
+            tags=["cloud", "aws", "cloudtrail", "iam", "privilege-escalation", "rca", "mitre.t1078.004", "mitre.t1098"],
+            trigger_tags=["cloud-misconfig", "cloudtrail", "aws-cloudtrail", "iam"],
+            steps=[
+                enrich("enrich-src-ip", "Enrich CloudTrail caller IP reputation & ASN", "alert.src_ip"),
+                http(
+                    "query-cloudtrail-history",
+                    "Query 24h CloudTrail API timeline for principal ARN",
+                    url="${AWS_URL}/cloudtrail/lookup?principal={{alert.principal_arn}}&window=24h",
+                    method="GET",
+                ),
+                investigate("rca-cloudtrail", "AI Root Cause Analysis: correlate STS AssumeRole chain & blast radius", focus="cloud"),
+                gate_human_approval(
+                    "approve-iam-rollback",
+                    "Detach escalated IAM policy {{alert.policy}} and revoke active STS sessions for {{alert.principal_arn}}?",
+                    gated_step="revoke-sts-and-detach",
+                ),
+                http(
+                    "revoke-sts-and-detach",
+                    "Revoke STS sessions and detach escalated IAM policy",
+                    url="${AWS_URL}/iam/{{alert.role}}/revoke-and-detach",
+                    method="POST",
+                    body_template='{"principal_arn":"{{alert.principal_arn}}","policy":"{{alert.policy}}"}',
+                ),
+                notify(
+                    "notify-cloudsec",
+                    "Notify Cloud Security with CloudTrail RCA findings",
+                    "slack",
+                    message="AWS CloudTrail IAM privilege escalation RCA completed for {{alert.principal_arn}} from {{alert.src_ip}}.",
+                    webhook_env="SLACK_CLOUD_WEBHOOK",
+                ),
+                ticket("ticket-cloudtrail-rca", "Open AWS CloudTrail IAM RCA incident ticket", "P1", "CloudTrail IAM PrivEsc RCA: {{alert.principal_arn}}"),
+            ],
+        ),
+        make_playbook(
+            pid="cloud-aws-cloudtrail-console-no-mfa-rca-v1",
+            name="AWS CloudTrail: Console Sign-In Without MFA & Anomalous API RCA",
+            description=(
+                "Triggered when AWS CloudTrail records a ConsoleLogin without MFA or from an anomalous ASN. "
+                "Enriches caller IP, audits post-login CloudTrail read/write API calls for RCA, challenges "
+                "or revokes the console session, and opens a tracked cloud identity ticket."
+            ),
+            category=cat,
+            severity=["medium", "high", "critical"],
+            tags=["cloud", "aws", "cloudtrail", "console-login", "mfa", "rca", "mitre.t1078.004"],
+            trigger_tags=["cloud-misconfig", "cloudtrail", "aws-cloudtrail", "mfa"],
+            steps=[
+                enrich("enrich-login-ip", "Enrich ConsoleLogin source IP & geo-velocity", "alert.src_ip"),
+                http(
+                    "audit-post-login-calls",
+                    "Fetch post-login CloudTrail mutating API calls",
+                    url="${AWS_URL}/cloudtrail/lookup?user={{alert.user}}&event_category=management&window=6h",
+                    method="GET",
+                ),
+                investigate("rca-console-session", "AI Root Cause Analysis: evaluate console session intent & post-auth mutations", focus="cloud"),
+                http(
+                    "revoke-console-session",
+                    "Revoke active AWS console session & enforce MFA step-up",
+                    url="${AWS_URL}/iam/users/{{alert.user}}/sessions/revoke",
+                    method="POST",
+                ),
+                notify(
+                    "notify-identity-soc",
+                    "Notify SOC of non-MFA AWS Console sign-in RCA",
+                    "slack",
+                    message="AWS ConsoleLogin without MFA investigated for {{alert.user}} ({{alert.src_ip}}). Active session revoked.",
+                    webhook_env="SLACK_CLOUD_WEBHOOK",
+                ),
+                ticket("ticket-console-mfa", "Open AWS Console non-MFA RCA ticket", "P2", "AWS ConsoleLogin without MFA: {{alert.user}}"),
+            ],
+        ),
+        make_playbook(
+            pid="cloud-aws-securityhub-critical-finding-rca-v1",
+            name="AWS Security Hub: Critical Finding RCA & Guarded Containment",
+            description=(
+                "Triggered by HIGH/CRITICAL AWS Security Hub ASFF findings across FSBP, CIS AWS Foundations, "
+                "or Inspector/Macie integrations. Correlates the affected AWS resource ARN with recent "
+                "CloudTrail configuration changes to determine root cause, gates automated resource remediation "
+                "on human approval, and updates Security Hub workflow status."
+            ),
+            category=cat,
+            severity=["high", "critical"],
+            tags=["cloud", "aws", "securityhub", "cspm", "asff", "rca", "mitre.t1190", "mitre.t1530"],
+            trigger_tags=["cloud-misconfig", "securityhub", "aws-securityhub", "cspm"],
+            steps=[
+                http(
+                    "fetch-asff-resource-context",
+                    "Fetch AWS Security Hub ASFF finding & resource configuration history",
+                    url="${AWS_URL}/securityhub/findings/{{alert.alert_id}}/context",
+                    method="GET",
+                ),
+                investigate(
+                    "rca-securityhub",
+                    "AI Root Cause Analysis: correlate Security Hub finding with CloudTrail change actor & exposure window",
+                    focus="cloud",
+                ),
+                gate_human_approval(
+                    "approve-sh-remediation",
+                    "Apply automated AWS Config / Security Hub remediation on resource {{alert.resource_arn}}?",
+                    gated_step="execute-sh-remediation",
+                ),
+                http(
+                    "execute-sh-remediation",
+                    "Revert non-compliant resource configuration & mark Security Hub finding NOTIFIED",
+                    url="${AWS_URL}/securityhub/findings/{{alert.alert_id}}/remediate",
+                    method="POST",
+                    body_template='{"resource_arn":"{{alert.resource_arn}}","workflow_status":"NOTIFIED"}',
+                ),
+                notify(
+                    "notify-secops",
+                    "Notify Cloud SecOps with Security Hub RCA report",
+                    "slack",
+                    message="AWS Security Hub finding {{alert.title}} on {{alert.resource_arn}} triaged with AI RCA and remediated.",
+                    webhook_env="SLACK_CLOUD_WEBHOOK",
+                ),
+                ticket("ticket-securityhub", "Open AWS Security Hub RCA remediation ticket", "P1", "Security Hub RCA: {{alert.title}}"),
+            ],
+        ),
+        make_playbook(
+            pid="cloud-aws-guardduty-credential-exfil-rca-v1",
+            name="AWS GuardDuty & CloudTrail: Instance Credential Exfiltration RCA",
+            description=(
+                "Triggered by AWS GuardDuty EC2/ECS instance credential exfiltration findings "
+                "(UnauthorizedAccess:IAMUser/InstanceCredentialExfiltration.OutsideAWS). Enriches external IP, "
+                "correlates CloudTrail calls made with the stolen IMDS role credentials for full RCA, "
+                "blocks the external attacker IP, and revokes the compromised IAM role session."
+            ),
+            category=cat,
+            severity=["critical"],
+            tags=["cloud", "aws", "guardduty", "cloudtrail", "imds", "credentials", "rca", "mitre.t1552.005"],
+            trigger_tags=["cloud-misconfig", "guardduty", "aws-guardduty", "cloudtrail"],
+            steps=[
+                enrich("enrich-exfil-ip", "Enrich external IP using stolen IMDS credentials", "alert.src_ip"),
+                block_ip("block-exfil-ip", "Block external credential-replay IP at perimeter", "alert.src_ip", "24h"),
+                http(
+                    "revoke-imds-role",
+                    "Attach inline deny-all token revocation policy to compromised EC2 IAM role",
+                    url="${AWS_URL}/iam/{{alert.role}}/sessions/revoke-all",
+                    method="POST",
+                ),
+                investigate(
+                    "rca-imds-exfil",
+                    "AI Root Cause Analysis: trace SSRF/IMDSv1 vector on instance & enumerate S3/SecretsManager calls by stolen token",
+                    focus="cloud",
+                ),
+                notify(
+                    "page-cloud-ir",
+                    "Page Cloud Incident Response on-call",
+                    "pagerduty",
+                    message="GuardDuty IMDS credential exfiltration on {{alert.role}} from {{alert.src_ip}}. Role sessions revoked & RCA attached.",
+                    service_env="PD_CLOUD_KEY",
+                ),
+                ticket("ticket-guardduty-imds", "Open P1 GuardDuty IMDS credential exfil RCA ticket", "P1", "GuardDuty IMDS Exfil RCA: {{alert.role}}"),
+            ],
+        ),
     ]
 
 
@@ -1712,7 +1877,7 @@ def main() -> int:
         "ransomware": 5,
         "bec": 5,
         "insider-risk": 5,
-        "cloud-misconfig": 10,
+        "cloud-misconfig": 14,
         "data-exfil": 5,
         "lateral-movement": 5,
         "supply-chain": 5,
@@ -1751,8 +1916,8 @@ def main() -> int:
     print(f"Generated {total} playbooks across {len(counts)} categories:")
     for cat, count in counts.items():
         print(f"  {cat:20s} {count:3d}")
-    if total != 50:
-        raise SystemExit(f"total mismatch: expected 50, got {total}")
+    if total != 54:
+        raise SystemExit(f"total mismatch: expected 54, got {total}")
     return 0
 
 

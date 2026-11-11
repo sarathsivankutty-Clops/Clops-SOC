@@ -86,7 +86,7 @@ const SEVERITY_TONES: Record<AlertSeverity | CaseSeverity | 'info', SeverityTone
   },
   info: {
     bg: 'bg-slate-500/15',
-    fg: 'text-slate-300',
+    fg: 'text-fg-secondary',
     border: 'border-l-slate-500',
     glyph: 'I',
     rank: 0,
@@ -112,8 +112,8 @@ const ALERT_STATUS: Record<string, StatusTone> = {
   investigating: { bg: 'bg-purple-500/20', fg: 'text-purple-300', label: 'Investigating' },
   in_progress: { bg: 'bg-purple-500/20', fg: 'text-purple-300', label: 'Active' },
   resolved: { bg: 'bg-green-500/20', fg: 'text-green-300', label: 'Resolved' },
-  closed: { bg: 'bg-slate-500/20', fg: 'text-slate-300', label: 'Closed' },
-  false_positive: { bg: 'bg-slate-500/20', fg: 'text-slate-400', label: 'FP' },
+  closed: { bg: 'bg-slate-500/20', fg: 'text-fg-secondary', label: 'Closed' },
+  false_positive: { bg: 'bg-slate-500/20', fg: 'text-fg-muted', label: 'FP' },
   snoozed: { bg: 'bg-amber-500/20', fg: 'text-amber-300', label: 'Snoozed' },
 };
 
@@ -126,17 +126,17 @@ const CASE_STATUS: Record<string, StatusTone> = {
   investigating: { bg: 'bg-purple-500/20', fg: 'text-purple-300', label: 'Investigating' },
   contained: { bg: 'bg-yellow-500/20', fg: 'text-yellow-300', label: 'Contained' },
   resolved: { bg: 'bg-green-500/20', fg: 'text-green-300', label: 'Resolved' },
-  closed: { bg: 'bg-slate-500/20', fg: 'text-slate-300', label: 'Closed' },
+  closed: { bg: 'bg-slate-500/20', fg: 'text-fg-secondary', label: 'Closed' },
 };
 
 export function alertStatusTone(status: AlertStatus | string | undefined | null): StatusTone {
   if (!status) return ALERT_STATUS.new;
   const key = status.toLowerCase();
-  return ALERT_STATUS[key] ?? { bg: 'bg-slate-500/20', fg: 'text-slate-300', label: status };
+  return ALERT_STATUS[key] ?? { bg: 'bg-slate-500/20', fg: 'text-fg-secondary', label: status };
 }
 
 export function caseStatusTone(status: CaseStatus | string | undefined | null): StatusTone {
   if (!status) return CASE_STATUS.new;
   const key = status.toLowerCase();
-  return CASE_STATUS[key] ?? { bg: 'bg-slate-500/20', fg: 'text-slate-300', label: status };
+  return CASE_STATUS[key] ?? { bg: 'bg-slate-500/20', fg: 'text-fg-secondary', label: status };
 }

@@ -37,7 +37,7 @@ const GRACE_CHOICES = [
 ];
 
 function inputClass() {
-  return 'w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none';
+  return 'w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary placeholder-fg-muted focus:border-brand-500 focus:outline-none';
 }
 
 function describeError(err: unknown, fallback: string): string {
@@ -139,18 +139,18 @@ export function ScimTokensPanel() {
 
   return (
     <div data-testid="scim-tokens-panel">
-      <div className="border-b border-gray-800 px-6 py-4">
-        <h2 className="text-base font-semibold text-gray-100">SCIM provisioning</h2>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="border-b border-surface-border px-6 py-4">
+        <h2 className="text-base font-semibold text-fg-primary">SCIM provisioning</h2>
+        <p className="mt-1 text-sm text-fg-muted">
           Bearer credentials your identity provider uses to create, update and
           deprovision principals. Each one is scoped to this tenant.
         </p>
       </div>
 
       <div className="space-y-5 px-6 py-5">
-        <div className="flex flex-col gap-3 rounded-lg border border-gray-800 bg-gray-950/40 p-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col gap-3 rounded-lg border border-surface-border bg-surface-sunken/50 p-4 sm:flex-row sm:items-end">
           <label className="flex-1 text-sm">
-            <span className="mb-1 block text-gray-400">Name</span>
+            <span className="mb-1 block text-fg-secondary">Name</span>
             <input
               className={inputClass()}
               value={draftName}
@@ -160,7 +160,7 @@ export function ScimTokensPanel() {
             />
           </label>
           <label className="text-sm sm:w-48">
-            <span className="mb-1 block text-gray-400">Expires in (days)</span>
+            <span className="mb-1 block text-fg-secondary">Expires in (days)</span>
             <input
               className={inputClass()}
               value={draftExpiry}
@@ -174,7 +174,7 @@ export function ScimTokensPanel() {
             type="button"
             onClick={() => void create()}
             disabled={busy}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 disabled:opacity-50"
           >
             {busy ? 'Working…' : 'Create credential'}
           </button>
@@ -188,20 +188,20 @@ export function ScimTokensPanel() {
             </p>
             <p className="mt-1 text-xs text-amber-300/80">{revealed.name}</p>
             <div className="mt-3 flex items-center gap-2">
-              <code className="block flex-1 truncate rounded bg-gray-950 px-3 py-2 font-mono text-sm text-amber-100 ring-1 ring-amber-500/30">
+              <code className="block flex-1 truncate rounded bg-surface-base px-3 py-2 font-mono text-sm text-amber-100 ring-1 ring-amber-500/30">
                 {revealed.token}
               </code>
               <button
                 type="button"
                 onClick={() => copy(revealed.token)}
-                className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-200 hover:bg-gray-800"
+                className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-2 text-sm text-fg-primary hover:bg-surface-elevated"
               >
                 Copy
               </button>
               <button
                 type="button"
                 onClick={() => setRevealed(null)}
-                className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-200 hover:bg-gray-800"
+                className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-2 text-sm text-fg-primary hover:bg-surface-elevated"
               >
                 Dismiss
               </button>
@@ -209,10 +209,10 @@ export function ScimTokensPanel() {
           </div>
         ) : null}
 
-        <label className="flex items-center gap-2 text-xs text-gray-500">
+        <label className="flex items-center gap-2 text-xs text-fg-muted">
           Rotation grace window
           <select
-            className="rounded border border-gray-700 bg-gray-950 px-2 py-1 text-xs text-gray-200"
+            className="rounded border border-surface-border-strong bg-surface-base px-2 py-1 text-xs text-fg-primary"
             value={graceHours}
             onChange={(e) => setGraceHours(Number(e.target.value))}
             aria-label="Rotation grace window"
@@ -235,9 +235,9 @@ export function ScimTokensPanel() {
             description="Create one above, then paste it into your identity provider alongside this deployment's /scim/v2 base URL."
           />
         ) : (
-          <div className="overflow-hidden rounded-lg border border-gray-800">
+          <div className="overflow-hidden rounded-lg border border-surface-border">
             <table className="w-full text-sm">
-              <thead className="bg-gray-900/60 text-xs uppercase tracking-wide text-gray-500">
+              <thead className="bg-surface-card text-xs uppercase tracking-wide text-fg-muted">
                 <tr>
                   <th className="px-4 py-2 text-left">Name</th>
                   <th className="px-4 py-2 text-left">Prefix</th>
@@ -247,26 +247,26 @@ export function ScimTokensPanel() {
                   <th className="px-4 py-2 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800 bg-gray-950/40">
+              <tbody className="divide-y divide-surface-border bg-surface-sunken/50">
                 {tokens.map((token) => (
                   <tr key={token.id}>
-                    <td className="px-4 py-3 font-medium text-gray-100">{token.name}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-400">{token.prefix}</td>
+                    <td className="px-4 py-3 font-medium text-fg-primary">{token.name}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-fg-secondary">{token.prefix}</td>
                     <td className="px-4 py-3 text-xs">
                       <span
                         className={
                           token.active
                             ? 'rounded bg-emerald-500/10 px-1.5 py-0.5 text-emerald-300 ring-1 ring-emerald-500/30'
-                            : 'rounded bg-gray-800 px-1.5 py-0.5 text-gray-400 ring-1 ring-gray-700'
+                            : 'rounded bg-surface-elevated px-1.5 py-0.5 text-fg-secondary ring-1 ring-surface-border-strong'
                         }
                       >
                         {token.active ? 'Active' : token.revoked_at ? 'Revoked' : 'Expired'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-xs text-fg-secondary" suppressHydrationWarning>
                       {format(new Date(token.created_at), 'PPP')}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-xs text-fg-secondary" suppressHydrationWarning>
                       {/* A credential nobody has used for months is a standing
                           key with no owner, which is why this column exists.
                           "Never" is a fact; an em dash would hide it. */}
@@ -280,7 +280,7 @@ export function ScimTokensPanel() {
                           type="button"
                           onClick={() => void rotate(token)}
                           disabled={busy || !token.active}
-                          className="rounded border border-gray-700 bg-gray-900 px-2 py-1 text-xs text-gray-200 hover:bg-gray-800 disabled:opacity-40"
+                          className="rounded border border-surface-border-strong bg-surface-card px-2 py-1 text-xs text-fg-primary hover:bg-surface-elevated disabled:opacity-40"
                         >
                           Rotate
                         </button>

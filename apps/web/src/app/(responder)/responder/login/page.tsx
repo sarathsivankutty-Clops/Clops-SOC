@@ -101,13 +101,13 @@ function ResponderLoginInner() {
   };
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 antialiased flex flex-col">
+    <div className="min-h-[100dvh] bg-surface-base text-fg-primary antialiased flex flex-col">
       <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
         {/* Brand mark */}
         <div className="flex flex-col items-center text-center mb-12">
           <div className="w-16 h-16 rounded-2xl bg-indigo-600 flex items-center justify-center mb-5">
             <svg
-              className="w-9 h-9 text-white"
+              className="w-9 h-9 text-fg-primary"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -123,7 +123,7 @@ function ResponderLoginInner() {
           <h1 className="text-2xl font-semibold tracking-tight">
             AiSOC Responder
           </h1>
-          <p className="text-sm text-zinc-400 mt-2 leading-relaxed">
+          <p className="text-sm text-fg-muted mt-2 leading-relaxed">
             Tap to sign in with your phone&rsquo;s passkey. No passwords. No
             SMS. Just biometrics.
           </p>
@@ -132,8 +132,8 @@ function ResponderLoginInner() {
         {/* Form */}
         <form onSubmit={handlePasskeyLogin} className="space-y-4">
           <label className="block">
-            <span className="block text-xs uppercase tracking-wider text-zinc-500 mb-2">
-              Email <span className="normal-case text-zinc-600">(optional)</span>
+            <span className="block text-xs uppercase tracking-wider text-fg-subtle mb-2">
+              Email <span className="normal-case text-fg-secondary">(optional)</span>
             </span>
             <input
               type="email"
@@ -145,9 +145,9 @@ function ResponderLoginInner() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={phase === 'pending'}
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3.5 text-base text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 disabled:opacity-60"
+              className="w-full bg-surface-card border border-surface-border rounded-xl px-4 py-3.5 text-base text-fg-primary placeholder:text-fg-secondary focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500/50 disabled:opacity-60"
             />
-            <span className="block text-[11px] text-zinc-600 mt-1.5 leading-snug">
+            <span className="block text-[11px] text-fg-secondary mt-1.5 leading-snug">
               Most phones use platform passkeys and don&rsquo;t need this.
             </span>
           </label>
@@ -155,7 +155,7 @@ function ResponderLoginInner() {
           <button
             type="submit"
             disabled={!supported || phase === 'pending'}
-            className="w-full bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white font-medium rounded-xl py-3.5 px-4 transition flex items-center justify-center gap-2 disabled:bg-zinc-800 disabled:text-zinc-500"
+            className="w-full bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white font-medium rounded-xl py-3.5 px-4 transition flex items-center justify-center gap-2 disabled:bg-surface-elevated disabled:text-fg-subtle"
           >
             {phase === 'pending' ? (
               <>
@@ -216,7 +216,7 @@ function ResponderLoginInner() {
 
         {/* Footer hint */}
         <div className="mt-10 text-center">
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-fg-subtle">
             New device?{' '}
             <Link
               href="/login"
@@ -230,7 +230,7 @@ function ResponderLoginInner() {
       </div>
 
       <div className="px-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 text-center">
-        <p className="text-[10px] text-zinc-700 uppercase tracking-widest">
+        <p className="text-[10px] text-fg-primary uppercase tracking-widest">
           AiSOC · MIT-licensed AI SOC
         </p>
       </div>

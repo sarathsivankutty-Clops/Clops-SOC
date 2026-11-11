@@ -59,7 +59,7 @@ function actionBadge(action: string): string {
   for (const [verb, cls] of Object.entries(ACTION_COLORS)) {
     if (action.includes(verb)) return cls;
   }
-  return 'bg-gray-700 text-gray-300';
+  return 'bg-surface-hover text-fg-secondary';
 }
 
 export function AuditLogView() {
@@ -184,14 +184,14 @@ export function AuditLogView() {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-2xl font-bold">Audit Log</h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold */>Audit Log</h1>
+          <p className="text-sm text-fg-muted mt-1">
             Immutable record of all platform actions
           </p>
         </div>
         <div className="flex items-center gap-3">
           {data && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-fg-subtle">
               {data.total.toLocaleString()} total events
             </span>
           )}
@@ -212,7 +212,7 @@ export function AuditLogView() {
                   ? 'Nothing to export with the current filters'
                   : 'Download the filtered audit trail as RFC 4180 CSV'
               }
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-gray-600 bg-gray-800 text-gray-200 hover:bg-gray-700 hover:border-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-surface-border-strong bg-surface-elevated text-fg-primary hover:bg-surface-hover hover:border-surface-border-strong disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -263,19 +263,19 @@ export function AuditLogView() {
       {/* Filters */}
       <form
         onSubmit={handleSearch}
-        className="flex flex-wrap gap-3 bg-gray-800/50 p-4 rounded-lg border border-gray-700 shadow-sm"
+        className="flex flex-wrap gap-3 bg-surface-elevated/50 p-4 rounded-lg border border-surface-border shadow-sm"
       >
         <input
           type="text"
           placeholder="Search email or action…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-48 rounded-md border border-gray-600 bg-gray-900 text-gray-200 px-3 py-2 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="flex-1 min-w-48 rounded-md border border-surface-border-strong bg-surface-card text-fg-primary px-3 py-2 text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         <select
           value={actionFilter}
           onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
-          className="rounded-md border border-gray-600 bg-gray-900 text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="rounded-md border border-surface-border-strong bg-surface-card text-fg-primary px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="">All actions</option>
           <option value="cases:">Cases</option>
@@ -289,7 +289,7 @@ export function AuditLogView() {
         <select
           value={resourceFilter}
           onChange={(e) => { setResourceFilter(e.target.value); setPage(1); }}
-          className="rounded-md border border-gray-600 bg-gray-900 text-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="rounded-md border border-surface-border-strong bg-surface-card text-fg-primary px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
         >
           <option value="">All resources</option>
           <option value="case">case</option>
@@ -309,7 +309,7 @@ export function AuditLogView() {
       </form>
 
       {/* Table */}
-      <div className="bg-gray-800/50 rounded-lg border border-gray-700 shadow-sm overflow-hidden">
+      <div className="bg-surface-elevated/50 rounded-lg border border-surface-border shadow-sm overflow-hidden">
         {error && !data && (
           <div className="p-4">
             <ErrorState
@@ -355,44 +355,44 @@ export function AuditLogView() {
           </div>
         )}
         {data && data.items.length > 0 && (
-          <table className="min-w-full divide-y divide-gray-700 text-sm">
-            <thead className="bg-gray-900/60">
+          <table className="min-w-full divide-y divide-surface-border text-sm">
+            <thead className="bg-surface-card/60">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">
                   Timestamp
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">
                   Actor
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">
                   Action
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">
                   Resource
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">
                   IP
                 </th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">
                   Details
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-700/50">
+            <tbody className="divide-y divide-surface-border/50">
               {data.items.map((event) => (
                 <>
                   <tr
                     key={event.id}
-                    className="hover:bg-gray-700/40 cursor-pointer"
+                    className="hover:bg-surface-hover/40 cursor-pointer"
                     onClick={() =>
                       setExpandedId(expandedId === event.id ? null : event.id)
                     }
                   >
-                    <td className="px-4 py-3 text-gray-500 whitespace-nowrap" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-fg-subtle whitespace-nowrap" suppressHydrationWarning>
                       {new Date(event.created_at).toLocaleString()}
                     </td>
                     <td className="px-4 py-3">
-                      <span className="font-medium text-gray-200">
+                      <span className="font-medium text-fg-primary">
                         {event.actor_email ?? 'system'}
                       </span>
                     </td>
@@ -405,15 +405,15 @@ export function AuditLogView() {
                         {event.action}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-300">
+                    <td className="px-4 py-3 text-fg-secondary">
                       {event.resource ?? '—'}
                       {event.resource_id && (
-                        <span className="ml-1 text-gray-400 text-xs">
+                        <span className="ml-1 text-fg-muted text-xs">
                           #{event.resource_id.slice(0, 8)}
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-400">
+                    <td className="px-4 py-3 text-fg-muted">
                       {event.actor_ip ?? '—'}
                     </td>
                     <td className="px-4 py-3 text-indigo-500 text-xs">
@@ -421,9 +421,9 @@ export function AuditLogView() {
                     </td>
                   </tr>
                   {expandedId === event.id && (
-                    <tr key={`${event.id}-expanded`} className="bg-gray-900/40">
+                    <tr key={`${event.id}-expanded`} className="bg-surface-card/40">
                       <td colSpan={6} className="px-4 py-3">
-                        <pre className="text-xs text-gray-300 whitespace-pre-wrap">
+                        <pre className="text-xs text-fg-secondary whitespace-pre-wrap">
                           {JSON.stringify(
                             {
                               id: event.id,
@@ -447,21 +447,21 @@ export function AuditLogView() {
       {/* Pagination */}
       {data && data.total_pages > 1 && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-fg-subtle">
             Page {data.page} of {data.total_pages}
           </p>
           <div className="flex gap-2">
             <button
               disabled={page <= 1}
               onClick={() => setPage((p) => p - 1)}
-              className="px-3 py-1.5 text-sm border border-gray-600 text-gray-300 rounded-md disabled:opacity-40 hover:bg-gray-700"
+              className="px-3 py-1.5 text-sm border border-surface-border-strong text-fg-secondary rounded-md disabled:opacity-40 hover:bg-surface-hover"
             >
               Previous
             </button>
             <button
               disabled={page >= data.total_pages}
               onClick={() => setPage((p) => p + 1)}
-              className="px-3 py-1.5 text-sm border border-gray-600 text-gray-300 rounded-md disabled:opacity-40 hover:bg-gray-700"
+              className="px-3 py-1.5 text-sm border border-surface-border-strong text-fg-secondary rounded-md disabled:opacity-40 hover:bg-surface-hover"
             >
               Next
             </button>

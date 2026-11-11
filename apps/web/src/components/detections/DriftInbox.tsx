@@ -164,7 +164,7 @@ export function DriftInbox() {
       </div>
 
       {/* Filter */}
-      <div className="inline-flex rounded-md border border-gray-800 bg-gray-950 p-0.5 text-xs">
+      <div className="inline-flex rounded-md border border-surface-border bg-surface-sunken p-0.5 text-xs">
         {ALL_ISSUES.map((opt) => (
           <button
             key={opt}
@@ -173,13 +173,13 @@ export function DriftInbox() {
             className={clsx(
               'rounded px-3 py-1.5 transition-colors',
               issueFilter === opt
-                ? 'bg-gray-800 text-gray-100'
-                : 'text-gray-400 hover:text-gray-200',
+                ? 'bg-surface-elevated text-fg-primary'
+                : 'text-fg-muted hover:text-fg-primary',
             )}
           >
             {FILTER_LABEL[opt]}
             {opt !== 'all' && (
-              <span className="ml-1.5 text-gray-500">
+              <span className="ml-1.5 text-fg-muted">
                 ({issueCount(data.entries, opt as IssueId)})
               </span>
             )}
@@ -219,7 +219,7 @@ function DriftRow({ entry }: DriftRowProps) {
   return (
     <Link
       href={`/detection/${entry.ruleId}`}
-      className="group block rounded-lg border border-gray-800 bg-gray-900/40 p-3 transition-colors hover:border-gray-700 hover:bg-gray-900/70"
+      className="group block rounded-lg border border-surface-border bg-surface-card/40 p-3 transition-colors hover:border-surface-border hover:bg-surface-card/70"
     >
       <div className="flex items-center gap-3">
         {/* Status dot */}
@@ -234,7 +234,7 @@ function DriftRow({ entry }: DriftRowProps) {
         {/* Body */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h3 className="truncate text-sm font-medium text-gray-100 group-hover:text-blue-300">
+            <h3 className="truncate text-sm font-medium text-fg-primary group-hover:text-blue-300">
               {entry.name}
             </h3>
             {entry.issues.map((issueId) => {
@@ -255,27 +255,27 @@ function DriftRow({ entry }: DriftRowProps) {
             })}
           </div>
           <div
-            className="mt-1 flex flex-wrap items-center gap-3 text-[11px] text-gray-500"
+            className="mt-1 flex flex-wrap items-center gap-3 text-[11px] text-fg-muted"
             suppressHydrationWarning
           >
             <span>
               Confidence{' '}
-              <span className="font-mono text-gray-300">
+              <span className="font-mono text-fg-secondary">
                 {Math.round(entry.confidence)}
               </span>
               {' / 100'}
             </span>
             <span>
               FP rate{' '}
-              <span className="font-mono text-gray-300">
+              <span className="font-mono text-fg-secondary">
                 {(entry.fpRate * 100).toFixed(1)}%
               </span>
             </span>
             <span>
               Last fired{' '}
-              <span className="text-gray-400">{lastFired}</span>
+              <span className="text-fg-muted">{lastFired}</span>
               {entry.daysSinceTriggered != null && (
-                <span className="text-gray-600">
+                <span className="text-fg-faint">
                   {' '}
                   ({entry.daysSinceTriggered}d)
                 </span>
@@ -285,7 +285,7 @@ function DriftRow({ entry }: DriftRowProps) {
         </div>
 
         {/* Severity */}
-        <div className="text-[10px] uppercase tracking-wide text-gray-500">
+        <div className="text-[10px] uppercase tracking-wide text-fg-muted">
           {entry.severity}
         </div>
       </div>
@@ -307,10 +307,10 @@ function SummaryCard({ label, value, tone }: SummaryCardProps) {
         ? 'text-amber-300'
         : tone === 'info'
           ? 'text-sky-300'
-          : 'text-gray-100';
+          : 'text-fg-primary';
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900/40 px-3 py-2.5">
-      <div className="text-[11px] uppercase tracking-wide text-gray-500">
+    <div className="rounded-lg border border-surface-border bg-surface-card/40 px-3 py-2.5">
+      <div className="text-[11px] uppercase tracking-wide text-fg-muted">
         {label}
       </div>
       <div className={clsx('mt-1 font-mono text-xl font-semibold', toneClass)}>

@@ -59,7 +59,7 @@ export function StepExecutionNotice({ schema }: { schema: StepSchema }) {
 
   return (
     <div className="space-y-2">
-      <p className="flex items-center gap-2 text-xs text-gray-500 leading-relaxed">
+      <p className="flex items-center gap-2 text-xs text-fg-muted leading-relaxed">
         <span
           className={`shrink-0 rounded border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${badge.className}`}
         >
@@ -69,7 +69,7 @@ export function StepExecutionNotice({ schema }: { schema: StepSchema }) {
       </p>
 
       {EXPLANATION[schema.execution] && (
-        <p className="text-[11px] text-gray-500 leading-relaxed">
+        <p className="text-[11px] text-fg-muted leading-relaxed">
           {EXPLANATION[schema.execution]}
         </p>
       )}

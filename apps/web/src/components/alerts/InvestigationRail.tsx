@@ -48,7 +48,9 @@ import {
 import { AttackStory } from './AttackStory';
 import { ExplainDrawer } from './ExplainDrawer';
 import { NarrativeMarkdown } from './NarrativeMarkdown';
+import { L1InvestigationStory } from './L1InvestigationStory';
 import { Skeleton } from '@/components/ui/Skeleton';
+import { AiSpinner } from '@/components/ui/AiSpinner';
 
 // ─── Visual config ───────────────────────────────────────────────────────────
 
@@ -64,19 +66,19 @@ const ENTITY_KIND_CONFIG: Record<
   RelatedEntity['kind'],
   { label: string; tone: string }
 > = {
-  principal: { label: 'Principals', tone: 'text-blue-300' },
-  network: { label: 'Network', tone: 'text-cyan-300' },
-  workflow: { label: 'Workflow', tone: 'text-purple-300' },
-  tenant: { label: 'Tenant', tone: 'text-gray-300' },
+  principal: { label: 'Principals', tone: 'text-brand-400' },
+  network: { label: 'Network', tone: 'text-cyan-400' },
+  workflow: { label: 'Workflow', tone: 'text-violet-400' },
+  tenant: { label: 'Tenant', tone: 'text-fg-secondary' },
 };
 
 /** Tone map for the priority chip on a recommended action. */
 const PRIORITY_TONE: Record<RecommendedAction['priority'], string> = {
-  critical: 'border-red-500/40 bg-red-500/10 text-red-300',
-  high: 'border-orange-500/40 bg-orange-500/10 text-orange-300',
-  medium: 'border-yellow-500/40 bg-yellow-500/10 text-yellow-300',
-  low: 'border-blue-500/40 bg-blue-500/10 text-blue-300',
-  info: 'border-gray-500/40 bg-gray-500/10 text-gray-300',
+  critical: 'border-red-500/40 bg-red-500/10 text-red-400',
+  high: 'border-orange-500/40 bg-orange-500/10 text-orange-400',
+  medium: 'border-amber-500/40 bg-amber-500/10 text-amber-400',
+  low: 'border-brand-500/40 bg-brand-500/10 text-brand-400',
+  info: 'border-surface-border bg-surface-elevated text-fg-secondary',
 };
 
 // ─── Props ───────────────────────────────────────────────────────────────────
@@ -119,9 +121,9 @@ export function InvestigationRail({ alertId, onClose }: InvestigationRailProps) 
   if (error || !alert) {
     return (
       <RailShell title="Investigation rail" onClose={onClose}>
-        <div className="px-4 py-6 text-sm text-red-300">
+        <div className="px-4 py-6 text-sm text-red-400">
           <p className="font-medium">Couldn&apos;t load the alert envelope.</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-fg-muted">
             The alert API didn&apos;t respond. Try selecting the alert again or
             open the full detail view.
           </p>
@@ -133,7 +135,11 @@ export function InvestigationRail({ alertId, onClose }: InvestigationRailProps) 
   return (
     <>
       <RailShell title={alert.title} onClose={onClose}>
-        <RailHeader alert={alert} onDeepExplain={() => setDeepExplainOpen(true)} />
+        <RailHeader
+          alert={alert}
+          deepExplainOpen={deepExplainOpen}
+          onDeepExplain={() => setDeepExplainOpen(true)}
+        />
         {/*
          * Story first, detail behind a toggle. An analyst holds "what
          * happened" in their head, not "what fields does this row have" —
@@ -142,7 +148,8 @@ export function InvestigationRail({ alertId, onClose }: InvestigationRailProps) 
          */}
         <ViewToggle view={view} onChange={setView} />
         {view === 'story' ? (
-          <div className="p-4">
+          <div className="p-4 space-y-5">
+            <L1InvestigationStory alert={alert} />
             <AttackStory alert={alert} showHeader={false} />
           </div>
         ) : (
@@ -190,7 +197,7 @@ function ViewToggle({
   ];
   return (
     <div
-      className="flex gap-1 border-b border-gray-800/60 px-4 py-2"
+      className="flex gap-1 border-b border-surface-border px-4 py-2 bg-surface-card"
       role="tablist"
       aria-label="Investigation view"
     >
@@ -202,10 +209,10 @@ function ViewToggle({
           aria-selected={view === tab.id}
           onClick={() => onChange(tab.id)}
           className={clsx(
-            'rounded px-2.5 py-1 text-xs transition-colors',
+            'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
             view === tab.id
-              ? 'bg-gray-800 text-gray-100'
-              : 'text-gray-500 hover:bg-gray-800/40 hover:text-gray-300',
+              ? 'bg-brand-500/15 text-brand-400 border border-brand-500/30'
+              : 'text-fg-muted hover:bg-surface-elevated hover:text-fg-primary',
           )}
         >
           {tab.label}
@@ -228,18 +235,18 @@ function RailShell({
 }) {
   return (
     <aside
-      className="flex flex-col bg-gray-900/60 border border-gray-800/60 rounded-xl overflow-hidden h-full"
+      className="flex flex-col bg-surface-card border border-surface-border rounded-xl overflow-hidden h-full shadow-sm"
       aria-label="Investigation rail"
     >
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800/60 bg-gray-900/80">
-        <h2 className="text-sm font-semibold text-gray-100 truncate" title={title}>
+      <div className="flex items-center justify-between px-4 py-3 border-b border-surface-border bg-surface-elevated/60">
+        <h2 className="text-sm font-semibold text-fg-primary truncate" title={title}>
           {title}
         </h2>
         <button
           type="button"
           onClick={onClose}
           aria-label="Close investigation rail"
-          className="text-xs text-gray-500 hover:text-gray-300 px-2 py-0.5 rounded hover:bg-gray-800/60 transition-colors"
+          className="text-xs text-fg-muted hover:text-fg-primary px-2 py-0.5 rounded hover:bg-surface-elevated transition-colors"
         >
           Close
         </button>
@@ -252,11 +259,11 @@ function RailShell({
 function RailPlaceholder() {
   return (
     <aside
-      className="flex flex-col items-center justify-center bg-gray-900/30 border border-dashed border-gray-800/60 rounded-xl text-gray-500 text-sm h-full p-6 text-center"
+      className="flex flex-col items-center justify-center bg-surface-card/60 border border-dashed border-surface-border rounded-xl text-fg-muted text-sm h-full p-6 text-center"
       aria-label="Investigation rail (no alert selected)"
     >
-      <p className="font-medium text-gray-400">Select an alert to investigate</p>
-      <p className="mt-1 text-xs text-gray-600">
+      <p className="font-medium text-fg-secondary">Select an alert to investigate</p>
+      <p className="mt-1 text-xs text-fg-muted">
         Click a row in the queue on the left. The rail will show the fusion
         narrative, related entities, recent events, and recommended actions.
       </p>
@@ -286,9 +293,11 @@ function RailLoading({ onClose }: { onClose: () => void }) {
 
 function RailHeader({
   alert,
+  deepExplainOpen,
   onDeepExplain,
 }: {
   alert: Alert;
+  deepExplainOpen?: boolean;
   onDeepExplain: () => void;
 }) {
   return (
@@ -297,12 +306,12 @@ function RailHeader({
     // list, which is correct in both places but ambiguous without a
     // landmark to distinguish them.
     <div
-      className="px-4 py-3 border-b border-gray-800/60 bg-gray-900/40"
+      className="px-4 py-3 border-b border-surface-border bg-surface-elevated/40"
       role="region"
       aria-label="Alert summary"
     >
-      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500">
-        <span className="capitalize text-gray-300">{alert.severity}</span>
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-fg-muted">
+        <span className="capitalize text-fg-primary font-medium">{alert.severity}</span>
         <span>·</span>
         <span className="capitalize">{alert.status.replace('_', ' ')}</span>
         <span>·</span>
@@ -314,7 +323,7 @@ function RailHeader({
         {typeof alert.riskScore === 'number' && (
           <>
             <span>·</span>
-            <span className="font-mono text-gray-400">
+            <span className="font-mono text-fg-secondary">
               {/* `normalizeAlert` already resolves this to a 0-100 integer.
                   The rounding here used to be the only thing standing between
                   a raw 0.85 and the page, and it printed "risk 1". */}
@@ -329,13 +338,14 @@ function RailHeader({
           onClick={onDeepExplain}
           aria-label="Open AI deep explain drawer"
           title="Run the LLM deep-explain for this alert"
-          className="text-xs font-medium px-2.5 py-1 rounded border border-violet-500/40 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 hover:border-violet-500/60 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-md border border-violet-500/40 bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 hover:border-violet-500/60 transition-colors"
         >
-          ✦ Deep Explain
+          <AiSpinner size="xs" state={deepExplainOpen ? 'busy' : 'idle'} />
+          <span>Deep Explain</span>
         </button>
         <Link
           href={`/alerts/${alert.id}`}
-          className="text-xs text-blue-300 hover:text-blue-200 transition-colors"
+          className="text-xs font-medium text-brand-400 hover:text-brand-300 transition-colors"
         >
           Open full detail →
         </Link>
@@ -348,10 +358,10 @@ function RailHeader({
 
 function SectionHeader({ title, count }: { title: string; count?: number }) {
   return (
-    <h3 className="text-[11px] uppercase tracking-wider text-gray-500 mb-2 font-medium">
+    <h3 className="text-[11px] uppercase tracking-wider text-fg-muted mb-2 font-medium">
       {title}
       {typeof count === 'number' && (
-        <span className="ml-1.5 text-gray-600">({count})</span>
+        <span className="ml-1.5 text-fg-subtle">({count})</span>
       )}
     </h3>
   );
@@ -388,10 +398,15 @@ function AutomatedTriageSection({ alert }: { alert: Alert }) {
   const hasRun = Boolean(verdict || rationale || typeof alert.aiScore === 'number');
 
   return (
-    <section className="px-4 py-4 border-b border-gray-800/40">
-      <SectionHeader title="Automated triage" />
+    <section className="px-4 py-4 border-b border-surface-border">
+      <div className="flex items-center gap-2 mb-2">
+        <AiSpinner size="xs" state={hasRun ? 'done' : 'idle'} />
+        <h3 className="text-[11px] uppercase tracking-wider text-fg-muted font-medium">
+          Automated triage
+        </h3>
+      </div>
       {!hasRun ? (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-fg-muted">
           Not triaged yet. Every fused alert is queued for the triage agent; if this stays empty,
           check the agents service.
         </p>
@@ -399,16 +414,16 @@ function AutomatedTriageSection({ alert }: { alert: Alert }) {
         <div className="space-y-2">
           <div className="flex items-center gap-2 flex-wrap">
             {verdict && (
-              <span className="text-xs px-2 py-0.5 rounded border border-gray-700 bg-gray-800/60 text-gray-200">
+              <span className="text-xs px-2 py-0.5 rounded border border-surface-border bg-surface-elevated text-fg-primary">
                 {verdict.replace(/_/g, ' ')}
               </span>
             )}
             {typeof alert.aiScore === 'number' && (
-              <span className="text-xs text-gray-400">
+              <span className="text-xs text-fg-secondary">
                 confidence {Math.round(alert.aiScore * 100)}/100
               </span>
             )}
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-fg-muted">
               groundedness{' '}
               {typeof alert.triageGroundedness === 'number'
                 ? `${Math.round(alert.triageGroundedness * 100)}%`
@@ -416,7 +431,7 @@ function AutomatedTriageSection({ alert }: { alert: Alert }) {
             </span>
           </div>
           {rationale && (
-            <p className="text-xs text-gray-300 leading-relaxed whitespace-pre-wrap">{rationale}</p>
+            <p className="text-xs text-fg-secondary leading-relaxed whitespace-pre-wrap">{rationale}</p>
           )}
           {alert.triageUngrounded && alert.triageUngrounded.length > 0 && (
             <p className="text-xs text-amber-400">
@@ -452,7 +467,7 @@ function SourceAddressClassSection({ alert }: { alert: Alert }) {
   const cfg = IP_CLASS_CONFIG[alert.srcIpClass];
   if (!cfg) return null;
   return (
-    <section className="px-4 py-4 border-b border-gray-800/40">
+    <section className="px-4 py-4 border-b border-surface-border">
       <SectionHeader title="Source address" />
       <div className="flex flex-wrap items-center gap-2">
         <span
@@ -464,12 +479,12 @@ function SourceAddressClassSection({ alert }: { alert: Alert }) {
           {cfg.label}
         </span>
         {alert.srcIpClassDatasetVersion && (
-          <span className="text-[11px] text-gray-500">
+          <span className="text-[11px] text-fg-muted">
             dataset {alert.srcIpClassDatasetVersion}
           </span>
         )}
       </div>
-      <p className="mt-1.5 text-xs text-gray-500">{cfg.detail}</p>
+      <p className="mt-1.5 text-xs text-fg-muted">{cfg.detail}</p>
     </section>
   );
 }
@@ -480,27 +495,27 @@ const IP_CLASS_CONFIG: Record<
 > = {
   tor_exit: {
     label: 'Tor exit relay',
-    tone: 'bg-rose-500/10 text-rose-300 ring-1 ring-rose-500/30',
+    tone: 'bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/30',
     detail: 'The address is published as a Tor exit relay. The originating network is not observable.',
   },
   vpn: {
     label: 'VPN exit',
-    tone: 'bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/30',
+    tone: 'bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/30',
     detail: 'The address is on a list of VPN exit nodes supplied by this tenant.',
   },
   public_proxy: {
     label: 'Public proxy',
-    tone: 'bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/30',
+    tone: 'bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/30',
     detail: 'The address is on a list of open proxies supplied by this tenant.',
   },
   residential_proxy: {
     label: 'Residential proxy',
-    tone: 'bg-orange-500/10 text-orange-300 ring-1 ring-orange-500/30',
+    tone: 'bg-orange-500/10 text-orange-400 ring-1 ring-orange-500/30',
     detail: 'The address is on a list of residential proxy exits supplied by this tenant.',
   },
   hosting_provider: {
     label: 'Hosting provider',
-    tone: 'bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/30',
+    tone: 'bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/30',
     detail: 'The address belongs to a cloud or hosting range, not to a consumer network.',
   },
 };
@@ -513,7 +528,7 @@ function NarrativeSection({ narrative }: { narrative: string | null }) {
   // renderer covers that dialect and escapes everything, which matters because
   // the narrative embeds attacker-influenceable entity names.
   return (
-    <section className="px-4 py-4 border-b border-gray-800/40">
+    <section className="px-4 py-4 border-b border-surface-border">
       <SectionHeader title="Narrative" />
       <NarrativeMarkdown source={narrative} />
     </section>
@@ -533,7 +548,7 @@ function RelatedEntitiesSection({ entities }: { entities: RelatedEntity[] }) {
     { principal: [], network: [], workflow: [], tenant: [] },
   );
   return (
-    <section className="px-4 py-4 border-b border-gray-800/40">
+    <section className="px-4 py-4 border-b border-surface-border">
       <SectionHeader title="Related entities" count={entities.length} />
       <div className="space-y-3">
         {(Object.keys(ENTITY_KIND_CONFIG) as Array<keyof typeof ENTITY_KIND_CONFIG>).map(
@@ -563,13 +578,13 @@ function EntityChip({ entity }: { entity: RelatedEntity }) {
   const inner = (
     <span
       className={clsx(
-        'inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded border border-gray-700/60 bg-gray-800/60 text-gray-200',
+        'inline-flex items-center gap-1.5 text-xs px-2 py-0.5 rounded border border-surface-border bg-surface-elevated text-fg-primary',
         entity.pivotPath &&
-          'hover:bg-gray-700/60 hover:border-gray-600/60 cursor-pointer transition-colors',
+          'hover:bg-brand-500/10 hover:border-brand-500/40 cursor-pointer transition-colors',
       )}
       title={`${entity.type}: ${entity.value}`}
     >
-      <span className="text-gray-500 font-mono text-[10px]">{entity.type}</span>
+      <span className="text-fg-muted font-mono text-[10px]">{entity.type}</span>
       <span className="font-mono">{display}</span>
     </span>
   );
@@ -589,7 +604,7 @@ function EntityChip({ entity }: { entity: RelatedEntity }) {
 function MiniTimelineSection({ events }: { events: MiniTimelineEvent[] }) {
   if (events.length === 0) return null;
   return (
-    <section className="px-4 py-4 border-b border-gray-800/40">
+    <section className="px-4 py-4 border-b border-surface-border">
       <SectionHeader title="Recent events" count={events.length} />
       <ol className="space-y-2.5">
         {events.map((e) => (
@@ -610,24 +625,24 @@ function TimelineRow({ event }: { event: MiniTimelineEvent }) {
     ts = event.timestamp;
   }
   return (
-    <li className="text-xs text-gray-300 border-l-2 border-gray-700/60 pl-3">
+    <li className="text-xs text-fg-secondary border-l-2 border-surface-border pl-3">
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-gray-500 text-[10px]" suppressHydrationWarning>
+        <span className="font-mono text-fg-muted text-[10px]" suppressHydrationWarning>
           {ts}
         </span>
-        <span className="px-1.5 py-0 text-[10px] font-mono rounded border border-gray-700/60 bg-gray-800/40 text-gray-400 uppercase">
+        <span className="px-1.5 py-0 text-[10px] font-mono rounded border border-surface-border bg-surface-elevated text-fg-muted uppercase">
           {event.source === 'case_timeline' ? 'case' : 'audit'}
         </span>
-        <span className="text-[10px] uppercase text-gray-500 tracking-wide">
+        <span className="text-[10px] uppercase text-fg-muted tracking-wide">
           {event.type}
         </span>
       </div>
-      <p className="mt-0.5 text-gray-200">{event.title}</p>
+      <p className="mt-0.5 text-fg-primary">{event.title}</p>
       {event.description && (
-        <p className="mt-0.5 text-gray-500 line-clamp-2">{event.description}</p>
+        <p className="mt-0.5 text-fg-muted line-clamp-2">{event.description}</p>
       )}
       {event.actor && (
-        <p className="mt-0.5 text-[10px] text-gray-600">by {event.actor}</p>
+        <p className="mt-0.5 text-[10px] text-fg-subtle">by {event.actor}</p>
       )}
     </li>
   );
@@ -641,26 +656,26 @@ function BusinessContextSection({ ctx }: { ctx: BusinessContextRail | null }) {
   const mutated =
     ctx.severityBefore && ctx.severityAfter && ctx.severityBefore !== ctx.severityAfter;
   return (
-    <section className="px-4 py-4 border-t border-gray-800/60">
+    <section className="px-4 py-4 border-t border-surface-border">
       <SectionHeader title="Business context" count={ctx.matchedRuleIds.length} />
-      <div className="border border-gray-800/60 bg-gray-900/40 rounded-lg p-2.5 space-y-1.5">
-        <p className="text-xs text-gray-400">
+      <div className="border border-surface-border bg-surface-elevated/40 rounded-lg p-2.5 space-y-1.5">
+        <p className="text-xs text-fg-secondary">
           Tenant rules applied before triage:{' '}
-          <span className="font-mono text-gray-200">{ctx.matchedRuleIds.join(', ')}</span>
+          <span className="font-mono text-fg-primary">{ctx.matchedRuleIds.join(', ')}</span>
         </p>
         {mutated && (
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-fg-secondary">
             Severity{' '}
-            <span className="font-mono text-gray-300">{ctx.severityBefore}</span>
+            <span className="font-mono text-fg-primary">{ctx.severityBefore}</span>
             {' → '}
-            <span className="font-mono text-amber-300">{ctx.severityAfter}</span>
+            <span className="font-mono text-amber-400">{ctx.severityAfter}</span>
           </p>
         )}
         {ctx.impactStatement && (
-          <p className="text-sm text-gray-200">
+          <p className="text-sm text-fg-primary">
             {ctx.impactStatement}
             {ctx.impactCitations.length > 0 && (
-              <span className="ml-1 text-[10px] font-mono text-gray-500">
+              <span className="ml-1 text-[10px] font-mono text-fg-muted">
                 [cites: {ctx.impactCitations.join(', ')}]
               </span>
             )}
@@ -680,7 +695,7 @@ function RecommendedActionsSection({ actions }: { actions: RecommendedAction[] }
         {actions.map((a, idx) => (
           <li
             key={`${a.action}-${idx}`}
-            className="border border-gray-800/60 bg-gray-900/40 rounded-lg p-2.5"
+            className="border border-surface-border bg-surface-elevated/40 rounded-lg p-2.5"
           >
             <div className="flex items-start gap-2">
               <span
@@ -691,15 +706,15 @@ function RecommendedActionsSection({ actions }: { actions: RecommendedAction[] }
               >
                 {a.priority}
               </span>
-              <p className="text-sm text-gray-200 flex-1">{a.action}</p>
+              <p className="text-sm text-fg-primary flex-1">{a.action}</p>
             </div>
             {a.rationale && (
-              <p className="mt-1 text-xs text-gray-500 ml-[3.25rem]">
+              <p className="mt-1 text-xs text-fg-muted ml-[3.25rem]">
                 {a.rationale}
               </p>
             )}
             {a.risk && (
-              <p className="mt-1 text-xs text-amber-400/80 ml-[3.25rem]">
+              <p className="mt-1 text-xs text-amber-400 ml-[3.25rem]">
                 Risk: {a.risk}
               </p>
             )}

@@ -177,10 +177,10 @@ export function OnboardingView() {
         <p className="text-xs uppercase tracking-wider text-blue-400/80 mb-2">
           Getting started
         </p>
-        <h1 className="text-3xl font-semibold text-gray-100 mb-3">
+        <h1 className="text-3xl font-semibold text-fg-primary mb-3">
           Connect your first security tool
         </h1>
-        <p className="text-gray-400 max-w-2xl leading-relaxed">
+        <p className="text-fg-muted max-w-2xl leading-relaxed">
           AiSOC pulls signals from the tools you already run and stitches them into a single
           investigation timeline. Most teams start with their endpoint or identity provider —
           you can wire up the rest later.
@@ -242,7 +242,7 @@ export function OnboardingView() {
       {popular.length > 0 && (
         <section className="mb-10">
           <div className="flex items-baseline justify-between mb-3">
-            <h2 className="text-sm font-medium text-gray-300 uppercase tracking-wider">
+            <h2 className="text-sm font-medium text-fg-secondary uppercase tracking-wider">
               Most teams pick
             </h2>
             <button
@@ -271,7 +271,7 @@ export function OnboardingView() {
       {/* Category pills */}
       {totalConnectorTypes > 0 && (
         <section className="mb-12">
-          <h2 className="text-sm font-medium text-gray-300 uppercase tracking-wider mb-3">
+          <h2 className="text-sm font-medium text-fg-secondary uppercase tracking-wider mb-3">
             Or browse by category
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -282,12 +282,12 @@ export function OnboardingView() {
                 onClick={() => openPicker(undefined, c)}
                 className={clsx(
                   'px-3 py-2 rounded-lg text-sm border transition-colors',
-                  'border-gray-800 bg-gray-900 text-gray-200 hover:border-blue-500/40 hover:bg-gray-900/80',
+                  'border-surface-border bg-surface-card text-fg-primary hover:border-blue-500/40 hover:bg-surface-card/80',
                   activeCategory === c && 'border-blue-500/60 bg-blue-500/10',
                 )}
               >
                 {CATEGORY_LABEL[c] ?? c}
-                <span className="ml-2 text-xs text-gray-500">{categoryCounts[c]}</span>
+                <span className="ml-2 text-xs text-fg-subtle">{categoryCounts[c]}</span>
               </button>
             ))}
           </div>
@@ -350,14 +350,14 @@ function Stat({
         'rounded-xl border px-4 py-3',
         tone === 'good'
           ? 'border-green-500/20 bg-green-500/5'
-          : 'border-gray-800 bg-gray-900/60',
+          : 'border-surface-border bg-surface-card/60',
       )}
     >
-      <div className="text-xs text-gray-500 uppercase tracking-wider">{label}</div>
+      <div className="text-xs text-fg-subtle uppercase tracking-wider">{label}</div>
       <div
         className={clsx(
           'text-2xl font-semibold mt-0.5',
-          tone === 'good' ? 'text-green-200' : 'text-gray-100',
+          tone === 'good' ? 'text-green-200' : 'text-fg-primary',
         )}
       >
         {value}
@@ -386,14 +386,14 @@ function PopularTile({
     <button
       type="button"
       onClick={onClick}
-      className="group relative text-left rounded-xl border border-gray-800 bg-gray-900/60 hover:bg-gray-900 hover:border-blue-500/40 px-4 py-4 transition-colors"
+      className="group relative text-left rounded-xl border border-surface-border bg-surface-card/60 hover:bg-surface-card hover:border-blue-500/40 px-4 py-4 transition-colors"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="text-sm font-medium text-gray-100 truncate">
+          <div className="text-sm font-medium text-fg-primary truncate">
             {entry.connector_name}
           </div>
-          <div className="text-xs text-gray-500 mt-0.5 capitalize">
+          <div className="text-xs text-fg-subtle mt-0.5 capitalize">
             {CATEGORY_LABEL[entry.category] ?? entry.category}
           </div>
         </div>
@@ -414,7 +414,7 @@ function PopularTile({
         ) : null}
       </div>
       {entry.description && (
-        <p className="text-xs text-gray-500 mt-2 line-clamp-2">{entry.description}</p>
+        <p className="text-xs text-fg-subtle mt-2 line-clamp-2">{entry.description}</p>
       )}
     </button>
   );
@@ -436,11 +436,11 @@ function NextStepCard({
   // markup otherwise so the visual treatment stays identical.
   const isExternal = /^https?:\/\//i.test(href);
   const className =
-    'block rounded-xl border border-gray-800 bg-gray-900/40 hover:bg-gray-900 hover:border-blue-500/40 p-5 transition-colors';
+    'block rounded-xl border border-surface-border bg-surface-card/40 hover:bg-surface-card hover:border-blue-500/40 p-5 transition-colors';
   const inner = (
     <>
-      <div className="text-sm font-medium text-gray-100 mb-1">{title}</div>
-      <p className="text-sm text-gray-500 mb-3 leading-relaxed">{body}</p>
+      <div className="text-sm font-medium text-fg-primary mb-1">{title}</div>
+      <p className="text-sm text-fg-subtle mb-3 leading-relaxed">{body}</p>
       <span className="text-xs text-blue-400 group-hover:text-blue-300">{cta} →</span>
     </>
   );

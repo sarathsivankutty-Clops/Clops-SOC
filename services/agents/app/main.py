@@ -82,14 +82,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     except Exception as exc:
         logger.warning("MITRE ATT&CK corpus load failed at startup", error=str(exc))
 
-    # Embed into Qdrant for RAG (only if configured)
+    # Embed into Qdrant with the local Ollama embedding model. This is separate
+    # from chat routing: Groq remains the only external LLM provider.
     qdrant_url = os.getenv("QDRANT_URL", "")
-    openai_key = os.getenv("OPENAI_API_KEY", "")
-    if qdrant_url and openai_key:
+    if qdrant_url:
         try:
             await embed_techniques_into_qdrant(
                 qdrant_url=qdrant_url,
-                openai_api_key=openai_key,
             )
         except Exception as exc:
             logger.warning("ATT&CK Qdrant embedding skipped", error=str(exc))

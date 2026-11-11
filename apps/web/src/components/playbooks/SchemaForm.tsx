@@ -57,7 +57,7 @@ function renderControl({
   invalid,
 }: ControlProps): React.ReactNode {
   const baseClass =
-    'w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60';
+    'w-full bg-surface-elevated border border-surface-border rounded px-3 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60';
   const shared = {
     id,
     disabled: readOnly,
@@ -214,7 +214,7 @@ export function SchemaForm({
   if (schema.fields.length === 0 && extraKeys.length === 0) {
     return (
       <div className="space-y-2">
-        <p className="text-xs text-gray-500 italic">
+        <p className="text-xs text-fg-muted italic">
           {schema.type === 'condition'
             ? 'Conditions have no params — configure the predicate via the Condition section above.'
             : 'No parameters for this step type.'}
@@ -249,7 +249,7 @@ export function SchemaForm({
           <div key={field.key}>
             <label
               htmlFor={controlId}
-              className="block text-gray-400 text-xs mb-1"
+              className="block text-fg-muted text-xs mb-1"
             >
               {field.label}
               {field.required && (
@@ -275,7 +275,7 @@ export function SchemaForm({
               </p>
             )}
             {field.help && (
-              <p id={helpId} className="text-[11px] text-gray-500 mt-1">
+              <p id={helpId} className="text-[11px] text-fg-muted mt-1">
                 {field.help}
               </p>
             )}
@@ -305,7 +305,7 @@ export function SchemaForm({
       )}
 
       {/* Raw JSON escape hatch */}
-      <div className="border-t border-gray-800 pt-3">
+      <div className="border-t border-surface-border pt-3">
         <button
           type="button"
           aria-expanded={showRaw}
@@ -315,7 +315,7 @@ export function SchemaForm({
             setRawError(null);
             setShowRaw((v) => !v);
           }}
-          className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+          className="text-xs text-fg-muted hover:text-fg-secondary transition-colors"
         >
           {showRaw ? '▾' : '▸'} Advanced (raw JSON)
         </button>
@@ -351,7 +351,7 @@ export function SchemaForm({
                 }
               }}
               disabled={readOnly}
-              className="w-full bg-gray-900 border border-gray-700 rounded px-3 py-2 text-green-400 font-mono text-xs focus:outline-none focus:border-blue-500 disabled:opacity-60"
+              className="w-full bg-surface-card border border-surface-border rounded px-3 py-2 text-green-400 font-mono text-xs focus:outline-none focus:border-brand-500 disabled:opacity-60"
             />
             {rawError && (
               <p id={`${formId}-raw-error`} className="text-xs text-red-400 mt-1">

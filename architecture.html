@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>AiSOC Architecture</title>
+  <style>
+    :root {
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: #172033;
+      background: #f3f6fb;
+    }
+
+    body {
+      margin: 0;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1rem 1.5rem;
+      background: #fff;
+      border-bottom: 1px solid #dbe3ee;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+
+    p {
+      margin: 0.35rem 0 0;
+      color: #526179;
+      font-size: 0.9rem;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    button {
+      min-width: 2.5rem;
+      padding: 0.45rem 0.7rem;
+      color: #172033;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.4rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #eaf0f8;
+    }
+
+    #viewport {
+      height: calc(100vh - 5.2rem);
+      overflow: auto;
+      padding: 1.25rem;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    #viewport:active {
+      cursor: grabbing;
+    }
+
+    #diagram {
+      width: max-content;
+      min-width: 100%;
+      padding: 1rem;
+      background: #fff;
+      border: 1px solid #dbe3ee;
+      border-radius: 0.75rem;
+      box-shadow: 0 8px 24px rgb(15 23 42 / 7%);
+    }
+
+    #diagram svg {
+      max-width: none;
+      height: auto;
+      transform-origin: top left;
+    }
+
+    #status {
+      padding: 0.75rem 1.5rem;
+      color: #9f1239;
+      background: #fff1f2;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>AiSOC Architecture</h1>
+      <p>Drag to pan. Use the controls or mouse wheel to zoom.</p>
+    </div>
+    <div class="controls" aria-label="Diagram zoom controls">
+      <button id="zoom-out" type="button" aria-label="Zoom out">-</button>
+      <button id="zoom-reset" type="button">Reset</button>
+      <button id="zoom-in" type="button" aria-label="Zoom in">+</button>
+    </div>
+  </header>
+  <div id="status" role="status" hidden>
+    Mermaid could not be loaded. Check the CDN connection and reload this page.
+  </div>
+  <main id="viewport" aria-label="Interactive AiSOC architecture diagram">
+    <div id="diagram"></div>
+  </main>
+
+  <script id="diagram-source" type="text/plain">
+flowchart TD
+  subgraph zone_sources["1. Log sources and ingestion"]
+    ext_logs["External SIEM, EDR, cloud and application telemetry"]:::source
+    cisa["CISA KEV public feed"]:::source
+    mitre["MITRE ATT&CK Enterprise STIX corpus<br/>local bundle or CDN fallback"]:::intel
+    connectors["Connectors scheduler<br/>host :8088 -> container :8003"]:::ingest
+    adapter["Security-Log-Generator<br/>log_adapter.py (optional companion)"]:::source
+    ingest["Go ingest HTTP API<br/>host :8081 -> container :8080<br/>POST /v1/ingest and /v1/ingest/batch"]:::ingest
+    normalize["Normalizer<br/>connector profile -> OCSF 1.1.0<br/>activity and entity projections"]:::ingest
+  end
+
+  subgraph zone_core["2. Core processing and application"]
+    fusion["Fusion and detection<br/>host :8003 -> container :8003<br/>rules, correlate, promote"]:::core
+    api["AiSOC REST API<br/>host :8000 -> container :8000"]:::core
+    threatintel["Threat intelligence service<br/>host :8005 -> container :8005"]:::intel
+    agents["Agent decision pipeline<br/>host :8001 -> container :8084<br/>consume fused alerts; triage"]:::core
+    actions["Governed actions service<br/>host :8002 -> container :8085"]:::core
+    realtime["Realtime gateway<br/>host :8086 -> container :4000"]:::core
+    enrichment["Enrichment service<br/>full profile only"]:::optional
+    ueba["UEBA consumer<br/>full profile only"]:::optional
+  end
+
+  subgraph zone_ai["3. AI model routing"]
+    gateway["LiteLLM router<br/>host :4000 -> container :4000<br/>OpenAI-compatible /v1 task aliases"]:::ai
+    ollama["Ollama local inference<br/>host :11434 -> container :11434<br/>default: llama3.2:3b-instruct-q4_K_M"]:::ai
+    hosted["Optional hosted model provider<br/>configured by environment"]:::optional
+    fallback["Deterministic triage fallback<br/>inside agents service"]:::ai
+  end
+
+  subgraph zone_data["4. Data and persistence"]
+    postgres["PostgreSQL<br/>host :5432 -> container :5432<br/>operational records, alerts, audit"]:::store
+    redis["Redis<br/>host :6379 -> container :6379<br/>cache and runtime state"]:::store
+    kafka["Kafka broker<br/>host :9092; internal :29092<br/>raw_events, alerts.fused and other topics"]:::store
+    zookeeper["ZooKeeper<br/>internal :2181; no host publish"]:::optional
+    qdrant["Qdrant vector store<br/>host :6333 -> container :6333<br/>threat intel, ATT&CK and semantic memory"]:::store
+    clickhouse["ClickHouse event lake<br/>full profile only<br/>host :8123 HTTP, :9000 native"]:::optional
+    opensearch["OpenSearch IOC full-text search<br/>full profile only<br/>host :9200"]:::optional
+    neo4j["Neo4j entity graph<br/>full profile only<br/>host :7474 HTTP, :7687 Bolt"]:::optional
+  end
+
+  subgraph zone_ui["5. Presentation and user interface"]
+    analyst["Security analyst"]:::source
+    web["Web console<br/>host :3000 -> container :3000<br/>same-origin API, agent and realtime proxies"]:::ui
+  end
+
+  ext_logs -->|poll vendor APIs| connectors
+  connectors -->|HTTP POST /v1/ingest/batch| ingest
+  adapter -->|HTTP POST /v1/ingest/batch| ingest
+  ingest -->|normalize request payload| normalize
+  mitre -->|STIX technique metadata| normalize
+  normalize -->|Kafka publish: aisoc.raw_events| kafka
+  kafka -->|consume: aisoc.raw_events| fusion
+  fusion -->|publish: aisoc.alerts.fused| kafka
+  fusion -->|SQL: persist promoted alerts| postgres
+  kafka -->|consume: aisoc.alerts.fused| agents
+
+  cisa -->|scheduled HTTPS feed fetch| threatintel
+  threatintel -->|HTTP: IOC and actor vectors| qdrant
+  threatintel -.->|optional full-text index| opensearch
+  api -->|HTTP REST: threat-intel proxy| threatintel
+
+  ingest -->|SQL: ingest credentials and inbox| postgres
+  ingest -->|Redis cache| redis
+  fusion -->|SQL: alert and fusion records| postgres
+  fusion -->|Redis cache| redis
+  agents -->|SQL: investigation ledger| postgres
+  agents -->|Redis cache| redis
+  agents -->|optional ATT&CK RAG| qdrant
+  api -->|SQL: application data| postgres
+  api -->|Redis cache| redis
+  api -->|HTTP REST: semantic memory| qdrant
+
+  agents -->|OpenAI-compatible REST: task alias| gateway
+  gateway -->|Ollama API: configured model| ollama
+  gateway -.->|if configured instead of local| hosted
+  agents -->|no key, circuit open or model failure| fallback
+  fallback -->|deterministic verdict| agents
+  mitre -->|ATT&CK corpus load| agents
+
+  fusion -.->|HTTP enrichment; full profile| enrichment
+  kafka -.->|UEBA stream; full profile| ueba
+  fusion -.->|event archive; full profile| clickhouse
+  api -.->|lake queries; full profile| clickhouse
+  api -.->|entity graph access; full profile| neo4j
+  agents -.->|entity context; full profile| neo4j
+  zookeeper -->|broker coordination| kafka
+
+  analyst -->|browser HTTPS/HTTP| web
+  web -->|same-origin REST proxy| api
+  web -->|agent routes proxy| agents
+  api -->|internal HTTP| actions
+  api -->|internal HTTP and realtime tickets| realtime
+  web -->|WebSocket proxy| realtime
+
+  classDef source fill:#f1f5f9,stroke:#475569,color:#0f172a;
+  classDef ingest fill:#dbeafe,stroke:#2563eb,color:#172554;
+  classDef core fill:#e0e7ff,stroke:#4f46e5,color:#1e1b4b;
+  classDef intel fill:#fef3c7,stroke:#d97706,color:#451a03;
+  classDef ai fill:#ede9fe,stroke:#7c3aed,color:#2e1065;
+  classDef store fill:#dcfce7,stroke:#16a34a,color:#052e16;
+  classDef ui fill:#ffedd5,stroke:#ea580c,color:#431407;
+  classDef optional fill:#f8fafc,stroke:#64748b,stroke-dasharray:4 3,color:#334155;
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <script>
+    const status = document.getElementById("status");
+    const target = document.getElementById("diagram");
+    const viewport = document.getElementById("viewport");
+    let scale = 1;
+    let offsetX = 0;
+    let offsetY = 0;
+    let dragStart = null;
+
+    function applyTransform() {
+      const svg = target.querySelector("svg");
+      if (svg) {
+        svg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+      }
+    }
+
+    function zoomBy(factor) {
+      scale = Math.min(2.5, Math.max(0.5, scale * factor));
+      applyTransform();
+    }
+
+    document.getElementById("zoom-in").addEventListener("click", () => zoomBy(1.2));
+    document.getElementById("zoom-out").addEventListener("click", () => zoomBy(1 / 1.2));
+    document.getElementById("zoom-reset").addEventListener("click", () => {
+      scale = 1;
+      offsetX = 0;
+      offsetY = 0;
+      applyTransform();
+    });
+
+    viewport.addEventListener("wheel", (event) => {
+      event.preventDefault();
+      zoomBy(event.deltaY < 0 ? 1.1 : 1 / 1.1);
+    }, { passive: false });
+
+    viewport.addEventListener("pointerdown", (event) => {
+      if (event.target.closest("svg")) {
+        dragStart = { x: event.clientX - offsetX, y: event.clientY - offsetY };
+        viewport.setPointerCapture(event.pointerId);
+      }
+    });
+    viewport.addEventListener("pointermove", (event) => {
+      if (dragStart) {
+        offsetX = event.clientX - dragStart.x;
+        offsetY = event.clientY - dragStart.y;
+        applyTransform();
+      }
+    });
+    viewport.addEventListener("pointerup", () => { dragStart = null; });
+    viewport.addEventListener("pointercancel", () => { dragStart = null; });
+
+    if (!window.mermaid) {
+      status.hidden = false;
+    } else {
+      target.className = "mermaid";
+      target.textContent = document.getElementById("diagram-source").textContent.trim();
+      mermaid.initialize({
+        startOnLoad: false,
+        securityLevel: "strict",
+        theme: "default",
+        flowchart: { htmlLabels: true, useMaxWidth: false, curve: "basis" }
+      });
+      mermaid.run({ nodes: [target] }).then(applyTransform).catch(() => {
+        status.hidden = false;
+      });
+    }
+  </script>
+</body>
+</html>

@@ -85,7 +85,7 @@ function kindLabel(kind: string): string {
 function chipClass(kind: string): string {
   return (
     KIND_TONE[kind.toLowerCase()] ??
-    'bg-slate-500/10 text-slate-300 ring-slate-500/30'
+    'bg-slate-500/10 text-fg-secondary ring-surface-border-strong/30'
   );
 }
 
@@ -320,14 +320,14 @@ export function InvestigationLedger({
   return (
     <div className="space-y-4">
       {/* Toolbar: run picker + filters + export */}
-      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-slate-800/80 bg-slate-900/40 px-3 py-2">
-        <span className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+      <div className="flex flex-wrap items-center gap-2 rounded-xl border border-surface-border bg-surface-card px-3 py-2">
+        <span className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Run
         </span>
         <select
           value={resolvedRunId ?? ''}
           onChange={(e) => onSelectRun?.(e.target.value)}
-          className="rounded-md border border-slate-700/70 bg-slate-900/60 px-2 py-1.5 text-xs text-slate-200 focus:border-emerald-500/40 focus:outline-none"
+          className="rounded-md border border-surface-border bg-surface-card px-2 py-1.5 text-xs text-fg-primary focus:border-brand-500 focus:outline-none"
         >
           {runs.map((r) => (
             <option key={r.id} value={r.id} suppressHydrationWarning>
@@ -343,7 +343,7 @@ export function InvestigationLedger({
             <select
               value={kindFilter ?? ''}
               onChange={(e) => setKindFilter(e.target.value || null)}
-              className="rounded-md border border-slate-700/70 bg-slate-900/60 px-2 py-1.5 text-xs text-slate-200 focus:border-emerald-500/40 focus:outline-none"
+              className="rounded-md border border-surface-border bg-surface-card px-2 py-1.5 text-xs text-fg-primary focus:border-brand-500 focus:outline-none"
               aria-label="Filter by event kind"
             >
               <option value="">All kinds ({events?.length ?? 0})</option>
@@ -359,7 +359,7 @@ export function InvestigationLedger({
             <select
               value={agentFilter ?? ''}
               onChange={(e) => setAgentFilter(e.target.value || null)}
-              className="rounded-md border border-slate-700/70 bg-slate-900/60 px-2 py-1.5 text-xs text-slate-200 focus:border-emerald-500/40 focus:outline-none"
+              className="rounded-md border border-surface-border bg-surface-card px-2 py-1.5 text-xs text-fg-primary focus:border-brand-500 focus:outline-none"
               aria-label="Filter by agent"
             >
               <option value="">All agents</option>
@@ -372,14 +372,14 @@ export function InvestigationLedger({
           )}
           <button
             onClick={() => void exportLedger()}
-            className="rounded-md border border-slate-700/70 bg-slate-800/50 px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:border-slate-600"
+            className="rounded-md border border-surface-border bg-surface-elevated px-2.5 py-1.5 text-xs font-medium text-fg-primary hover:border-surface-border"
             title="Export signed JSON for auditor handoff"
           >
             Export
           </button>
           <button
             onClick={() => void refreshEvents()}
-            className="rounded-md border border-slate-700/70 bg-slate-800/50 px-2.5 py-1.5 text-xs font-medium text-slate-200 hover:border-slate-600"
+            className="rounded-md border border-surface-border bg-surface-elevated px-2.5 py-1.5 text-xs font-medium text-fg-primary hover:border-surface-border"
             title="Refresh"
           >
             ↻
@@ -411,7 +411,7 @@ export function InvestigationLedger({
           <Panel
             title="Decision timeline"
             actions={
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-fg-muted">
                 {filteredEvents.length} of {events?.length ?? 0}
               </span>
             }
@@ -452,7 +452,7 @@ export function InvestigationLedger({
                   />
                 ))}
                 {isLive && (
-                  <li className="px-3 py-2 text-[11px] text-slate-500">
+                  <li className="px-3 py-2 text-[11px] text-fg-muted">
                     <span className="mr-1 inline-block h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                     Live — tailing for new events
                   </li>
@@ -518,7 +518,7 @@ function RunSummaryCard({
       : '—';
 
   return (
-    <div className="grid grid-cols-2 gap-3 rounded-xl border border-slate-800/80 bg-slate-900/40 p-4 text-xs sm:grid-cols-3 lg:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3 rounded-xl border border-surface-border bg-surface-card p-4 text-xs sm:grid-cols-3 lg:grid-cols-6">
       <Stat label="Run ID" value={<span className="font-mono">{run.id.slice(0, 8)}…</span>} />
       <Stat label="Status" value={<RunStatusBadge run={run} />} />
       <Stat label="Model" value={run.model_used ?? '—'} />
@@ -528,7 +528,7 @@ function RunSummaryCard({
         value={
           <span>
             {run.total_tokens.toLocaleString()}{' '}
-            <span className="text-slate-500">·</span> {formatRunCost(run)}
+            <span className="text-fg-muted">·</span> {formatRunCost(run)}
           </span>
         }
       />
@@ -537,7 +537,7 @@ function RunSummaryCard({
         value={
           <span suppressHydrationWarning>
             {format(startedAt, 'HH:mm:ss')}{' '}
-            <span className="text-slate-500">·</span> {duration}
+            <span className="text-fg-muted">·</span> {duration}
           </span>
         }
       />
@@ -546,7 +546,7 @@ function RunSummaryCard({
           <span className="font-semibold">Error:</span> {run.error}
         </div>
       )}
-      <div className="col-span-full text-[11px] text-slate-500">
+      <div className="col-span-full text-[11px] text-fg-muted">
         {eventCount} events recorded
       </div>
     </div>
@@ -580,19 +580,19 @@ function ModelCostsCard({ costs }: { costs: LedgerModelCost[] }) {
   );
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/40">
-      <div className="flex items-center justify-between border-b border-slate-800/80 px-3 py-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+    <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
+      <div className="flex items-center justify-between border-b border-surface-border px-3 py-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-fg-secondary">
           Cost by model
         </h3>
-        <span className="text-[10px] text-slate-500">
+        <span className="text-[10px] text-fg-muted">
           {sorted.length} model{sorted.length === 1 ? '' : 's'}
         </span>
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-800/60 text-xs">
-          <thead className="bg-slate-950/40">
-            <tr className="text-left text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+        <table className="min-w-full divide-y divide-surface-border text-xs">
+          <thead className="bg-surface-elevated/60">
+            <tr className="text-left text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
               <th className="px-3 py-2">Model</th>
               <th className="px-3 py-2 text-right">Calls</th>
               <th className="px-3 py-2 text-right">Prompt tok</th>
@@ -601,13 +601,13 @@ function ModelCostsCard({ costs }: { costs: LedgerModelCost[] }) {
               <th className="px-3 py-2 text-right">Latency</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/40">
+          <tbody className="divide-y divide-surface-border/70">
             {sorted.map((c) => (
-              <tr key={c.model} className="text-slate-300">
-                <td className="px-3 py-2 font-mono text-[11px] text-slate-200">
+              <tr key={c.model} className="text-fg-secondary">
+                <td className="px-3 py-2 font-mono text-[11px] text-fg-primary">
                   {c.model}
                   {c.resolved_model && (
-                    <span className="block text-[10px] text-slate-500">→ {c.resolved_model}</span>
+                    <span className="block text-[10px] text-fg-muted">→ {c.resolved_model}</span>
                   )}
                 </td>
                 <td className="px-3 py-2 text-right">{c.call_count.toLocaleString()}</td>
@@ -620,7 +620,7 @@ function ModelCostsCard({ costs }: { costs: LedgerModelCost[] }) {
                 <td className="px-3 py-2 text-right tabular-nums">
                   {formatModelCost(c)}
                 </td>
-                <td className="px-3 py-2 text-right text-slate-400">
+                <td className="px-3 py-2 text-right text-fg-muted">
                   {formatLatencyMs(c.total_latency_ms)}
                 </td>
               </tr>
@@ -682,7 +682,7 @@ function TimelineRow({
           'flex w-full items-start gap-2.5 rounded-lg border px-3 py-2 text-left transition-colors',
           selected
             ? 'border-emerald-500/40 bg-emerald-500/5'
-            : 'border-slate-800/60 bg-slate-900/30 hover:border-slate-700 hover:bg-slate-800/40',
+            : 'border-surface-border bg-surface-card/60 hover:border-surface-border hover:bg-surface-elevated/60',
         )}
       >
         <span className="mt-0.5 shrink-0 text-base leading-none">
@@ -690,7 +690,7 @@ function TimelineRow({
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="font-mono text-[10px] text-slate-500">
+            <span className="font-mono text-[10px] text-fg-muted">
               #{event.seq.toString().padStart(3, '0')}
             </span>
             <span
@@ -702,21 +702,21 @@ function TimelineRow({
               {kindLabel(event.kind)}
             </span>
             {event.agent && (
-              <span className="text-[11px] font-semibold text-slate-300">
+              <span className="text-[11px] font-semibold text-fg-secondary">
                 {event.agent}
               </span>
             )}
             {event.duration_ms > 0 && (
-              <span className="text-[10px] text-slate-500">
+              <span className="text-[10px] text-fg-muted">
                 {event.duration_ms}ms
               </span>
             )}
-            <span className="ml-auto shrink-0 text-[10px] text-slate-600" suppressHydrationWarning>
+            <span className="ml-auto shrink-0 text-[10px] text-fg-subtle" suppressHydrationWarning>
               {format(new Date(event.ts), 'HH:mm:ss.SSS')}
             </span>
           </div>
-          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-slate-400">
-            {event.summary || <span className="text-slate-600 italic">(no summary)</span>}
+          <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-fg-muted">
+            {event.summary || <span className="text-fg-subtle italic">(no summary)</span>}
           </p>
         </div>
       </button>
@@ -761,7 +761,7 @@ function ExplainPanel({ runId, step }: { runId: string; step: number }) {
     <Panel
       title="Why this step?"
       actions={
-        <span className="font-mono text-[10px] text-slate-500">
+        <span className="font-mono text-[10px] text-fg-muted">
           step #{focus.seq}
         </span>
       }
@@ -780,22 +780,22 @@ function ExplainPanel({ runId, step }: { runId: string; step: number }) {
               {kindLabel(focus.kind)}
             </span>
             {focus.agent && (
-              <span className="text-xs font-semibold text-slate-200">{focus.agent}</span>
+              <span className="text-xs font-semibold text-fg-primary">{focus.agent}</span>
             )}
-            <span className="ml-auto text-[10px] text-slate-500" suppressHydrationWarning>
+            <span className="ml-auto text-[10px] text-fg-muted" suppressHydrationWarning>
               {format(new Date(focus.ts), 'MMM d, HH:mm:ss.SSS')}
               {focus.duration_ms > 0 && ` · ${focus.duration_ms}ms`}
             </span>
           </div>
           {focus.summary && (
-            <p className="mt-1.5 text-sm text-slate-200">{focus.summary}</p>
+            <p className="mt-1.5 text-sm text-fg-primary">{focus.summary}</p>
           )}
         </div>
 
         {/* Cryptographic hashes for replay verification */}
         {(focus.input_hash || focus.output_hash) && (
-          <div className="rounded-lg border border-slate-800/60 bg-slate-950/40 p-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+          <div className="rounded-lg border border-surface-border bg-surface-elevated/60 p-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
               Replay hashes
             </p>
             <div className="mt-1.5 grid grid-cols-1 gap-1.5 text-[11px] sm:grid-cols-2">
@@ -819,7 +819,7 @@ function ExplainPanel({ runId, step }: { runId: string; step: number }) {
         {/* Artifacts (LLM transcripts, tool I/O) */}
         {artifacts.length > 0 && (
           <div className="space-y-2">
-            <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
               Artifacts ({artifacts.length})
             </p>
             {artifacts.map((art) => (
@@ -849,8 +849,8 @@ function ExplainPanel({ runId, step }: { runId: string; step: number }) {
 function HashRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="w-12 shrink-0 text-slate-500">{label}</span>
-      <code className="min-w-0 flex-1 truncate rounded bg-slate-900/60 px-1.5 py-0.5 font-mono text-[10px] text-slate-300">
+      <span className="w-12 shrink-0 text-fg-muted">{label}</span>
+      <code className="min-w-0 flex-1 truncate rounded bg-surface-card px-1.5 py-0.5 font-mono text-[10px] text-fg-secondary">
         {value}
       </code>
       <button
@@ -858,7 +858,7 @@ function HashRow({ label, value }: { label: string; value: string }) {
           void navigator.clipboard.writeText(value);
           toast.success('Hash copied');
         }}
-        className="text-[10px] text-slate-500 hover:text-slate-300"
+        className="text-[10px] text-fg-muted hover:text-fg-secondary"
         title="Copy hash"
       >
         copy
@@ -877,8 +877,8 @@ function NeighbourCard({
   placeholder: string;
 }) {
   return (
-    <div className="rounded-lg border border-slate-800/60 bg-slate-950/40 p-2.5">
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+    <div className="rounded-lg border border-surface-border bg-surface-elevated/60 p-2.5">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
         {label}
       </p>
       {event ? (
@@ -893,19 +893,19 @@ function NeighbourCard({
             >
               {kindLabel(event.kind)}
             </span>{' '}
-            <span className="text-[11px] font-semibold text-slate-300">
+            <span className="text-[11px] font-semibold text-fg-secondary">
               {event.agent}
             </span>
-            <p className="mt-0.5 line-clamp-2 text-[11px] text-slate-400">
+            <p className="mt-0.5 line-clamp-2 text-[11px] text-fg-muted">
               {event.summary || '—'}
             </p>
-            <p className="mt-0.5 font-mono text-[10px] text-slate-600" suppressHydrationWarning>
+            <p className="mt-0.5 font-mono text-[10px] text-fg-subtle" suppressHydrationWarning>
               #{event.seq} · {formatDistanceToNow(new Date(event.ts), { addSuffix: true })}
             </p>
           </div>
         </div>
       ) : (
-        <p className="mt-1 text-[11px] italic text-slate-600">{placeholder}</p>
+        <p className="mt-1 text-[11px] italic text-fg-subtle">{placeholder}</p>
       )}
     </div>
   );
@@ -915,34 +915,34 @@ function ArtifactBlock({ artifact }: { artifact: LedgerArtifactDetail }) {
   const [open, setOpen] = useState(false);
   const isText = !!artifact.content;
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-800/60 bg-slate-950/40">
+    <div className="overflow-hidden rounded-lg border border-surface-border bg-surface-elevated/60">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-slate-900/40"
+        className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-surface-card"
       >
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-slate-300">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-fg-secondary">
           {artifact.kind}
         </span>
-        <span className="text-[10px] text-slate-500">
+        <span className="text-[10px] text-fg-muted">
           {artifact.size_bytes.toLocaleString()} bytes
         </span>
-        <code className="ml-auto truncate font-mono text-[10px] text-slate-500">
+        <code className="ml-auto truncate font-mono text-[10px] text-fg-muted">
           sha256:{artifact.sha256.slice(0, 12)}…
         </code>
-        <span className="text-slate-500">{open ? '▾' : '▸'}</span>
+        <span className="text-fg-muted">{open ? '▾' : '▸'}</span>
       </button>
       {open && (
-        <div className="border-t border-slate-800/60 bg-slate-950/60 p-3">
+        <div className="border-t border-surface-border bg-surface-base p-3">
           {isText ? (
-            <pre className="max-h-[400px] overflow-auto whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-slate-300">
+            <pre className="max-h-[400px] overflow-auto whitespace-pre-wrap font-mono text-[11px] leading-relaxed text-fg-secondary">
               {artifact.content}
             </pre>
           ) : artifact.blob_ref ? (
-            <p className="text-[11px] text-slate-400">
-              Stored externally: <code className="text-slate-300">{artifact.blob_ref}</code>
+            <p className="text-[11px] text-fg-muted">
+              Stored externally: <code className="text-fg-secondary">{artifact.blob_ref}</code>
             </p>
           ) : (
-            <p className="text-[11px] italic text-slate-500">Empty artifact</p>
+            <p className="text-[11px] italic text-fg-muted">Empty artifact</p>
           )}
         </div>
       )}
@@ -961,18 +961,18 @@ function CollapsibleBlock({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="overflow-hidden rounded-lg border border-slate-800/60 bg-slate-950/40">
+    <div className="overflow-hidden rounded-lg border border-surface-border bg-surface-elevated/60">
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-slate-900/40"
+        className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-surface-card"
       >
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
           {title}
         </span>
-        <span className="ml-auto text-slate-500">{open ? '▾' : '▸'}</span>
+        <span className="ml-auto text-fg-muted">{open ? '▾' : '▸'}</span>
       </button>
       {open && (
-        <div className="border-t border-slate-800/60 bg-slate-950/60 p-3">
+        <div className="border-t border-surface-border bg-surface-base p-3">
           {children}
         </div>
       )}
@@ -982,7 +982,7 @@ function CollapsibleBlock({
 
 function JsonView({ value }: { value: unknown }) {
   return (
-    <pre className="max-h-[400px] overflow-auto font-mono text-[11px] leading-relaxed text-slate-300">
+    <pre className="max-h-[400px] overflow-auto font-mono text-[11px] leading-relaxed text-fg-secondary">
       {JSON.stringify(value, null, 2)}
     </pre>
   );
@@ -993,10 +993,10 @@ function JsonView({ value }: { value: unknown }) {
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
-      <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+      <p className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
         {label}
       </p>
-      <div className="mt-0.5 text-xs text-slate-200">{value}</div>
+      <div className="mt-0.5 text-xs text-fg-primary">{value}</div>
     </div>
   );
 }
@@ -1011,9 +1011,9 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/40">
-      <div className="flex items-center justify-between border-b border-slate-800/80 px-3 py-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+    <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
+      <div className="flex items-center justify-between border-b border-surface-border px-3 py-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-fg-secondary">
           {title}
         </h3>
         {actions}

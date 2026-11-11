@@ -1,0 +1,121 @@
+{
+  "id": "cloud-aws-cloudtrail-iam-privesc-rca-v1",
+  "name": "AWS CloudTrail: IAM Privilege Escalation & AssumeRole RCA",
+  "description": "Triggered by suspicious AWS CloudTrail IAM/STS events (AttachUserPolicy, PutRolePolicy, UpdateAssumeRolePolicy, CreateAccessKey). Enriches source IP & principal ARN, pivots across CloudTrail API history for root-cause analysis (RCA), gates destructive IAM rollback on human approval, and revokes active STS sessions.",
+  "version": "1.0.0",
+  "tags": [
+    "cloud-misconfig",
+    "cloud",
+    "aws",
+    "cloudtrail",
+    "iam",
+    "privilege-escalation",
+    "rca",
+    "mitre.t1078.004",
+    "mitre.t1098"
+  ],
+  "trigger": {
+    "on": "alert",
+    "severity": [
+      "high",
+      "critical"
+    ],
+    "tags": [
+      "cloud-misconfig",
+      "cloudtrail",
+      "aws-cloudtrail",
+      "iam"
+    ]
+  },
+  "author": "AiSOC",
+  "enabled": true,
+  "created_at": "2026-05-03T00:00:00+00:00",
+  "updated_at": "2026-05-03T00:00:00+00:00",
+  "steps": [
+    {
+      "id": "enrich-src-ip",
+      "name": "Enrich CloudTrail caller IP reputation & ASN",
+      "type": "enrich",
+      "params": {
+        "indicator_field": "alert.src_ip"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 30
+    },
+    {
+      "id": "query-cloudtrail-history",
+      "name": "Query 24h CloudTrail API timeline for principal ARN",
+      "type": "http",
+      "params": {
+        "url": "${AWS_URL}/cloudtrail/lookup?principal={{alert.principal_arn}}&window=24h",
+        "method": "GET"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    },
+    {
+      "id": "rca-cloudtrail",
+      "name": "AI Root Cause Analysis: correlate STS AssumeRole chain & blast radius",
+      "type": "investigate",
+      "params": {
+        "case_id_field": "alert.case_id",
+        "focus": "cloud"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 180
+    },
+    {
+      "id": "approve-iam-rollback",
+      "name": "Wait for human approval",
+      "type": "approval",
+      "params": {
+        "prompt": "Detach escalated IAM policy {{alert.policy}} and revoke active STS sessions for {{alert.principal_arn}}?"
+      },
+      "on_failure": "abort",
+      "retry_max": 0,
+      "timeout_seconds": 920
+    },
+    {
+      "id": "revoke-sts-and-detach",
+      "name": "Revoke STS sessions and detach escalated IAM policy",
+      "type": "http",
+      "params": {
+        "url": "${AWS_URL}/iam/{{alert.role}}/revoke-and-detach",
+        "method": "POST",
+        "body_template": "{\"principal_arn\":\"{{alert.principal_arn}}\",\"policy\":\"{{alert.policy}}\"}"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    },
+    {
+      "id": "notify-cloudsec",
+      "name": "Notify Cloud Security with CloudTrail RCA findings",
+      "type": "notify",
+      "params": {
+        "channel": "slack",
+        "message_template": "AWS CloudTrail IAM privilege escalation RCA completed for {{alert.principal_arn}} from {{alert.src_ip}}.",
+        "webhook_env": "SLACK_CLOUD_WEBHOOK"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 10
+    },
+    {
+      "id": "ticket-cloudtrail-rca",
+      "name": "Open AWS CloudTrail IAM RCA incident ticket",
+      "type": "create_ticket",
+      "params": {
+        "priority": "P1",
+        "title_template": "CloudTrail IAM PrivEsc RCA: {{alert.principal_arn}}",
+        "queue": "soc"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    }
+  ]
+}

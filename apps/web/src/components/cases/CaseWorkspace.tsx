@@ -45,6 +45,7 @@ import { InvestigationLedger } from "./InvestigationLedger";
 import { WarRoomPanel } from "./WarRoomPanel";
 import { ContextualActions } from "@/components/copilot/ContextualActions";
 import { canUseDemoData } from "@/lib/demoFallback";
+import { AiSpinner } from "@/components/ui/AiSpinner";
 
 type WorkspaceTab =
   "overview" | "investigation" | "attack-path" | "attack-chain" | "ledger" | "report";
@@ -187,7 +188,7 @@ const STATUS_DOT: Record<CaseStatus, string> = {
 };
 
 const TASK_STATUS_BADGE: Record<CaseTask["status"], string> = {
-  todo: "bg-slate-500/15 text-slate-300 ring-slate-500/30",
+  todo: "bg-slate-500/15 text-fg-secondary ring-surface-border-strong/30",
   in_progress: "bg-blue-500/15 text-blue-300 ring-blue-500/30",
   done: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30",
 };
@@ -206,7 +207,7 @@ const TIMELINE_ICON: Record<string, string> = {
 
 function StatusPill({ status }: { status: CaseStatus }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-700/70 bg-slate-800/40 px-2 py-0.5 text-xs font-medium text-slate-200">
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-surface-border bg-surface-elevated/60 px-2 py-0.5 text-xs font-medium text-fg-primary">
       <span className={clsx("h-1.5 w-1.5 rounded-full", STATUS_DOT[status])} />
       {STATUS_LABEL[status]}
     </span>
@@ -230,18 +231,18 @@ function TimelineItem({ event }: { event: CaseTimelineEvent }) {
   const icon = TIMELINE_ICON[event.type] ?? "·";
   return (
     <li className="relative pl-10">
-      <span className="absolute left-0 top-1 flex h-7 w-7 items-center justify-center rounded-full border border-slate-700/70 bg-slate-900 text-[10px] font-medium uppercase tracking-wide text-slate-400">
+      <span className="absolute left-0 top-1 flex h-7 w-7 items-center justify-center rounded-full border border-surface-border bg-surface-elevated text-[10px] font-medium uppercase tracking-wide text-fg-muted">
         {icon}
       </span>
-      <div className="rounded-lg border border-slate-800/60 bg-slate-900/40 p-3">
+      <div className="rounded-lg border border-surface-border bg-surface-card p-3">
         <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <p className="text-sm font-medium text-slate-100">{event.title}</p>
-          {event.actor && <span className="text-[11px] text-slate-500">by {event.actor}</span>}
-          <span className="ml-auto text-[11px] text-slate-500" suppressHydrationWarning>
+          <p className="text-sm font-medium text-fg-primary">{event.title}</p>
+          {event.actor && <span className="text-[11px] text-fg-muted">by {event.actor}</span>}
+          <span className="ml-auto text-[11px] text-fg-muted" suppressHydrationWarning>
             {formatDistanceToNow(new Date(event.timestamp), { addSuffix: true })}
           </span>
         </div>
-        {event.description && <p className="mt-1.5 text-xs text-slate-400">{event.description}</p>}
+        {event.description && <p className="mt-1.5 text-xs text-fg-muted">{event.description}</p>}
       </div>
     </li>
   );
@@ -257,7 +258,7 @@ function TaskRow({ task, onChangeStatus }: TaskRowProps) {
     task.status === "todo" ? "in_progress" : task.status === "in_progress" ? "done" : "todo";
 
   return (
-    <li className="flex items-start gap-2 rounded-lg border border-slate-800/60 bg-slate-900/40 px-3 py-2">
+    <li className="flex items-start gap-2 rounded-lg border border-surface-border bg-surface-card px-3 py-2">
       <button
         onClick={() => onChangeStatus(next)}
         className={clsx(
@@ -266,7 +267,7 @@ function TaskRow({ task, onChangeStatus }: TaskRowProps) {
             ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-300"
             : task.status === "in_progress"
               ? "border-blue-500/40 bg-blue-500/15 text-blue-300"
-              : "border-slate-600 text-slate-500 hover:border-slate-400"
+              : "border-surface-border text-fg-muted hover:border-surface-border-strong"
         )}
         aria-label={`Mark task ${next}`}
         title={`Move to ${next}`}
@@ -277,12 +278,12 @@ function TaskRow({ task, onChangeStatus }: TaskRowProps) {
         <p
           className={clsx(
             "text-sm",
-            task.status === "done" ? "text-slate-500 line-through" : "text-slate-100"
+            task.status === "done" ? "text-fg-muted line-through" : "text-fg-primary"
           )}
         >
           {task.title}
         </p>
-        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-slate-500">
+        <div className="mt-0.5 flex flex-wrap items-center gap-x-2 text-[11px] text-fg-muted">
           <span
             className={clsx(
               "inline-flex items-center rounded px-1.5 py-0.5 ring-1",
@@ -717,7 +718,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
         action={
           <Link
             href="/cases"
-            className="rounded-md border border-slate-700/70 bg-slate-800/50 px-3 py-1.5 text-sm font-medium text-slate-200 hover:border-slate-600"
+            className="rounded-md border border-surface-border bg-surface-elevated px-3 py-1.5 text-sm font-medium text-fg-primary hover:border-surface-border"
           >
             Back to cases
           </Link>
@@ -739,11 +740,11 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
       {/* Breadcrumb + demo banner */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs">
-          <Link href="/cases" className="text-slate-500 hover:text-slate-300">
+          <Link href="/cases" className="text-fg-muted hover:text-fg-secondary">
             Cases
           </Link>
-          <span className="text-slate-600">/</span>
-          <span className="font-mono text-slate-400">{caseRecord.id}</span>
+          <span className="text-fg-subtle">/</span>
+          <span className="font-mono text-fg-muted">{caseRecord.id}</span>
         </div>
         {useFallback && (
           <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] text-amber-300 ring-1 ring-amber-500/30">
@@ -754,7 +755,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
       </div>
 
       {/* Header */}
-      <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-5">
+      <div className="rounded-xl border border-surface-border bg-surface-card p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
@@ -770,19 +771,19 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
               {caseRecord.tags?.map((t) => (
                 <span
                   key={t}
-                  className="rounded bg-slate-800/60 px-2 py-0.5 text-[11px] text-slate-300"
+                  className="rounded bg-surface-elevated px-2 py-0.5 text-[11px] text-fg-secondary"
                 >
                   #{t}
                 </span>
               ))}
             </div>
-            <h1 className="mt-2 text-xl font-semibold text-white">{caseRecord.title}</h1>
+            <h1 className="mt-2 text-xl font-semibold text-fg-primary">{caseRecord.title}</h1>
             {caseRecord.description && (
-              <p className="mt-2 max-w-3xl text-sm text-slate-400">{caseRecord.description}</p>
+              <p className="mt-2 max-w-3xl text-sm text-fg-muted">{caseRecord.description}</p>
             )}
             {caseRecord.mitre && caseRecord.mitre.length > 0 && (
               <div className="mt-3 flex flex-wrap items-center gap-1.5 text-xs">
-                <span className="text-slate-500">MITRE ATT&CK:</span>
+                <span className="text-fg-muted">MITRE ATT&CK:</span>
                 {caseRecord.mitre.map((m) => (
                   <MitreChip key={m} id={m} />
                 ))}
@@ -802,7 +803,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
               value={caseRecord.status}
               onChange={(e) => void updateStatus(e.target.value as CaseStatus)}
               disabled={statusUpdating}
-              className="rounded-md border border-slate-700/70 bg-slate-900/60 px-2 py-1.5 text-xs text-slate-200 focus:border-emerald-500/40 focus:outline-none"
+              className="rounded-md border border-surface-border bg-surface-card px-2 py-1.5 text-xs text-fg-primary focus:border-brand-500 focus:outline-none"
             >
               {/*
                   The three it used to offer -- open, in_progress, pending --
@@ -828,16 +829,23 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
               onClick={() => void startInvestigation()}
               disabled={investigating}
               className={clsx(
-                "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors",
+                "inline-flex items-center gap-2 rounded-md border px-3.5 py-1.5 text-xs font-semibold transition-colors",
                 investigating
-                  ? "cursor-not-allowed border-slate-700/40 bg-slate-800/40 text-slate-500"
-                  : "border-emerald-500/40 bg-emerald-500/10 text-emerald-200 hover:bg-emerald-500/20"
+                  ? "cursor-not-allowed border-surface-border bg-surface-elevated text-fg-muted"
+                  : "border-brand-500/40 bg-brand-500/10 text-brand-400 hover:bg-brand-500/20"
               )}
             >
-              {investigating && (
-                <span className="h-3 w-3 animate-spin rounded-full border border-emerald-500/30 border-t-emerald-400" />
-              )}
-              {investigating ? "Investigating…" : "Investigate with agent"}
+              <AiSpinner
+                size="xs"
+                state={
+                  investigating
+                    ? "busy"
+                    : investigationStatus === "completed"
+                      ? "done"
+                      : "idle"
+                }
+              />
+              <span>{investigating ? "Investigating…" : "Investigate with agent"}</span>
             </button>
             {/*
               WS-D2 — deterministic, analyst-ready snapshot of the entire case
@@ -855,7 +863,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
               className={clsx(
                 "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors",
                 summaryDownloading || !caseRecord
-                  ? "cursor-not-allowed border-slate-700/40 bg-slate-800/40 text-slate-500"
+                  ? "cursor-not-allowed border-surface-border/60 bg-surface-elevated/60 text-fg-muted"
                   : "border-indigo-500/40 bg-indigo-500/10 text-indigo-200 hover:bg-indigo-500/20"
               )}
               title="Open a print-ready case summary (HTML → Save as PDF)"
@@ -869,7 +877,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
         </div>
 
         {/* Meta row */}
-        <div className="mt-4 grid grid-cols-2 gap-2 border-t border-slate-800/60 pt-4 text-xs text-slate-400 sm:grid-cols-4">
+        <div className="mt-4 grid grid-cols-2 gap-2 border-t border-surface-border pt-4 text-xs text-fg-muted sm:grid-cols-4">
           <Meta label="Assignee" value={caseRecord.assignee?.split("@")[0] ?? "—"} />
           <Meta
             label="Created"
@@ -894,14 +902,19 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 border-b border-slate-800/70 text-xs">
+      {/* [HIDDEN-UI P4 tab-demoted] was: <div className="flex items-center gap-1 border-b border-surface-border text-xs"> (underline tab bar).
+          Now a sticky section rail of pills; same activeTab state and panels. */}
+      <div className="sticky top-0 z-10 -mx-1 flex flex-wrap items-center gap-1 bg-surface-base/95 px-1 py-2 text-xs backdrop-blur">
         {VALID_TABS.map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={clsx(
-              "relative px-3 py-2 font-medium capitalize transition-colors",
-              activeTab === tab ? "text-emerald-300" : "text-slate-500 hover:text-slate-300"
+              // [HIDDEN-UI P4 tab-demoted] was: "relative px-3 py-2 font-medium capitalize transition-colors", activeTab === tab ? "text-brand-400" : "text-fg-muted hover:text-fg-primary"
+              "relative rounded-[0.75rem] px-3 py-1.5 font-medium capitalize transition-colors",
+              activeTab === tab
+                ? "bg-[var(--co-ac-bg)] text-[var(--co-ac)]"
+                : "text-fg-muted hover:bg-surface-hover hover:text-fg-primary"
             )}
           >
             {tab === "investigation" && investigating && (
@@ -940,9 +953,10 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
             ) : (
               tab
             )}
+            {/* [HIDDEN-UI P4 tab-demoted] active underline replaced by pill tint:
             {activeTab === tab && (
-              <span className="absolute inset-x-0 bottom-0 h-px bg-emerald-400" />
-            )}
+              <span className="absolute inset-x-0 bottom-0 h-0.5 bg-brand-400" />
+            )} */}
           </button>
         ))}
       </div>
@@ -953,7 +967,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
           status={investigationStatus}
           data={investigationData}
           liveSteps={liveSteps}
-          onViewReport={() => setActiveTab("report")}
+          onViewReport={() => setActiveTab("report")} onStartInvestigation={() => void startInvestigation()}
         />
       )}
 
@@ -1037,10 +1051,10 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
                       <li key={id}>
                         <Link
                           href={`/alerts?focus=${encodeURIComponent(id)}`}
-                          className="flex items-center justify-between rounded-md border border-slate-800/80 bg-slate-900/40 px-2.5 py-1.5 text-xs text-slate-300 transition-colors hover:border-slate-700 hover:bg-slate-800/40"
+                          className="flex items-center justify-between rounded-md border border-surface-border bg-surface-card px-2.5 py-1.5 text-xs text-fg-secondary transition-colors hover:border-surface-border hover:bg-surface-elevated/60"
                         >
                           <span className="font-mono">{id}</span>
-                          <span className="text-[10px] uppercase tracking-wide text-slate-500">
+                          <span className="text-[10px] uppercase tracking-wide text-fg-muted">
                             open
                           </span>
                         </Link>
@@ -1051,8 +1065,8 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
               </Panel>
 
               <Panel title="Tasks">
-                <div className="mb-2 flex items-center gap-2 text-[11px] text-slate-400">
-                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+                <div className="mb-2 flex items-center gap-2 text-[11px] text-fg-muted">
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-elevated">
                     <div
                       className="h-full rounded-full bg-emerald-500 transition-all"
                       style={{ width: `${tasksProgress}%` }}
@@ -1083,11 +1097,11 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
                       if (e.key === "Enter") void addTask();
                     }}
                     placeholder="Add task and press ↵"
-                    className="flex-1 rounded-md border border-slate-700/70 bg-slate-900/40 px-2 py-1.5 text-xs text-slate-100 placeholder-slate-600 focus:border-emerald-500/40 focus:outline-none"
+                    className="flex-1 rounded-md border border-surface-border bg-surface-card px-2 py-1.5 text-xs text-fg-primary placeholder-fg-subtle focus:border-brand-500 focus:outline-none"
                   />
                   <button
                     onClick={() => void addTask()}
-                    className="rounded-md bg-emerald-500 px-2.5 py-1.5 text-xs font-semibold text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+                    className="rounded-md bg-emerald-500 px-2.5 py-1.5 text-xs font-semibold text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-surface-elevated disabled:text-fg-muted"
                     disabled={!newTask.trim()}
                   >
                     Add
@@ -1101,7 +1115,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
               <Panel
                 title="Timeline"
                 actions={
-                  <span className="text-[11px] text-slate-500">{sortedTimeline.length} events</span>
+                  <span className="text-[11px] text-fg-muted">{sortedTimeline.length} events</span>
                 }
               >
                 {sortedTimeline.length === 0 ? (
@@ -1110,7 +1124,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
                     description="Activity, comments, and agent runs will appear here."
                   />
                 ) : (
-                  <ol className="relative space-y-3 before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-px before:bg-slate-800/80">
+                  <ol className="relative space-y-3 before:absolute before:left-3.5 before:top-2 before:bottom-2 before:w-px before:bg-surface-elevated">
                     {sortedTimeline.map((e) => (
                       <TimelineItem key={e.id} event={e} />
                     ))}
@@ -1128,19 +1142,19 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
                     onChange={(e) => setNewComment(e.target.value)}
                     rows={4}
                     placeholder="Drop your findings, IOCs, or next steps…"
-                    className="w-full resize-none rounded-md border border-slate-700/70 bg-slate-900/40 px-2 py-1.5 text-xs text-slate-100 placeholder-slate-600 focus:border-emerald-500/40 focus:outline-none"
+                    className="w-full resize-none rounded-md border border-surface-border bg-surface-card px-2 py-1.5 text-xs text-fg-primary placeholder-fg-subtle focus:border-brand-500 focus:outline-none"
                   />
                   <div className="flex items-center justify-end gap-2">
                     <button
                       onClick={() => setNewComment("")}
-                      className="rounded-md border border-slate-700/70 px-2.5 py-1.5 text-xs text-slate-300 hover:border-slate-600"
+                      className="rounded-md border border-surface-border px-2.5 py-1.5 text-xs text-fg-secondary hover:border-surface-border"
                     >
                       Clear
                     </button>
                     <button
                       onClick={() => void addComment()}
                       disabled={!newComment.trim()}
-                      className="rounded-md bg-emerald-500 px-2.5 py-1.5 text-xs font-semibold text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-500"
+                      className="rounded-md bg-emerald-500 px-2.5 py-1.5 text-xs font-semibold text-emerald-950 transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:bg-surface-elevated disabled:text-fg-muted"
                     >
                       Post
                     </button>
@@ -1153,7 +1167,7 @@ export function CaseWorkspace({ caseId }: { caseId: string }) {
                   defaultValue={caseRecord.resolution ?? ""}
                   rows={5}
                   placeholder="Final summary, root cause, remediation…"
-                  className="w-full resize-none rounded-md border border-slate-700/70 bg-slate-900/40 px-2 py-1.5 text-xs text-slate-100 placeholder-slate-600 focus:border-emerald-500/40 focus:outline-none"
+                  className="w-full resize-none rounded-md border border-surface-border bg-surface-card px-2 py-1.5 text-xs text-fg-primary placeholder-fg-subtle focus:border-brand-500 focus:outline-none"
                 />
               </Panel>
             </aside>
@@ -1173,33 +1187,47 @@ function InvestigationPanel({
   data,
   liveSteps,
   onViewReport,
+  onStartInvestigation,
 }: {
   status: string;
   data: Record<string, unknown> | null;
   liveSteps: LiveStep[];
   onViewReport: () => void;
+  onStartInvestigation?: () => void;
 }) {
   if (status === "idle" || status === "starting") {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 py-16 text-center">
-        <p className="text-sm font-medium text-slate-300">Agent investigation</p>
-        <p className="mt-1 max-w-md text-xs text-slate-500">
-          Use &ldquo;Investigate with agent&rdquo; in the header to run the recon, forensic, and
-          responder agents on this case.
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-surface-border bg-surface-card/60 py-14 px-6 text-center">
+        <AiSpinner size="lg" state={status === "starting" ? "busy" : "idle"} />
+        <p className="mt-4 text-sm font-semibold text-fg-primary">Agent investigation</p>
+        <p className="mt-1 max-w-md text-xs text-fg-muted leading-relaxed">
+          Use &ldquo;Investigate with agent&rdquo; in the header (or click below) to run the recon,
+          forensic, and responder agents on this case.
         </p>
+        {onStartInvestigation && (
+          <button
+            type="button"
+            onClick={onStartInvestigation}
+            disabled={status === "starting"}
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-brand-500 hover:bg-brand-400 px-4 py-2 text-xs font-semibold text-white transition-colors disabled:opacity-50"
+          >
+            <AiSpinner size="xs" state={status === "starting" ? "busy" : "idle"} />
+            <span>Trigger Manual AI Deep Dive</span>
+          </button>
+        )}
       </div>
     );
   }
 
   if (status === "running") {
     return (
-      <div className="rounded-xl border border-slate-800/70 bg-slate-900/30 p-5 space-y-4">
+      <div className="rounded-xl border border-brand-500/30 bg-surface-card p-5 space-y-4">
         <div className="flex items-center gap-3">
-          <span className="h-7 w-7 animate-spin rounded-full border-2 border-emerald-500/30 border-t-emerald-400 shrink-0" />
+          <AiSpinner size="md" state="busy" />
           <div>
-            <p className="text-sm font-medium text-slate-300">Investigation in progress…</p>
-            <p className="text-xs text-slate-500">
-              Agents are working. Steps appear below in real-time.
+            <p className="text-sm font-semibold text-fg-primary">Investigation in progress…</p>
+            <p className="text-xs text-fg-muted">
+              Agents are working (Recon &rarr; Forensic &rarr; Responder). Steps appear below in real-time.
             </p>
           </div>
         </div>
@@ -1212,7 +1240,7 @@ function InvestigationPanel({
     return (
       <div className="rounded-xl border border-red-800/40 bg-red-900/10 p-5">
         <p className="text-sm font-semibold text-red-300">Investigation failed</p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="mt-1 text-xs text-fg-muted">
           {String((data as { error?: string })?.error ?? "Unknown error")}
         </p>
         {liveSteps.length > 0 && (
@@ -1241,7 +1269,7 @@ function InvestigationPanel({
         </span>
         <button
           onClick={onViewReport}
-          className="rounded-md border border-slate-700/70 bg-slate-800/50 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-slate-600"
+          className="rounded-md border border-surface-border bg-surface-elevated px-3 py-1.5 text-xs font-medium text-fg-primary hover:border-surface-border"
         >
           View full report
         </button>
@@ -1249,18 +1277,18 @@ function InvestigationPanel({
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Recon */}
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-4 space-y-2">
+        <div className="rounded-xl border border-surface-border bg-surface-card p-4 space-y-2">
           <h4 className="text-xs font-semibold uppercase tracking-wide text-blue-300">Recon</h4>
           {recon?.summary != null && (
-            <p className="text-xs text-slate-400">{String(recon.summary)}</p>
+            <p className="text-xs text-fg-muted">{String(recon.summary)}</p>
           )}
           {Array.isArray(recon?.iocs) && recon.iocs.length > 0 && (
             <div>
-              <p className="text-[11px] text-slate-500 mb-1">IOCs found:</p>
+              <p className="text-[11px] text-fg-muted mb-1">IOCs found:</p>
               <ul className="space-y-0.5">
                 {(recon.iocs as Array<{ type: string; value: string }>).slice(0, 5).map((ioc) => (
-                  <li key={ioc.value} className="text-[11px] font-mono text-slate-300">
-                    <span className="text-slate-500">[{ioc.type}]</span> {ioc.value}
+                  <li key={ioc.value} className="text-[11px] font-mono text-fg-secondary">
+                    <span className="text-fg-muted">[{ioc.type}]</span> {ioc.value}
                   </li>
                 ))}
               </ul>
@@ -1281,28 +1309,28 @@ function InvestigationPanel({
         </div>
 
         {/* Forensic */}
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-4 space-y-2">
+        <div className="rounded-xl border border-surface-border bg-surface-card p-4 space-y-2">
           <h4 className="text-xs font-semibold uppercase tracking-wide text-purple-300">
             Forensic
           </h4>
           {forensic?.summary != null && (
-            <p className="text-xs text-slate-400">{String(forensic.summary)}</p>
+            <p className="text-xs text-fg-muted">{String(forensic.summary)}</p>
           )}
           {forensic?.root_cause_hypothesis != null && (
             <div>
-              <p className="text-[11px] text-slate-500">Root cause hypothesis:</p>
-              <p className="text-xs text-slate-300">{String(forensic.root_cause_hypothesis)}</p>
+              <p className="text-[11px] text-fg-muted">Root cause hypothesis:</p>
+              <p className="text-xs text-fg-secondary">{String(forensic.root_cause_hypothesis)}</p>
             </div>
           )}
           {typeof forensic?.confidence === "number" && (
             <div className="flex items-center gap-2">
-              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-800">
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-elevated">
                 <div
                   className="h-full rounded-full bg-purple-500"
                   style={{ width: `${(forensic.confidence as number) * 100}%` }}
                 />
               </div>
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[11px] text-fg-muted">
                 {Math.round((forensic.confidence as number) * 100)}% confidence
               </span>
             </div>
@@ -1310,10 +1338,10 @@ function InvestigationPanel({
         </div>
 
         {/* Responder */}
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-4 space-y-2">
+        <div className="rounded-xl border border-surface-border bg-surface-card p-4 space-y-2">
           <h4 className="text-xs font-semibold uppercase tracking-wide text-amber-300">Response</h4>
           {responder?.summary != null && (
-            <p className="text-xs text-slate-400">{String(responder.summary)}</p>
+            <p className="text-xs text-fg-muted">{String(responder.summary)}</p>
           )}
           {Array.isArray(responder?.recommended_actions) && (
             <ul className="space-y-1.5">
@@ -1323,7 +1351,7 @@ function InvestigationPanel({
                 const prio = typeof a.priority === "number" ? a.priority : null;
                 const risk = a.risk != null ? String(a.risk) : null;
                 return (
-                  <li key={i} className="flex items-start gap-1.5 text-xs text-slate-300">
+                  <li key={i} className="flex items-start gap-1.5 text-xs text-fg-secondary">
                     <span className="mt-0.5 h-1.5 w-1.5 flex-none rounded-full bg-amber-400" />
                     <span>
                       {prio != null && (
@@ -1338,7 +1366,7 @@ function InvestigationPanel({
                         </span>
                       )}
                       {a.rationale != null && String(a.rationale).length > 0 && (
-                        <span className="block text-[10px] text-slate-500">
+                        <span className="block text-[10px] text-fg-muted">
                           {String(a.rationale)}
                         </span>
                       )}
@@ -1366,8 +1394,8 @@ function InvestigationPanel({
       </div>
 
       {auditLog.length > 0 && (
-        <details className="rounded-xl border border-slate-800/80">
-          <summary className="cursor-pointer px-4 py-2 text-xs text-slate-400 hover:text-slate-200">
+        <details className="rounded-xl border border-surface-border">
+          <summary className="cursor-pointer px-4 py-2 text-xs text-fg-muted hover:text-fg-primary">
             Agent audit log ({auditLog.length} steps)
           </summary>
           <AuditLogPreview log={auditLog} />
@@ -1398,9 +1426,9 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
 
   if (!hasCaseId) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 py-16 text-center">
-        <p className="text-sm font-medium text-slate-300">Loading case context…</p>
-        <p className="mt-1 max-w-md text-xs text-slate-500">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-surface-border bg-surface-card/60 py-16 text-center">
+        <p className="text-sm font-medium text-fg-secondary">Loading case context…</p>
+        <p className="mt-1 max-w-md text-xs text-fg-muted">
           The attack-path graph appears once the case is loaded.
         </p>
       </div>
@@ -1428,7 +1456,7 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
 
   if (!data || data.nodeCount === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 py-16 text-center">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-surface-border bg-surface-card/60 py-16 text-center">
         <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/10 ring-1 ring-orange-500/30">
           <svg
             className="h-5 w-5 text-orange-300"
@@ -1444,8 +1472,8 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
             />
           </svg>
         </div>
-        <p className="text-sm font-medium text-slate-300">No attack path yet</p>
-        <p className="mt-1 max-w-md text-xs text-slate-500">
+        <p className="text-sm font-medium text-fg-secondary">No attack path yet</p>
+        <p className="mt-1 max-w-md text-xs text-fg-muted">
           The Attack-Path Investigation Agent reconstructs lateral movement and blast radius from
           linked alerts and graph entities. Run an investigation or link more alerts to surface a
           path here.
@@ -1466,8 +1494,8 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-medium text-slate-200">Reconstructed attack path</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="text-sm font-medium text-fg-primary">Reconstructed attack path</h3>
+          <p className="text-xs text-fg-muted">
             {data.nodeCount} node{data.nodeCount === 1 ? "" : "s"} · {data.edgeCount} edge
             {data.edgeCount === 1 ? "" : "s"} · depth ≤ 4
           </p>
@@ -1481,8 +1509,8 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
           backend returns dense graphs (10s of nodes is normal). */}
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {Object.entries(nodesByType).map(([type, nodes]) => (
-          <div key={type} className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-4">
-            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <div key={type} className="rounded-xl border border-surface-border bg-surface-card p-4">
+            <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-fg-muted">
               {type} ({nodes.length})
             </h4>
             <ul className="space-y-1.5">
@@ -1490,9 +1518,9 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
                 <li key={node.id} className="flex items-start gap-2 text-xs">
                   <span className="mt-0.5 inline-block h-1.5 w-1.5 rounded-full bg-orange-400/60 shrink-0" />
                   <div className="min-w-0">
-                    <p className="truncate font-mono text-slate-300">{node.label || node.id}</p>
+                    <p className="truncate font-mono text-fg-secondary">{node.label || node.id}</p>
                     {typeof node.properties?.risk_score === "number" && (
-                      <p className="text-[10px] text-slate-500">
+                      <p className="text-[10px] text-fg-muted">
                         risk score: {(node.properties.risk_score as number).toFixed(2)}
                       </p>
                     )}
@@ -1500,7 +1528,7 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
                 </li>
               ))}
               {nodes.length > 8 && (
-                <li className="text-[10px] italic text-slate-500">+{nodes.length - 8} more</li>
+                <li className="text-[10px] italic text-fg-muted">+{nodes.length - 8} more</li>
               )}
             </ul>
           </div>
@@ -1510,8 +1538,8 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
       {/* Edges — show the relationship verbs because that's what differentiates
           a benign topology snapshot from an actual attack chain. */}
       {data.edges.length > 0 && (
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-4">
-          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
+        <div className="rounded-xl border border-surface-border bg-surface-card p-4">
+          <h4 className="mb-2 text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Relationships
           </h4>
           <ul className="space-y-1">
@@ -1520,15 +1548,15 @@ function AttackPathPanel({ caseId }: { caseId: string }) {
                 key={`${edge.source}-${edge.target}-${i}`}
                 className="flex items-center gap-2 text-[11px] font-mono"
               >
-                <span className="truncate text-slate-300">{edge.source}</span>
-                <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-orange-300">
+                <span className="truncate text-fg-secondary">{edge.source}</span>
+                <span className="rounded bg-surface-elevated px-1.5 py-0.5 text-[10px] text-orange-300">
                   {edge.type}
                 </span>
-                <span className="truncate text-slate-300">{edge.target}</span>
+                <span className="truncate text-fg-secondary">{edge.target}</span>
               </li>
             ))}
             {data.edges.length > 12 && (
-              <li className="text-[10px] italic text-slate-500">
+              <li className="text-[10px] italic text-fg-muted">
                 +{data.edges.length - 12} more relationships
               </li>
             )}
@@ -1556,7 +1584,7 @@ const CHAIN_SEVERITY_STYLES: Record<string, string> = {
   high: "bg-orange-500/15 text-orange-300 ring-orange-500/30",
   medium: "bg-amber-500/15 text-amber-300 ring-amber-500/30",
   low: "bg-sky-500/15 text-sky-300 ring-sky-500/30",
-  info: "bg-slate-500/15 text-slate-300 ring-slate-500/30",
+  info: "bg-slate-500/15 text-fg-secondary ring-surface-border-strong/30",
 };
 
 function severityChipClass(severity: string): string {
@@ -1628,9 +1656,9 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
 
   if (!hasCaseId) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 py-16 text-center">
-        <p className="text-sm font-medium text-slate-300">Loading case context…</p>
-        <p className="mt-1 max-w-md text-xs text-slate-500">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-surface-border bg-surface-card/60 py-16 text-center">
+        <p className="text-sm font-medium text-fg-secondary">Loading case context…</p>
+        <p className="mt-1 max-w-md text-xs text-fg-muted">
           The attack-chain timeline appears once the case is loaded.
         </p>
       </div>
@@ -1664,7 +1692,7 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
     return (
       <div className="space-y-3">
         <WindowSelector value={windowParam} onChange={handleWindowChange} />
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 py-16 text-center">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-surface-border bg-surface-card/60 py-16 text-center">
           <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-rose-500/10 ring-1 ring-rose-500/30">
             <svg
               className="h-5 w-5 text-rose-300"
@@ -1680,8 +1708,8 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
               />
             </svg>
           </div>
-          <p className="text-sm font-medium text-slate-300">No attack chain yet</p>
-          <p className="mt-1 max-w-md text-xs text-slate-500">
+          <p className="text-sm font-medium text-fg-secondary">No attack chain yet</p>
+          <p className="mt-1 max-w-md text-xs text-fg-muted">
             An attack chain forms once two or more alerts in the {windowParam} window share entities
             or MITRE techniques. Link more alerts to the case or widen the window.
           </p>
@@ -1700,7 +1728,7 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
       ? "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30"
       : confidenceBand === "medium"
         ? "bg-amber-500/15 text-amber-300 ring-amber-500/30"
-        : "bg-slate-500/15 text-slate-300 ring-slate-500/30";
+        : "bg-slate-500/15 text-fg-secondary ring-surface-border-strong/30";
 
   const nodeCount = data.entityGraph.nodes.length;
   const edgeCount = data.entityGraph.edges.length;
@@ -1709,14 +1737,14 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-sm font-medium text-slate-200">Reconstructed attack chain</h3>
-          <p className="text-xs text-slate-500">
+          <h3 className="text-sm font-medium text-fg-primary">Reconstructed attack chain</h3>
+          <p className="text-xs text-fg-muted">
             {data.chain.length} link{data.chain.length === 1 ? "" : "s"} · {nodeCount} entit
             {nodeCount === 1 ? "y" : "ies"} · {edgeCount} edge{edgeCount === 1 ? "" : "s"} · window{" "}
             {data.window}
           </p>
           {data.chainSignature && (
-            <p className="mt-0.5 font-mono text-[10px] text-slate-600 truncate">
+            <p className="mt-0.5 font-mono text-[10px] text-fg-subtle truncate">
               signature: {data.chainSignature}
             </p>
           )}
@@ -1738,7 +1766,7 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
       {/* Vertical timeline. Steps are already sorted by event_time on the
           backend (oldest → newest); we render in that order so the analyst
           reads the chain the same way the campaign actually unfolded. */}
-      <ol className="relative space-y-3 border-l border-slate-800/60 pl-5">
+      <ol className="relative space-y-3 border-l border-surface-border pl-5">
         {data.chain.map((link, index) => {
           const sevClass = severityChipClass(link.severity);
           const isFirst = index === 0;
@@ -1755,11 +1783,11 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
               {/* Dot anchored to the spine */}
               <span
                 className={clsx(
-                  "absolute -left-[26px] top-2 inline-block h-2.5 w-2.5 rounded-full ring-2 ring-slate-950",
+                  "absolute -left-[26px] top-2 inline-block h-2.5 w-2.5 rounded-full ring-2 ring-surface-card",
                   isFirst ? "bg-rose-400" : "bg-slate-500"
                 )}
               />
-              <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-4">
+              <div className="rounded-xl border border-surface-border bg-surface-card p-4">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
@@ -1777,24 +1805,24 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
                         </span>
                       )}
                       {link.connectorType && (
-                        <span className="inline-flex items-center rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-medium text-slate-400 ring-1 ring-slate-700/60">
+                        <span className="inline-flex items-center rounded-full bg-surface-elevated px-2 py-0.5 text-[10px] font-medium text-fg-muted ring-1 ring-surface-border">
                           {link.connectorType}
                         </span>
                       )}
                       <span
-                        className="text-[10px] font-mono text-slate-500"
+                        className="text-[10px] font-mono text-fg-muted"
                         title="time since previous link"
                       >
                         Δt {dtLabel}
                       </span>
                     </div>
                     <p
-                      className="mt-1.5 text-sm font-medium text-slate-200 truncate"
+                      className="mt-1.5 text-sm font-medium text-fg-primary truncate"
                       title={link.title}
                     >
                       {link.title}
                     </p>
-                    <p className="mt-0.5 text-[11px] text-slate-500">
+                    <p className="mt-0.5 text-[11px] text-fg-muted">
                       {(() => {
                         try {
                           return `${format(new Date(link.eventTime), "MMM d, HH:mm:ss")} · ${formatDistanceToNow(new Date(link.eventTime), { addSuffix: true })}`;
@@ -1805,10 +1833,10 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
                     </p>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">
-                    <span className="rounded-md bg-slate-800/60 px-2 py-0.5 text-[10px] font-mono text-slate-300 ring-1 ring-slate-700/60">
+                    <span className="rounded-md bg-surface-elevated px-2 py-0.5 text-[10px] font-mono text-fg-secondary ring-1 ring-surface-border">
                       score {link.score.toFixed(2)}
                     </span>
-                    <span className="text-[10px] text-slate-600">distance {link.distance}</span>
+                    <span className="text-[10px] text-fg-subtle">distance {link.distance}</span>
                   </div>
                 </div>
 
@@ -1820,15 +1848,15 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
                     {link.sharedEntities.slice(0, 6).map((entity, i) => (
                       <span
                         key={`${entity.kind ?? "entity"}-${entity.value ?? i}`}
-                        className="inline-flex items-center gap-1 rounded bg-slate-800/70 px-1.5 py-0.5 text-[10px] font-mono text-slate-300 ring-1 ring-slate-700/60"
+                        className="inline-flex items-center gap-1 rounded bg-surface-elevated px-1.5 py-0.5 text-[10px] font-mono text-fg-secondary ring-1 ring-surface-border"
                         title={`Shared with previous link: ${entity.kind ?? ""}`}
                       >
-                        <span className="text-slate-500">{entity.kind}</span>
+                        <span className="text-fg-muted">{entity.kind}</span>
                         <span>{entity.value}</span>
                       </span>
                     ))}
                     {link.sharedEntities.length > 6 && (
-                      <span className="text-[10px] italic text-slate-500">
+                      <span className="text-[10px] italic text-fg-muted">
                         +{link.sharedEntities.length - 6} more
                       </span>
                     )}
@@ -1848,7 +1876,7 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
                       </span>
                     ))}
                     {link.mitreTechniques.length > 4 && (
-                      <span className="text-[10px] italic text-slate-500">
+                      <span className="text-[10px] italic text-fg-muted">
                         +{link.mitreTechniques.length - 4} more
                       </span>
                     )}
@@ -1864,12 +1892,12 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
           graph; here we just call out the entities that actually appear in
           the chain itself so the analyst can scan them at a glance. */}
       {data.entityGraph.nodes.length > 0 && (
-        <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-4">
+        <div className="rounded-xl border border-surface-border bg-surface-card p-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
               Entities in chain ({data.entityGraph.nodes.length})
             </h4>
-            <span className="text-[10px] text-slate-500">
+            <span className="text-[10px] text-fg-muted">
               {data.entityGraph.edges.length} connection
               {data.entityGraph.edges.length === 1 ? "" : "s"}
             </span>
@@ -1878,15 +1906,15 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
             {data.entityGraph.nodes.slice(0, 24).map((node) => (
               <li
                 key={node.id}
-                className="inline-flex items-center gap-1 rounded bg-slate-800/70 px-1.5 py-0.5 text-[10px] font-mono text-slate-300 ring-1 ring-slate-700/60"
+                className="inline-flex items-center gap-1 rounded bg-surface-elevated px-1.5 py-0.5 text-[10px] font-mono text-fg-secondary ring-1 ring-surface-border"
                 title={node.label ?? node.id}
               >
-                <span className="text-slate-500">{node.kind}</span>
+                <span className="text-fg-muted">{node.kind}</span>
                 <span className="truncate max-w-[160px]">{node.label ?? node.id}</span>
               </li>
             ))}
             {data.entityGraph.nodes.length > 24 && (
-              <li className="text-[10px] italic text-slate-500 self-center">
+              <li className="text-[10px] italic text-fg-muted self-center">
                 +{data.entityGraph.nodes.length - 24} more
               </li>
             )}
@@ -1894,7 +1922,7 @@ function AttackChainPanel({ caseId }: { caseId: string }) {
         </div>
       )}
 
-      <p className="text-[10px] text-slate-600">
+      <p className="text-[10px] text-fg-subtle">
         Chain computed at{" "}
         {(() => {
           try {
@@ -1918,7 +1946,7 @@ function WindowSelector({
 }) {
   return (
     <div
-      className="inline-flex items-center rounded-md border border-slate-800/80 bg-slate-900/40 p-0.5"
+      className="inline-flex items-center rounded-md border border-surface-border bg-surface-card p-0.5"
       role="group"
       aria-label="Attack chain time window"
     >
@@ -1930,8 +1958,8 @@ function WindowSelector({
           className={clsx(
             "rounded px-2 py-1 text-[11px] font-medium transition",
             value === opt.value
-              ? "bg-slate-800 text-slate-100 ring-1 ring-slate-700/60"
-              : "text-slate-400 hover:text-slate-200"
+              ? "bg-surface-elevated text-fg-primary ring-1 ring-surface-border"
+              : "text-fg-muted hover:text-fg-primary"
           )}
           aria-pressed={value === opt.value}
         >
@@ -1951,9 +1979,9 @@ function AuditLogPreview({
     <ul className="p-4 space-y-1.5">
       {log.map((entry, i) => (
         <li key={i} className="flex items-start gap-2 text-[11px]">
-          <span className="font-mono text-slate-500">[{entry.kind}]</span>
-          <span className="font-semibold text-slate-400">{entry.agent}:</span>
-          <span className="text-slate-400">{entry.summary}</span>
+          <span className="font-mono text-fg-muted">[{entry.kind}]</span>
+          <span className="font-semibold text-fg-muted">{entry.agent}:</span>
+          <span className="text-fg-muted">{entry.summary}</span>
         </li>
       ))}
     </ul>
@@ -1978,30 +2006,30 @@ function LiveStepsFeed({ steps }: { steps: LiveStep[] }) {
   }, [steps.length]);
 
   return (
-    <div className="rounded-lg border border-slate-800/60 bg-slate-950/60 overflow-hidden">
-      <div className="flex items-center justify-between px-3 py-1.5 border-b border-slate-800/60">
-        <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+    <div className="rounded-lg border border-surface-border bg-surface-base overflow-hidden">
+      <div className="flex items-center justify-between px-3 py-1.5 border-b border-surface-border">
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
           Live agent steps
         </span>
-        <span className="text-[10px] text-slate-600">{steps.length} events</span>
+        <span className="text-[10px] text-fg-subtle">{steps.length} events</span>
       </div>
-      <ul className="max-h-56 overflow-y-auto divide-y divide-slate-800/40">
+      <ul className="max-h-56 overflow-y-auto divide-y divide-surface-border/70">
         {steps.map((step, i) => {
           const label = AGENT_LABELS[step.kind] ?? step.kind;
           return (
             <li key={i} className="flex items-start gap-2.5 px-3 py-2">
-              <span className="shrink-0 mt-0.5 rounded border border-slate-700/60 bg-slate-900 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-slate-400">
+              <span className="shrink-0 mt-0.5 rounded border border-surface-border bg-surface-elevated px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-fg-muted">
                 {label}
               </span>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-[11px] font-semibold text-slate-300">{step.agent}</span>
-                  <span className="text-[10px] text-slate-600 font-mono">[{step.kind}]</span>
+                  <span className="text-[11px] font-semibold text-fg-secondary">{step.agent}</span>
+                  <span className="text-[10px] text-fg-subtle font-mono">[{step.kind}]</span>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-0.5 leading-relaxed">{step.summary}</p>
+                <p className="text-[11px] text-fg-muted mt-0.5 leading-relaxed">{step.summary}</p>
               </div>
               <span
-                className="shrink-0 text-[9px] text-slate-600 font-mono mt-0.5"
+                className="shrink-0 text-[9px] text-fg-subtle font-mono mt-0.5"
                 suppressHydrationWarning
               >
                 {new Date(step.ts).toLocaleTimeString([], {
@@ -2048,17 +2076,17 @@ function ReportPanel({
 
   if (!markdown) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 py-16 text-center">
-        <p className="text-sm font-medium text-slate-300">No report yet</p>
-        <p className="mt-1 text-xs text-slate-500">Run an investigation to generate a report.</p>
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-surface-border bg-surface-card/60 py-16 text-center">
+        <p className="text-sm font-medium text-fg-secondary">No report yet</p>
+        <p className="mt-1 text-xs text-fg-muted">Run an investigation to generate a report.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-slate-800/80 bg-slate-900/40">
-      <div className="flex items-center justify-between border-b border-slate-800/80 px-4 py-2">
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+    <div className="rounded-xl border border-surface-border bg-surface-card">
+      <div className="flex items-center justify-between border-b border-surface-border px-4 py-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-secondary">
           Incident Report
         </h2>
         <div className="flex items-center gap-3">
@@ -2073,7 +2101,7 @@ function ReportPanel({
               a.click();
               URL.revokeObjectURL(url);
             }}
-            className="text-[11px] text-slate-400 hover:text-slate-200"
+            className="text-[11px] text-fg-muted hover:text-fg-primary"
           >
             Download .md
           </button>
@@ -2085,7 +2113,7 @@ function ReportPanel({
               className={clsx(
                 "flex items-center gap-1 rounded px-2 py-0.5 text-[11px] font-medium transition-colors",
                 pdfDownloading
-                  ? "cursor-not-allowed text-slate-500"
+                  ? "cursor-not-allowed text-fg-muted"
                   : "bg-indigo-600/20 text-indigo-300 hover:bg-indigo-600/40"
               )}
             >
@@ -2106,7 +2134,7 @@ function ReportPanel({
           PDF error: {pdfError}
         </div>
       )}
-      <pre className="overflow-auto whitespace-pre-wrap p-4 font-mono text-[11px] leading-relaxed text-slate-300">
+      <pre className="overflow-auto whitespace-pre-wrap p-4 font-mono text-[11px] leading-relaxed text-fg-secondary">
         {markdown}
       </pre>
     </div>
@@ -2126,8 +2154,8 @@ function Meta({
 }) {
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wide text-slate-500">{label}</p>
-      <p className="mt-0.5 text-sm text-slate-200" suppressHydrationWarning={shw}>
+      <p className="text-[11px] uppercase tracking-wide text-fg-muted">{label}</p>
+      <p className="mt-0.5 text-sm text-fg-primary" suppressHydrationWarning={shw}>
         {value}
       </p>
     </div>
@@ -2144,13 +2172,13 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/40">
-      <div className="flex items-center justify-between border-b border-slate-800/80 px-3 py-2">
+    <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
+      <div className="flex items-center justify-between border-b border-surface-border px-3 py-2">
         {/* `h2`, not `h3`. The case title above is the page's `h1` and a
             panel is its direct child, so `h3` skipped a level -- which is
             what a screen-reader user navigating by heading reads as a
             missing section. The size is a class, not the tag. */}
-        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-300">{title}</h2>
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-secondary">{title}</h2>
         {actions}
       </div>
       <div className="p-3">{children}</div>

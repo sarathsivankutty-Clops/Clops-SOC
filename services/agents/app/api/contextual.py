@@ -371,16 +371,16 @@ def _fallback_response(system: str, user: str) -> str:
     # Keep this short and obviously synthetic so it doesn't get mistaken for
     # genuine analysis in a screenshot.
     return (
-        "## Heads up: LLM not configured\n\n"
-        "This deployment of AiSOC does not have `OPENAI_API_KEY` configured, "
-        "so the contextual Copilot cannot reach a language model right now. "
-        "You're seeing a deterministic placeholder response.\n\n"
-        "**To enable real contextual answers:**\n\n"
-        "1. Set `OPENAI_API_KEY` in your `.env` file — the gateway reads it\n"
-        "2. Bring up the `full` profile so the LiteLLM gateway runs; "
-        "`LLM_GATEWAY_URL` already points every service at it\n"
-        "3. Restart the `aisoc-agents` service\n\n"
-        "See the LLM-gateway docs for self-hosted model alternatives (Ollama, vLLM, Together)."
+        "## Heads up: LLM unavailable\n\n"
+        "The contextual Copilot could not complete a live model request, so this is a "
+        "deterministic placeholder response.\n\n"
+        "**For a Groq-backed deployment:**\n\n"
+        "1. Check that `GROQ_API_KEY` is valid and `AISOC_LLM_MODEL_FAST` / "
+        "`AISOC_LLM_MODEL_DEEP` in `.env` use Groq model names\n"
+        "2. Check the `litellm` service with `docker compose ps litellm` and inspect "
+        "its logs for provider errors\n"
+        "3. Recreate the gateway and agents after changing `.env`\n\n"
+        "This response is not an AI-generated analysis."
     )
 
 

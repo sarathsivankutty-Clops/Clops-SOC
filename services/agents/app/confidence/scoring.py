@@ -101,6 +101,18 @@ def score_triage(state: InvestigationState) -> tuple[float, list[str], str]:
         basis.append("hostname present (enables containment)")
         weight += 0.05
 
+    kb = getattr(state, "knowledge_base", None) or {}
+    kb_runbooks = kb.get("runbooks") if isinstance(kb, dict) else None
+    if isinstance(kb_runbooks, list) and kb_runbooks:
+        basis.append(f"corroborated by {len(kb_runbooks)} matched runbook(s) for RCA")
+        weight += min(0.10 + (len(kb_runbooks) - 1) * 0.04, 0.16)
+
+    if any(raw.get(k) for k in ("principal_arn", "resource_arn", "finding_type", "event_name", "trail")) and (
+        risk > 0 or _has_critical_keyword(state) or _has_high_keyword(state)
+    ):
+        basis.append("cloud audit trail & resource context present (enables RCA)")
+        weight += 0.06
+
     confidence = _clamp(weight)
 
     if confidence >= 0.80:
@@ -150,6 +162,18 @@ def score_investigation(state: InvestigationState) -> tuple[float, list[str], st
 
     if state.proposed_actions:
         basis.append(f"{len(state.proposed_actions)} proposed action(s)")
+
+    depth = getattr(state, "investigation_depth", None)
+    if isinstance(depth, dict) and (depth.get("reached_depth") or int(depth.get("distinct_pivots") or 0) >= 2):
+        pivots = int(depth.get("distinct_pivots") or 2)
+        basis.append(f"RCA deep investigation completed {pivots} distinct telemetry pivots")
+        weight += 0.12
+
+    kb = getattr(state, "knowledge_base", None) or {}
+    kb_runbooks = kb.get("runbooks") if isinstance(kb, dict) else None
+    if isinstance(kb_runbooks, list) and kb_runbooks:
+        basis.append(f"investigation guided by {len(kb_runbooks)} operational runbook(s)")
+        weight += 0.08
 
     # If enrichment ran but produced no malicious or suspicious classification,
     # *lower* confidence — false-positive prior strengthens.

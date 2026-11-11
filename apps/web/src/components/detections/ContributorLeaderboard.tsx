@@ -22,7 +22,7 @@ interface Contributor {
 const BADGE_STYLES: Record<Contributor['badge'], { bg: string; text: string; border: string; label: string }> = {
   platinum: { bg: 'bg-violet-500/10', text: 'text-violet-300', border: 'border-violet-500/30', label: 'Platinum' },
   gold:     { bg: 'bg-amber-500/10',  text: 'text-amber-300',  border: 'border-amber-500/30',  label: 'Gold' },
-  silver:   { bg: 'bg-gray-400/10',   text: 'text-gray-300',   border: 'border-gray-400/30',   label: 'Silver' },
+  silver:   { bg: 'bg-gray-400/10',   text: 'text-fg-secondary',   border: 'border-surface-border-strong/30',   label: 'Silver' },
   bronze:   { bg: 'bg-orange-500/10',  text: 'text-orange-300', border: 'border-orange-500/30', label: 'Bronze' },
 };
 
@@ -62,13 +62,13 @@ export function ContributorLeaderboard() {
   }, [sortBy]);
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-8">
+    <div className="rounded-2xl border border-surface-border bg-white/[0.02] p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h3 className="text-xl font-semibold tracking-tight text-white">
+          <h3 className="text-xl font-semibold tracking-tight text-fg-primary">
             Detection rule contributors
           </h3>
-          <p className="mt-2 max-w-2xl text-sm text-gray-400">
+          <p className="mt-2 max-w-2xl text-sm text-fg-muted">
             Community members and teams that contribute Sigma rules,
             platform-native detections, and cross-platform translations to
             the open-source detection corpus.
@@ -103,15 +103,15 @@ export function ContributorLeaderboard() {
               <div className={`text-xs font-bold uppercase tracking-wider ${s.text}`}>
                 {s.label}
               </div>
-              <div className="mt-1 text-[10px] text-gray-400">{t.label}</div>
+              <div className="mt-1 text-[10px] text-fg-muted">{t.label}</div>
             </div>
           );
         })}
       </div>
 
       <div className="mt-6">
-        <div className="flex items-center gap-3 border-b border-white/5 pb-3">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+        <div className="flex items-center gap-3 border-b border-surface-border pb-3">
+          <span className="text-xs font-medium text-fg-muted uppercase tracking-wider">
             Sort by
           </span>
           {(['rules', 'name'] as SortKey[]).map((key) => (
@@ -120,8 +120,8 @@ export function ContributorLeaderboard() {
               onClick={() => setSortBy(key)}
               className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
                 sortBy === key
-                  ? 'bg-white/10 text-white'
-                  : 'text-gray-500 hover:text-gray-300'
+                  ? 'bg-surface-hover text-fg-primary'
+                  : 'text-fg-muted hover:text-fg-secondary'
               }`}
             >
               {key === 'rules' ? 'Rule count' : 'Name'}
@@ -135,14 +135,14 @@ export function ContributorLeaderboard() {
             return (
               <div
                 key={c.name}
-                className="flex items-center gap-4 rounded-lg border border-white/5 bg-black/20 p-4"
+                className="flex items-center gap-4 rounded-lg border border-surface-border bg-black/20 p-4"
               >
-                <span className="w-6 text-right text-sm font-bold text-gray-500">
+                <span className="w-6 text-right text-sm font-bold text-fg-muted">
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-semibold text-white truncate">
+                    <span className="text-sm font-semibold text-fg-primary truncate">
                       {c.name}
                     </span>
                     <span
@@ -155,7 +155,7 @@ export function ContributorLeaderboard() {
                     {c.categories.map((cat) => (
                       <span
                         key={cat}
-                        className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] text-gray-400"
+                        className="rounded bg-surface-hover px-1.5 py-0.5 text-[10px] text-fg-muted"
                       >
                         {cat}
                       </span>
@@ -163,8 +163,8 @@ export function ContributorLeaderboard() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-lg font-bold text-white">{c.rules}</span>
-                  <span className="ml-1 text-xs text-gray-500">rules</span>
+                  <span className="text-lg font-bold text-fg-primary">{c.rules}</span>
+                  <span className="ml-1 text-xs text-fg-muted">rules</span>
                 </div>
               </div>
             );
@@ -173,17 +173,17 @@ export function ContributorLeaderboard() {
       </div>
 
       {sorted.length <= 1 && (
-        <div className="mt-6 rounded-lg border border-dashed border-white/10 bg-black/20 p-6 text-center">
-          <p className="text-sm text-gray-400">
+        <div className="mt-6 rounded-lg border border-dashed border-surface-border bg-black/20 p-6 text-center">
+          <p className="text-sm text-fg-muted">
             The community leaderboard grows as detection rule PRs are merged.
           </p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-fg-muted">
             Submit your first rule using the{' '}
             <a
               href={CONTRIBUTE_URL}
               target="_blank"
               rel="noreferrer"
-              className="underline decoration-dotted hover:text-gray-300"
+              className="underline decoration-dotted hover:text-fg-secondary"
             >
               detection rule PR template
             </a>{' '}
@@ -192,20 +192,20 @@ export function ContributorLeaderboard() {
         </div>
       )}
 
-      <div className="mt-6 flex items-center justify-between border-t border-white/5 pt-4">
-        <p className="text-xs text-gray-500">
+      <div className="mt-6 flex items-center justify-between border-t border-surface-border pt-4">
+        <p className="text-xs text-fg-muted">
           Corpus:{' '}
           <a
             href={DETECTIONS_URL}
             target="_blank"
             rel="noreferrer"
-            className="underline decoration-dotted hover:text-gray-300"
+            className="underline decoration-dotted hover:text-fg-secondary"
           >
             {sorted.reduce((sum, c) => sum + c.rules, 0).toLocaleString()} executable rules
             across {[...new Set(sorted.flatMap((c) => c.categories))].length} categories
           </a>
         </p>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-fg-muted">
           Badge tiers update as PRs are merged.
         </p>
       </div>

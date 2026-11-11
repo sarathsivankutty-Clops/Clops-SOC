@@ -65,14 +65,14 @@ export function ResponseActionsPanel() {
   return (
     <section
       aria-labelledby="ops-approvals-heading"
-      className="rounded-xl border border-gray-800/60 bg-gray-900/40"
+      className="rounded-xl border border-surface-border/60 bg-surface-card/40"
     >
       <div className="flex items-baseline justify-between px-4 py-3">
         <div>
-          <h2 id="ops-approvals-heading" className="text-sm font-medium text-gray-300">
+          <h2 id="ops-approvals-heading" className="text-sm font-medium text-fg-secondary">
             Actions awaiting approval
           </h2>
-          <p className="mt-0.5 text-[11px] text-gray-500">
+          <p className="mt-0.5 text-[11px] text-fg-subtle">
             Containment the agent has proposed and paused on.
           </p>
         </div>
@@ -84,7 +84,7 @@ export function ResponseActionsPanel() {
       </div>
 
       {isLoading && !data ? (
-        <div className="m-4 h-20 animate-pulse rounded bg-gray-800/40" />
+        <div className="m-4 h-20 animate-pulse rounded bg-surface-elevated/40" />
       ) : error ? (
         <ErrorState
           title="Approval queue unavailable"
@@ -107,7 +107,7 @@ export function ResponseActionsPanel() {
             {sorted.slice(0, 6).map((item) => (
               <li
                 key={item.id}
-                className="border-t border-gray-800/40 px-4 py-2.5 first:border-t-0"
+                className="border-t border-surface-border/40 px-4 py-2.5 first:border-t-0"
               >
                 <Link
                   href="/responder/approvals"
@@ -122,19 +122,19 @@ export function ResponseActionsPanel() {
                     {item.risk_level}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm text-gray-200">{item.title}</span>
-                    <span className="block truncate text-[11px] text-gray-500">
+                    <span className="block truncate text-sm text-fg-primary">{item.title}</span>
+                    <span className="block truncate text-[11px] text-fg-subtle">
                       {item.summary}
                     </span>
                   </span>
-                  <span className="shrink-0 text-[11px] text-gray-500">
+                  <span className="shrink-0 text-[11px] text-fg-subtle">
                     {formatWaitingFor(item.created_at)}
                   </span>
                 </Link>
               </li>
             ))}
           </ul>
-          <div className="border-t border-gray-800/40 px-4 py-2.5">
+          <div className="border-t border-surface-border/40 px-4 py-2.5">
             <Link
               href="/responder/approvals"
               className="text-xs text-blue-400 underline underline-offset-2 hover:text-blue-300"

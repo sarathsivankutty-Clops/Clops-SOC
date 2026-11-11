@@ -205,7 +205,7 @@ function TruncationNotice({
         <select
           value={depth}
           onChange={(event) => onNarrow(Number(event.target.value))}
-          className="rounded border border-amber-500/40 bg-slate-900/80 px-2 py-1 text-xs text-amber-100 focus:outline-none focus:ring-1 focus:ring-amber-400"
+          className="rounded border border-amber-500/40 bg-surface-card px-2 py-1 text-xs text-amber-100 focus:outline-none focus:ring-1 focus:ring-amber-400"
         >
           {DEPTH_CHOICES.map((choice) => (
             <option key={choice} value={choice}>
@@ -408,7 +408,7 @@ function MitreHeatmap({ coverage }: { coverage: MitreCoverage }) {
       >
         {coverage.tactics.map((tactic) => (
           <div key={tactic} className="flex flex-col gap-1">
-            <div className="text-[10px] uppercase tracking-wider text-slate-400 mb-1 truncate">
+            <div className="text-[10px] uppercase tracking-wider text-fg-secondary mb-1 truncate">
               {tactic}
             </div>
             {(grouped.get(tactic) ?? []).map((cell) => {
@@ -418,10 +418,10 @@ function MitreHeatmap({ coverage }: { coverage: MitreCoverage }) {
                   key={cell.techniqueId}
                   title={`${cell.techniqueId} ${cell.techniqueName} — ${cell.detections} detections / ${cell.alerts} alerts`}
                   className={clsx(
-                    'rounded px-2 py-1.5 text-[10px] font-medium border border-white/5 hover:border-white/30 transition-colors cursor-default',
+                    'rounded px-2 py-1.5 text-[10px] font-medium border border-surface-border hover:border-surface-border transition-colors cursor-default',
                     cell.detections === 0
-                      ? 'text-slate-500'
-                      : 'text-white',
+                      ? 'text-fg-muted'
+                      : 'text-fg-primary',
                   )}
                   style={{
                     backgroundColor:
@@ -557,13 +557,13 @@ export function AttackGraphView() {
       <header className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-white">Attack Graph</h1>
-            <p className="text-sm text-slate-400">
+            <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-semibold text-white */>Attack Graph</h1>
+            <p className="text-sm text-fg-secondary">
               Live identity, asset, and ATT&amp;CK relationships across your
               telemetry.
             </p>
           </div>
-          <div className="text-xs text-slate-500" suppressHydrationWarning>
+          <div className="text-xs text-fg-muted" suppressHydrationWarning>
             {graph
               ? `Generated ${new Date(graph.generatedAt).toLocaleTimeString()}`
               : ''}
@@ -572,7 +572,7 @@ export function AttackGraphView() {
       </header>
 
       {/* Graph panel */}
-      <section className="rounded-xl bg-slate-900/60 border border-white/5 overflow-hidden">
+      <section className="rounded-xl bg-surface-card border border-surface-border overflow-hidden">
         {/*
           Above the canvas, and only when the response says so. The three
           existing states are deliberately untouched: an empty tenant still
@@ -629,7 +629,7 @@ export function AttackGraphView() {
             )}
 
             {/* Legend */}
-            <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 text-[10px] uppercase tracking-wider text-slate-300 bg-slate-900/80 backdrop-blur-sm rounded-lg p-2 border border-white/10">
+            <div className="absolute bottom-3 left-3 flex flex-wrap gap-2 text-[10px] uppercase tracking-wider text-fg-secondary bg-surface-card backdrop-blur-sm rounded-lg p-2 border border-surface-border">
               {(
                 [
                   'host',
@@ -655,43 +655,43 @@ export function AttackGraphView() {
           </div>
 
           {/* Side panel */}
-          <aside className="border-l border-white/5 bg-slate-900/80 p-4 text-sm">
-            <h2 className="text-xs uppercase tracking-wider text-slate-400 mb-3">
+          <aside className="border-l border-surface-border bg-surface-card p-4 text-sm">
+            <h2 className="text-xs uppercase tracking-wider text-fg-secondary mb-3">
               {selected ? 'Selected entity' : 'How to read this'}
             </h2>
             {selected ? (
               <div className="space-y-3">
                 <div>
-                  <div className="text-xs text-slate-500">{selected.kind}</div>
-                  <div className="text-base font-medium text-white truncate">
+                  <div className="text-xs text-fg-muted">{selected.kind}</div>
+                  <div className="text-base font-medium text-fg-primary truncate">
                     {selected.label}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="rounded bg-slate-800/60 px-2 py-1.5">
-                    <div className="text-slate-500">Risk</div>
-                    <div className="text-white font-medium">
+                  <div className="rounded bg-surface-sunken px-2 py-1.5">
+                    <div className="text-fg-muted">Risk</div>
+                    <div className="text-fg-primary font-medium">
                       {selected.riskScore ?? '—'}
                     </div>
                   </div>
-                  <div className="rounded bg-slate-800/60 px-2 py-1.5">
-                    <div className="text-slate-500">Severity</div>
-                    <div className="text-white font-medium">
+                  <div className="rounded bg-surface-sunken px-2 py-1.5">
+                    <div className="text-fg-muted">Severity</div>
+                    <div className="text-fg-primary font-medium">
                       {selected.severity ?? '—'}
                     </div>
                   </div>
                 </div>
                 <button
-                  className="w-full text-xs px-3 py-2 rounded bg-blue-500/20 text-blue-300 hover:bg-blue-500/30 border border-blue-500/30"
+                  className="w-full text-xs px-3 py-2 rounded bg-blue-500/20 text-brand-300 hover:bg-brand-500/30 border border-brand-500/30"
                   onClick={() => setSelected(null)}
                 >
                   Clear selection
                 </button>
               </div>
             ) : (
-              <ul className="space-y-2 text-xs text-slate-400 leading-relaxed">
+              <ul className="space-y-2 text-xs text-fg-secondary leading-relaxed">
                 <li>
-                  <span className="text-white font-medium">Click</span> any node
+                  <span className="text-fg-primary font-medium">Click</span> any node
                   to inspect its risk score and attributes.
                 </li>
                 <li>
@@ -719,18 +719,18 @@ export function AttackGraphView() {
       </section>
 
       {/* MITRE heatmap */}
-      <section className="rounded-xl bg-slate-900/60 border border-white/5 p-5">
+      <section className="rounded-xl bg-surface-card border border-surface-border p-5">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className="text-lg font-semibold text-fg-primary">
               MITRE ATT&amp;CK Coverage
             </h2>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-fg-secondary">
               Detection density across tactics. Brighter cells mean more
               detections firing on that technique.
             </p>
           </div>
-          <div className="text-xs text-slate-500" suppressHydrationWarning>
+          <div className="text-xs text-fg-muted" suppressHydrationWarning>
             {mitre
               ? `Updated ${new Date(mitre.generatedAt).toLocaleTimeString()}`
               : ''}

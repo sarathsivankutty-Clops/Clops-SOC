@@ -48,8 +48,8 @@ export default function CompliancePage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-white">Compliance Frameworks</h1>
-        <p className="text-gray-400 text-sm mt-1">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-white */>Compliance Frameworks</h1>
+        <p className="text-fg-muted text-sm mt-1">
           Select a framework to view controls, collect evidence, and export reports.
         </p>
       </div>
@@ -59,17 +59,17 @@ export default function CompliancePage() {
           <Link
             key={fw.id}
             href={`/compliance/${fw.id}`}
-            className="block bg-gray-800 border border-gray-700 rounded-lg p-5 hover:border-blue-500 hover:bg-gray-750 transition-all group"
+            className="block bg-surface-elevated border border-surface-border rounded-lg p-5 hover:border-blue-500 hover:bg-gray-750 transition-all group"
           >
             <div className="flex items-start justify-between mb-3">
-              <h2 className="text-white font-semibold text-base group-hover:text-blue-400 transition-colors">
+              <h2 className="text-fg-primary font-semibold text-base group-hover:text-blue-400 transition-colors">
                 {fw.name}
               </h2>
-              <span className="ml-2 flex-shrink-0 text-xs bg-gray-700 text-gray-300 px-2 py-0.5 rounded-full">
+              <span className="ml-2 flex-shrink-0 text-xs bg-surface-hover text-fg-secondary px-2 py-0.5 rounded-full">
                 {fw.badge}
               </span>
             </div>
-            <p className="text-gray-400 text-sm leading-relaxed">{fw.description}</p>
+            <p className="text-fg-muted text-sm leading-relaxed">{fw.description}</p>
             <div className="mt-4 text-blue-400 text-xs font-medium group-hover:text-blue-300">
               View Dashboard →
             </div>

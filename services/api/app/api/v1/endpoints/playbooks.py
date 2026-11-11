@@ -117,6 +117,22 @@ async def get_run(run_id: str, user: ReadUser):
     return await _proxy("GET", f"/runs/{safe_run_id}", tenant_id=user.tenant_id)
 
 
+@router.get("/blueprints", summary="List runbook blueprints")
+async def list_blueprints(user: ReadUser):
+    return await _proxy("GET", "/blueprints", tenant_id=user.tenant_id)
+
+
+@router.get("/packs-catalog", summary="List composable packs catalog")
+async def list_packs_catalog(user: ReadUser):
+    return await _proxy("GET", "/packs-catalog", tenant_id=user.tenant_id)
+
+
+@router.post("/investigate-story", summary="Perform context-first investigation and emit Dual-Projection story")
+async def investigate_story(request: Request, user: ReadUser):
+    body = await request.json()
+    return await _proxy("POST", "/investigate-story", json=body, tenant_id=user.tenant_id)
+
+
 @router.get("/{playbook_id}", summary="Get a playbook")
 async def get_playbook(playbook_id: str, user: ReadUser):
     safe_id = _validate_path_id(playbook_id, "playbook_id")

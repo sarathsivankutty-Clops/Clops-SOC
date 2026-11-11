@@ -32,10 +32,14 @@
 # model. **To upgrade**, put a provider key in `.env` and set the two model
 # variables beside it:
 #
-#     OPENAI_API_KEY=sk-...
+#     OPENAI_API_KEY=sk-...  (or GROQ_API_KEY for Groq)
 #     AISOC_LLM_MODEL_FAST=openai/gpt-4o-mini
 #     AISOC_LLM_MODEL_DEEP=openai/gpt-4o
 #     AISOC_LLM_API_BASE=
+#
+# For Groq, use `groq/<model-id>` and set GROQ_API_KEY. Compose passes that
+# credential to LiteLLM when OPENAI_API_KEY is empty; leave api_base empty so
+# LiteLLM uses Groq's endpoint.
 #
 # then `make up` again. No code change, no profile change, no edit to this file.
 # Air-gapped deployments keep the defaults and never set a key.

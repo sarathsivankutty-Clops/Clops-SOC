@@ -591,35 +591,65 @@ else
   pass "no container exited with an error"
 fi
 
-# ── 5c. The local model ─────────────────────────────────────────────────────
+# ── 5c. Local Ollama models ──────────────────────────────────────────────────
 #
-# The one-shot `ollama-pull` fetches the model AI triage runs on. It exits 0
-# whether or not that works — deliberately, because a missing model is a
-# degraded capability and not a broken stack, and representing it as a dead
-# container is what used to abort the entire `up` — so its exit code says
-# nothing and the state has to be probed where it is used.
+# The one-shot `ollama-pull` always fetches the ATT&CK embedding model, and
+# fetches a chat model only when a configured chat alias uses Ollama. It exits
+# 0 whether or not a pull works, so probe the models the deployment needs.
 #
-# The check is therefore "does Ollama have the model", not "did the pull
+# The check is "does Ollama have the required models", not "did the pull
 # container succeed".
-head2 "Local model"
+head2 "Local Ollama models"
 MODEL_NAME="${AISOC_LLM_LOCAL_MODEL:-$(sed -n 's/^AISOC_LLM_LOCAL_MODEL=//p' .env 2>/dev/null | tail -n1 | tr -d '\r')}"
 MODEL_NAME="${MODEL_NAME:-llama3.2:3b-instruct-q4_K_M}"
+EMBEDDING_MODEL="${AISOC_EMBEDDING_MODEL:-$(sed -n 's/^AISOC_EMBEDDING_MODEL=//p' .env 2>/dev/null | tail -n1 | tr -d '\r')}"
+EMBEDDING_MODEL="${EMBEDDING_MODEL:-nomic-embed-text}"
+MODEL_FAST="${AISOC_LLM_MODEL_FAST:-$(sed -n 's/^AISOC_LLM_MODEL_FAST=//p' .env 2>/dev/null | tail -n1 | tr -d '\r')}"
+MODEL_DEEP="${AISOC_LLM_MODEL_DEEP:-$(sed -n 's/^AISOC_LLM_MODEL_DEEP=//p' .env 2>/dev/null | tail -n1 | tr -d '\r')}"
+MODEL_FAST="${MODEL_FAST:-ollama_chat/$MODEL_NAME}"
+MODEL_DEEP="${MODEL_DEEP:-ollama_chat/$MODEL_NAME}"
+LOCAL_CHAT_REQUIRED=0
+case "$MODEL_FAST $MODEL_DEEP" in
+  *ollama_chat/*|*ollama/*) LOCAL_CHAT_REQUIRED=1 ;;
+esac
+
+model_present() {
+  local model="$1"
+  local tag="$model"
+  case "$tag" in
+    *:*) ;;
+    *) tag="${tag}:latest" ;;
+  esac
+  printf '%s' "$tags" | grep -qF "\"$tag\""
+}
+
 if ! svc_running ollama; then
-  warn "ollama is not running, so there is no local model — AI triage falls back to the deterministic path" \
+  warn "ollama is not running, so local ATT&CK embeddings are unavailable" \
        "$COMPOSE_HINT up -d ollama ollama-pull"
+  if [ "$LOCAL_CHAT_REQUIRED" -eq 1 ]; then
+    printf '  %sLocal AI triage also falls back to the deterministic path.%s\n' "$D" "$X"
+  fi
 elif tags="$(curl -s -m 8 "$(svc_base_url ollama 11434 http://localhost:11434)/api/tags" 2>/dev/null)" \
      && printf '%s' "$tags" | grep -q '"models"'; then
-  if printf '%s' "$tags" | grep -qF "\"$MODEL_NAME\""; then
-    pass "local model present: $MODEL_NAME"
+  if model_present "$EMBEDDING_MODEL"; then
+    pass "ATT&CK embedding model present: $EMBEDDING_MODEL"
   else
-    # Named, with the remedy, and bounded: everything else is working.
-    warn "ollama is up but does not have $MODEL_NAME — the ollama-pull container could not fetch it" \
+    warn "ollama is up but does not have $EMBEDDING_MODEL — the ollama-pull container could not fetch it" \
          "$COMPOSE_HINT logs ollama-pull | tail -30   (then: $COMPOSE_HINT run --rm ollama-pull to retry, or 'make up-host-llm' to use an Ollama you already run)"
-    printf '  %sAI triage runs deterministically until a model is available. Ingest, fusion,%s\n' "$D" "$X"
-    printf '  %sdetection, alerting and the console are unaffected.%s\n' "$D" "$X"
+    printf '  %sATT&CK semantic embeddings are unavailable until this model is installed.%s\n' "$D" "$X"
+  fi
+  if [ "$LOCAL_CHAT_REQUIRED" -eq 1 ]; then
+    if model_present "$MODEL_NAME"; then
+      pass "local chat model present: $MODEL_NAME"
+    else
+      warn "ollama is up but does not have $MODEL_NAME — the ollama-pull container could not fetch it" \
+           "$COMPOSE_HINT logs ollama-pull | tail -30   (then: $COMPOSE_HINT run --rm ollama-pull to retry, or 'make up-host-llm' to use an Ollama you already run)"
+      printf '  %sLocal AI triage runs deterministically until a chat model is available.%s\n' "$D" "$X"
+      printf '  %sIngest, fusion, detection, alerting and the console are unaffected.%s\n' "$D" "$X"
+    fi
   fi
 else
-  warn "ollama is running but did not answer /api/tags, so the model cannot be confirmed" \
+  warn "ollama is running but did not answer /api/tags, so required local models cannot be confirmed" \
        "$COMPOSE_HINT logs ollama | tail -30"
 fi
 

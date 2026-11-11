@@ -191,26 +191,26 @@ export function AttackStory({
 
   return (
     <section
-      className="space-y-6 rounded-lg border border-gray-800 bg-gray-950/60 p-5"
+      className="space-y-6 rounded-lg border border-surface-border bg-surface-base p-5"
       aria-label="Attack story"
     >
       {showHeader && (
         <header className="space-y-1">
-          <p className="font-mono text-xs uppercase tracking-wide text-gray-500">
+          <p className="font-mono text-xs uppercase tracking-wide text-fg-muted">
             {alert.sourceRef ?? alert.id.slice(0, 8)}
           </p>
-          <h2 className="text-lg font-semibold text-gray-100">{alert.title}</h2>
+          <h2 className="text-lg font-semibold text-fg-primary">{alert.title}</h2>
         </header>
       )}
 
       {/* ── Progression ───────────────────────────────────────────────── */}
       <div>
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Progression
         </h3>
 
         {stages.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-fg-muted">
             No ATT&amp;CK tactic is mapped to this alert, so there is no
             progression to show. That is a gap in the detection&rsquo;s
             metadata rather than a statement about the activity.
@@ -223,23 +223,23 @@ export function AttackStory({
                   <div className="flex gap-3">
                     <div className="flex flex-col items-center">
                       <span
-                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-gray-700 bg-gray-900 font-mono text-[10px] text-gray-400"
+                        className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-surface-border bg-surface-card font-mono text-[10px] text-fg-muted"
                         aria-hidden="true"
                       >
                         {index + 1}
                       </span>
                       {index < stages.length - 1 && (
-                        <span className="my-1 w-px grow bg-gray-800" aria-hidden="true" />
+                        <span className="my-1 w-px grow bg-surface-elevated" aria-hidden="true" />
                       )}
                     </div>
                     <div className="pb-4">
-                      <p className="text-sm font-medium text-gray-200">{stage.label}</p>
+                      <p className="text-sm font-medium text-fg-primary">{stage.label}</p>
                       <ul className="mt-1 space-y-0.5">
                         {stage.techniques.map((technique) => (
-                          <li key={technique.techniqueId} className="text-xs text-gray-400">
+                          <li key={technique.techniqueId} className="text-xs text-fg-muted">
                             <Link
                               href={`/attack-graph?technique=${encodeURIComponent(technique.techniqueId)}`}
-                              className="font-mono text-gray-500 hover:text-gray-300"
+                              className="font-mono text-fg-muted hover:text-fg-secondary"
                             >
                               {technique.techniqueId}
                             </Link>{' '}
@@ -254,7 +254,7 @@ export function AttackStory({
             </ol>
 
             {stages.length === 1 && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-fg-muted">
                 One stage observed. This is a single-stage detection, not a
                 chain &mdash; nothing has been inferred about what came before
                 or after.
@@ -266,25 +266,25 @@ export function AttackStory({
 
       {/* ── Evidence ──────────────────────────────────────────────────── */}
       <div>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Evidence
         </h3>
         {sources.length === 0 ? (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-fg-muted">
             No evidence source is attributable to this alert yet.
           </p>
         ) : (
           <ul className="space-y-1">
             {sources.map(({ source, count }) => (
               <li key={source} className="flex items-center justify-between text-sm">
-                <span className="text-gray-300">{source}</span>
-                <span className="font-mono text-xs text-gray-500">{count}</span>
+                <span className="text-fg-secondary">{source}</span>
+                <span className="font-mono text-xs text-fg-muted">{count}</span>
               </li>
             ))}
           </ul>
         )}
         {sources.length === 1 && (
-          <p className="mt-2 text-xs text-gray-500">
+          <p className="mt-2 text-xs text-fg-muted">
             A single source. Corroboration across sources is what raises
             confidence in a verdict, and there is none here.
           </p>
@@ -294,17 +294,17 @@ export function AttackStory({
       {/* ── Confidence ────────────────────────────────────────────────── */}
       {typeof alert.confidenceScore === 'number' && (
         <div>
-          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-400">
+          <h3 className="mb-1 text-xs font-semibold uppercase tracking-wide text-fg-muted">
             Confidence
           </h3>
-          <p className="text-sm text-gray-200">
+          <p className="text-sm text-fg-primary">
             {alert.confidenceScore}
-            <span className="text-gray-500">/100</span>
+            <span className="text-fg-muted">/100</span>
             {alert.confidenceLabel && (
-              <span className="ml-2 text-xs text-gray-400">({alert.confidenceLabel})</span>
+              <span className="ml-2 text-xs text-fg-muted">({alert.confidenceLabel})</span>
             )}
           </p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-fg-muted">
             Scored by fusion from corroboration and source reliability.
             Independent of severity, and not a probability that the verdict is
             correct.
@@ -314,11 +314,11 @@ export function AttackStory({
 
       {/* ── Response ──────────────────────────────────────────────────── */}
       <div>
-        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+        <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Response
         </h3>
         {actions.length === 0 ? (
-          <p className="text-sm text-gray-500">No actions have been recommended for this alert.</p>
+          <p className="text-sm text-fg-muted">No actions have been recommended for this alert.</p>
         ) : (
           <>
             <ul className="space-y-2">
@@ -329,12 +329,12 @@ export function AttackStory({
                       type="checkbox"
                       checked={staged.has(action.action)}
                       onChange={() => toggle(action)}
-                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-700 bg-gray-900"
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded border-surface-border bg-surface-card"
                     />
                     <span className="min-w-0">
-                      <span className="text-sm text-gray-200">{action.action}</span>
+                      <span className="text-sm text-fg-primary">{action.action}</span>
                       {action.rationale && (
-                        <span className="block text-xs text-gray-500">{action.rationale}</span>
+                        <span className="block text-xs text-fg-muted">{action.rationale}</span>
                       )}
                       {action.risk && (
                         <span className="block text-xs text-amber-500/80">
@@ -350,7 +350,7 @@ export function AttackStory({
             <p
               className={clsx(
                 'mt-3 text-xs',
-                staged.size > 0 ? 'text-gray-400' : 'text-gray-600',
+                staged.size > 0 ? 'text-fg-muted' : 'text-fg-subtle',
               )}
             >
               {staged.size > 0

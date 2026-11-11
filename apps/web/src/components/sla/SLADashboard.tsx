@@ -4,6 +4,7 @@ import { useState } from 'react';
 import useSWR, { mutate } from 'swr';
 import { demoFallback } from '@/lib/demoFallback';
 import { apiFetch, authedFetcher } from '@/lib/api';
+import { DialogBehavior } from '@/components/ui/Dialog';
 
 interface SeverityMetrics {
   total: number;
@@ -79,7 +80,7 @@ const SEVERITY_COLORS: Record<string, string> = {
   high:     'text-orange-400',
   medium:   'text-yellow-400',
   low:      'text-blue-400',
-  info:     'text-slate-400',
+  info:     'text-fg-muted',
 };
 
 const SEVERITY_BG: Record<string, string> = {
@@ -87,7 +88,7 @@ const SEVERITY_BG: Record<string, string> = {
   high:     'bg-orange-900/30 border-orange-700',
   medium:   'bg-yellow-900/30 border-yellow-700',
   low:      'bg-blue-900/30 border-blue-700',
-  info:     'bg-slate-900/30 border-slate-700',
+  info:     'bg-surface-card/30 border-surface-border',
 };
 
 function fmtMinutes(min: number | null): string {
@@ -100,13 +101,13 @@ function fmtMinutes(min: number | null): string {
 
 function StatusBadge({ value, target }: { value: number | null; target: number | null }) {
   if (value === null || target === null) {
-    return <span className="text-gray-500">—</span>;
+    return <span className="text-fg-subtle">—</span>;
   }
   const ok = value <= target;
   return (
     <span className={ok ? 'text-green-400' : 'text-red-400'}>
       {fmtMinutes(value)}
-      <span className="ml-1 text-xs text-gray-500">/ {fmtMinutes(target)}</span>
+      <span className="ml-1 text-xs text-fg-subtle">/ {fmtMinutes(target)}</span>
     </span>
   );
 }
@@ -139,21 +140,22 @@ function EditConfigModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6 w-full max-w-sm space-y-4">
-        <h3 className="text-white font-semibold text-lg capitalize">{config.severity} SLA Targets</h3>
+      <DialogBehavior onClose={onClose} /> {/* [P6 overlay-dialog] role=dialog, focus trap, Escape */}
+      <div className="bg-surface-card border border-surface-border rounded-xl p-6 w-full max-w-sm space-y-4">
+        <h3 className="text-fg-primary font-semibold text-lg capitalize">{config.severity} SLA Targets</h3>
         {[
           { label: 'MTTD (min)', val: mttd, set: setMttd },
           { label: 'MTTR (min)', val: mttr, set: setMttr },
           { label: 'MTTC (min)', val: mttc, set: setMttc },
         ].map(({ label, val, set }) => (
           <div key={label}>
-            <label className="text-gray-400 text-xs block mb-1">{label}</label>
+            <label className="text-fg-muted text-xs block mb-1">{label}</label>
             <input
               type="number"
               min={1}
               value={val}
               onChange={(e) => set(Number(e.target.value))}
-              className="w-full bg-gray-800 border border-gray-600 text-white rounded px-3 py-1.5 text-sm"
+              className="w-full bg-surface-elevated border border-surface-border-strong text-fg-primary rounded px-3 py-1.5 text-sm"
             />
           </div>
         ))}
@@ -167,7 +169,7 @@ function EditConfigModal({
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-700 hover:bg-gray-600 text-white rounded px-3 py-2 text-sm"
+            className="flex-1 bg-surface-hover hover:bg-gray-600 text-fg-primary rounded px-3 py-2 text-sm"
           >
             Cancel
           </button>
@@ -224,9 +226,10 @@ function EditKpiBarModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="w-full max-w-md space-y-4 rounded-xl border border-gray-700 bg-gray-900 p-6">
-        <h3 className="text-lg font-semibold text-white">2026 KPI bar targets</h3>
-        <p className="text-xs text-gray-500">
+      <DialogBehavior onClose={onClose} /> {/* [P6 overlay-dialog] role=dialog, focus trap, Escape */}
+      <div className="w-full max-w-md space-y-4 rounded-xl border border-surface-border bg-surface-card p-6">
+        <h3 className="text-lg font-semibold text-fg-primary">2026 KPI bar targets</h3>
+        <p className="text-xs text-fg-subtle">
           Published defaults apply until you override. Metrics use the same look-back as SLA metrics.
         </p>
         {[
@@ -264,7 +267,7 @@ function EditKpiBarModal({
           },
         ].map(({ label, val, set, min, max, step }) => (
           <div key={label}>
-            <label className="mb-1 block text-xs text-gray-400">{label}</label>
+            <label className="mb-1 block text-xs text-fg-muted">{label}</label>
             <input
               type="number"
               min={min}
@@ -272,7 +275,7 @@ function EditKpiBarModal({
               step={step}
               value={val}
               onChange={(e) => set(Number(e.target.value))}
-              className="w-full rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-white"
+              className="w-full rounded border border-surface-border-strong bg-surface-elevated px-3 py-1.5 text-sm text-fg-primary"
             />
           </div>
         ))}
@@ -289,7 +292,7 @@ function EditKpiBarModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex-1 rounded bg-gray-700 px-3 py-2 text-sm text-white hover:bg-gray-600"
+            className="flex-1 rounded bg-surface-hover px-3 py-2 text-sm text-fg-primary hover:bg-gray-600"
           >
             Cancel
           </button>
@@ -351,19 +354,19 @@ function SlaSummaryCards({
       {cards.map(({ label, value, hint }) => (
         <div
           key={label}
-          className="bg-gray-800 border border-gray-700 rounded-lg p-4"
+          className="bg-surface-elevated border border-surface-border rounded-lg p-4"
         >
-          <p className="text-gray-400 text-xs">{label}</p>
+          <p className="text-fg-muted text-xs">{label}</p>
           <p
             className={
               value === '—'
-                ? 'text-gray-500 text-2xl font-semibold mt-1'
-                : 'text-white text-2xl font-semibold mt-1'
+                ? 'text-fg-subtle text-2xl font-semibold mt-1'
+                : 'text-fg-primary text-2xl font-semibold mt-1'
             }
           >
             {value}
           </p>
-          {hint && <p className="text-[10px] text-gray-500 mt-1">{hint}</p>}
+          {hint && <p className="text-[10px] text-fg-subtle mt-1">{hint}</p>}
         </div>
       ))}
     </div>
@@ -437,8 +440,8 @@ function KpiBarSection({
     <div className="rounded-xl border border-violet-500/25 bg-violet-950/20 p-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold text-white">2026 KPI bar</h2>
-          <p className="text-xs text-gray-500">
+          <h2 className="text-lg font-semibold text-fg-primary">2026 KPI bar</h2>
+          <p className="text-xs text-fg-subtle">
             Operational quality vs tenant targets (last {days} days)
           </p>
         </div>
@@ -464,7 +467,7 @@ function KpiBarSection({
       <div className="overflow-x-auto">
         <table className="w-full min-w-[520px] text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-700 text-gray-500">
+            <tr className="border-b border-surface-border text-fg-subtle">
               <th className="py-2 pr-4 font-medium">Metric</th>
               <th className="py-2 pr-4 font-medium">Observed</th>
               <th className="py-2 pr-4 font-medium">Target</th>
@@ -473,10 +476,10 @@ function KpiBarSection({
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.key} className="border-b border-gray-800/80">
-                <td className="py-2.5 pr-4 text-gray-200">{r.label}</td>
-                <td className="py-2.5 pr-4 text-white">{r.observed}</td>
-                <td className="py-2.5 pr-4 text-gray-400">{r.target}</td>
+              <tr key={r.key} className="border-b border-surface-border/80">
+                <td className="py-2.5 pr-4 text-fg-primary">{r.label}</td>
+                <td className="py-2.5 pr-4 text-fg-primary">{r.observed}</td>
+                <td className="py-2.5 pr-4 text-fg-muted">{r.target}</td>
                 <td className="py-2.5">
                   {r.breach ? (
                     <span className="text-red-400">Breach</span>
@@ -558,8 +561,8 @@ export function SLADashboard() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">SLA Tracking</h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-white */>SLA Tracking</h1>
+          <p className="text-fg-muted text-sm mt-1">
             MTTD / MTTR / MTTC metrics vs configured targets
           </p>
         </div>
@@ -567,7 +570,7 @@ export function SLADashboard() {
           value={days}
           onChange={(e) => setDays(Number(e.target.value))}
           aria-label="Reporting period"
-          className="bg-gray-800 border border-gray-600 text-white text-sm rounded px-3 py-1.5"
+          className="bg-surface-elevated border border-surface-border-strong text-fg-primary text-sm rounded px-3 py-1.5"
         >
           {[7, 14, 30, 60, 90].map((d) => (
             <option key={d} value={d}>
@@ -580,24 +583,24 @@ export function SLADashboard() {
       {!metrics && (
         <div
           role="alert"
-          className="rounded-md border border-gray-700 bg-gray-900/40 px-4 py-3 text-sm text-gray-300"
+          className="rounded-md border border-surface-border bg-surface-card/40 px-4 py-3 text-sm text-fg-secondary"
         >
-          <h2 className="font-medium text-gray-200">
+          <h2 className="font-medium text-fg-primary">
             {metricsError ? 'SLA metrics unavailable' : 'SLA metrics not measured yet'}
           </h2>
-          <p className="mt-1 text-xs text-gray-400">
+          <p className="mt-1 text-xs text-fg-muted">
             {metricsError
               ? 'The SLA service did not answer, so there is nothing to report for this period.'
               : 'Waiting for the SLA service. Figures appear once it answers.'}
           </p>
           {metricsError != null && (
             <>
-              <pre className="mt-2 overflow-x-auto rounded bg-black/30 px-2 py-1 font-mono text-xs text-gray-400">
+              <pre className="mt-2 overflow-x-auto rounded bg-black/30 px-2 py-1 font-mono text-xs text-fg-muted">
                 {metricsError instanceof Error ? metricsError.message : String(metricsError)}
               </pre>
               <button
                 onClick={() => void refetchMetrics()}
-                className="mt-3 rounded border border-gray-600 px-3 py-1 text-xs text-gray-200 hover:bg-gray-800"
+                className="mt-3 rounded border border-surface-border-strong px-3 py-1 text-xs text-fg-primary hover:bg-surface-elevated"
               >
                 Retry
               </button>
@@ -638,7 +641,7 @@ export function SLADashboard() {
                     {sev}
                   </h2>
                   <div className="flex items-center gap-3">
-                    <span className="text-gray-400 text-xs">
+                    <span className="text-fg-muted text-xs">
                       {s.total} alerts · {s.breaches} breaches ({s.breach_rate}%)
                     </span>
                     {cfg && (
@@ -658,14 +661,14 @@ export function SLADashboard() {
                     { metric: 'MTTC', avg: s.mttc_avg, target: s.mttc_target },
                   ].map(({ metric, avg, target }) => (
                     <div key={metric}>
-                      <p className="text-gray-500 text-xs mb-1">{metric}</p>
+                      <p className="text-fg-subtle text-xs mb-1">{metric}</p>
                       <StatusBadge value={avg} target={target} />
                     </div>
                   ))}
                 </div>
                 {/* Breach indicator bar */}
                 <div className="mt-4">
-                  <div className="h-1.5 w-full bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-1.5 w-full bg-surface-hover rounded-full overflow-hidden">
                     <div
                       className={`h-full rounded-full transition-all ${
                         s.breach_rate > 50
@@ -677,7 +680,7 @@ export function SLADashboard() {
                       style={{ width: `${Math.min(s.breach_rate, 100)}%` }}
                     />
                   </div>
-                  <p className="text-gray-500 text-xs mt-1">
+                  <p className="text-fg-subtle text-xs mt-1">
                     {s.breach_rate}% breach rate
                   </p>
                 </div>

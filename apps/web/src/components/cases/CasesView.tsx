@@ -71,7 +71,7 @@ const SEVERITY_CONFIG = {
 const STATUS_CONFIG: Record<Case["status"], { label: string; className: string; dot: string }> = {
   new: {
     label: "New",
-    className: "text-gray-300 bg-gray-700/50 border-gray-600/50",
+    className: "text-fg-secondary bg-surface-hover/50 border-surface-border-strong/50",
     dot: "bg-gray-400",
   },
   triaged: {
@@ -96,7 +96,7 @@ const STATUS_CONFIG: Record<Case["status"], { label: string; className: string; 
   },
   closed: {
     label: "Closed",
-    className: "text-gray-500 bg-gray-800/50 border-gray-700/50",
+    className: "text-fg-muted bg-surface-elevated/70 border-surface-border",
     dot: "bg-gray-600",
   },
 };
@@ -113,7 +113,7 @@ function CaseCard({ c }: { c: Case }) {
 
   return (
     <Link href={detailHref} className="block">
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-5 hover:border-gray-700 hover:bg-gray-900/80 transition-all group">
+      <div className="bg-surface-card border border-surface-border rounded-xl p-5 hover:border-surface-border hover:bg-surface-elevated/70 transition-all group">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-2">
@@ -132,23 +132,23 @@ function CaseCard({ c }: { c: Case }) {
                 {sts.label}
               </span>
             </div>
-            <h3 className="text-sm font-medium text-gray-200 group-hover:text-white truncate">
+            <h3 className="text-sm font-medium text-fg-primary group-hover:text-fg-primary truncate">
               {c.title}
             </h3>
             <div className="flex items-center gap-3 mt-2">
-              <span className="text-xs text-gray-500">#{displayId}</span>
-              <span className="text-xs text-gray-500">·</span>
-              <span className="text-xs text-gray-500">{c.alertCount ?? 0} alerts</span>
+              <span className="text-xs text-fg-muted">#{displayId}</span>
+              <span className="text-xs text-fg-muted">·</span>
+              <span className="text-xs text-fg-muted">{c.alertCount ?? 0} alerts</span>
               {c.assignee && (
                 <>
-                  <span className="text-xs text-gray-500">·</span>
-                  <span className="text-xs text-gray-400">{c.assignee.split("@")[0]}</span>
+                  <span className="text-xs text-fg-muted">·</span>
+                  <span className="text-xs text-fg-muted">{c.assignee.split("@")[0]}</span>
                 </>
               )}
             </div>
           </div>
           <div className="text-right shrink-0 flex flex-col items-end gap-2">
-            <p className="text-xs text-gray-500" suppressHydrationWarning>
+            <p className="text-xs text-fg-muted" suppressHydrationWarning>
               {format(new Date(c.createdAt), "MMM dd, HH:mm")}
             </p>
             {c.tags && c.tags.length > 0 && (
@@ -156,7 +156,7 @@ function CaseCard({ c }: { c: Case }) {
                 {c.tags.slice(0, 2).map((tag) => (
                   <span
                     key={tag}
-                    className="text-xs text-gray-500 bg-gray-800 px-1.5 py-0.5 rounded"
+                    className="text-xs text-fg-muted bg-surface-elevated px-1.5 py-0.5 rounded"
                   >
                     {tag}
                   </span>
@@ -168,7 +168,7 @@ function CaseCard({ c }: { c: Case }) {
                 e.preventDefault();
                 toast.success("Incident report generated — downloading PDF");
               }}
-              className="flex items-center gap-1 text-xs text-gray-500 hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100"
+              className="flex items-center gap-1 text-xs text-fg-muted hover:text-blue-400 transition-colors opacity-0 group-hover:opacity-100"
             >
               <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -252,8 +252,8 @@ export function CasesView() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-semibold text-gray-100">Cases</h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-xl font-semibold text-fg-primary */>Cases</h1>
+          <p className="text-sm text-fg-muted mt-0.5">
             Manage security investigations and incidents
           </p>
         </div>
@@ -261,7 +261,7 @@ export function CasesView() {
           <button
             disabled
             title="Case creation wizard is planned for v1.1"
-            className="flex items-center gap-2 bg-gray-700 text-gray-400 text-sm font-medium px-4 py-2 rounded-lg cursor-not-allowed select-none"
+            className="flex items-center gap-2 bg-surface-hover text-fg-muted text-sm font-medium px-4 py-2 rounded-lg cursor-not-allowed select-none"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -299,21 +299,21 @@ export function CasesView() {
               key={s}
               onClick={() => setStatusFilter(s)}
               className={clsx(
-                "bg-gray-900/60 border rounded-xl p-4 text-left transition-all",
+                "bg-surface-card border rounded-xl p-4 text-left transition-all",
                 statusFilter === s
-                  ? "border-blue-500/50 bg-blue-500/5"
-                  : "border-gray-800/60 hover:border-gray-700"
+                  ? "border-brand-500/50 bg-brand-500/5"
+                  : "border-surface-border hover:border-surface-border"
               )}
             >
               <p
                 className={clsx(
                   "text-2xl font-bold",
-                  statCounts[s] === null ? "text-gray-600" : "text-gray-100"
+                  statCounts[s] === null ? "text-fg-subtle" : "text-fg-primary"
                 )}
               >
                 {statCounts[s] === null ? "—" : statCounts[s]}
               </p>
-              <p className="text-xs text-gray-500 mt-0.5 capitalize">
+              <p className="text-xs text-fg-muted mt-0.5 capitalize">
                 {s === "all" ? "All Cases" : s.replace("_", " ")}
               </p>
             </button>
@@ -345,7 +345,7 @@ export function CasesView() {
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
           <svg
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -362,7 +362,7 @@ export function CasesView() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search cases…"
-            className="w-full pl-9 pr-4 py-2 bg-gray-900/60 border border-gray-800 rounded-lg text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
+            className="w-full pl-9 pr-4 py-2 bg-surface-card border border-surface-border rounded-lg text-sm text-fg-secondary placeholder-fg-subtle focus:outline-none focus:border-brand-500"
           />
         </div>
 
@@ -375,7 +375,7 @@ export function CasesView() {
           aria-label="Filter cases by severity"
           value={severityFilter}
           onChange={(e) => setSeverityFilter(e.target.value as Case["severity"] | "all")}
-          className="bg-gray-900/60 border border-gray-800 rounded-lg text-sm text-gray-400 px-3 py-2 focus:outline-none focus:border-blue-500/50"
+          className="bg-surface-card border border-surface-border rounded-lg text-sm text-fg-muted px-3 py-2 focus:outline-none focus:border-brand-500"
         >
           <option value="all">All Severities</option>
           <option value="critical">Critical</option>
@@ -390,7 +390,7 @@ export function CasesView() {
             the confident one was the wrong one, because a zero reads as
             measured-and-none rather than not-measured. */}
         <span
-          className="text-xs text-gray-500"
+          className="text-xs text-fg-muted"
           title={
             countsUnknown
               ? "The case service has not answered, so there is no count to show."
@@ -428,7 +428,7 @@ export function CasesView() {
                   setSeverityFilter("all");
                   setSearch("");
                 }}
-                className="text-xs px-3 py-1.5 rounded-md border border-blue-500/40 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 transition-colors"
+                className="text-xs px-3 py-1.5 rounded-md border border-blue-500/40 bg-blue-500/10 text-blue-300 hover:bg-brand-400/20 transition-colors"
               >
                 Clear filters
               </button>

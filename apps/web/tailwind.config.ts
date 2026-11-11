@@ -27,16 +27,21 @@ const config: Config = {
         // logo gradient (sky-400 → blue-700) so the marketing site and console feel
         // like one product.
         brand: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          200: '#bfdbfe',
-          300: '#93c5fd',
-          400: '#60a5fa',
-          500: '#3b82f6',
-          600: '#2563eb',
-          700: '#1d4ed8',
-          800: '#1e40af',
-          900: '#1e3a8a',
+          50: 'var(--brand-50)',
+          100: 'var(--brand-100)',
+          200: 'var(--brand-200)',
+          300: 'var(--brand-300)',
+          400: 'var(--brand-400)',
+          500: 'var(--brand-500)',
+          600: 'var(--brand-600)',
+          700: 'var(--brand-700)',
+          800: 'var(--brand-800)',
+          900: 'var(--brand-900)',
+        },
+        // AI accent: violet, reserved for AI-driven surfaces so they are easy to tell apart.
+        ai: {
+          DEFAULT: 'var(--ai-accent)',
+          soft: 'var(--ai-accent-soft)',
         },
         // Surface ramp — themeable. Resolves to dark hex values on
         // `[data-theme="dark"]` and slate-tinted whites on
@@ -47,6 +52,9 @@ const config: Config = {
           card: 'var(--surface-card)',
           hover: 'var(--surface-hover)',
           subtle: 'var(--surface-subtle)',
+          elevated: 'var(--surface-elevated)',
+          sunken: 'var(--surface-sunken)',
+          'border-strong': 'var(--border-strong)',
           border: 'var(--surface-border)',
           divider: 'var(--surface-divider)',
         },

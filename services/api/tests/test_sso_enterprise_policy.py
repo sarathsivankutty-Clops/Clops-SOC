@@ -139,3 +139,58 @@ def test_status_endpoint_contract(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("SSO_LOCAL_ADMIN_ONLY", "true")
     out = asyncio.run(auth_ep.sso_status())
     assert out["local_login_enabled"] is False
+
+
+def test_oidc_idp_hint_sanitization_and_forwarding(monkeypatch: pytest.MonkeyPatch) -> None:
+    import asyncio
+    from unittest.mock import AsyncMock
+
+    from starlette.requests import Request
+
+    from app.auth import oidc
+
+    assert oidc._sanitize_idp_hint("google") == "google"
+    assert oidc._sanitize_idp_hint("azure-ad_01") == "azure-ad_01"
+    assert oidc._sanitize_idp_hint("a" * 64) == "a" * 64
+    assert oidc._sanitize_idp_hint("a" * 65) is None
+    assert oidc._sanitize_idp_hint(None) is None
+    assert oidc._sanitize_idp_hint("") is None
+    assert oidc._sanitize_idp_hint("   ") is None
+    assert oidc._sanitize_idp_hint("google&evil=1") is None
+    assert oidc._sanitize_idp_hint("https://evil.example") is None
+    assert oidc._sanitize_idp_hint("google\r\nSet-Cookie: evil=1") is None
+
+    monkeypatch.setenv("SSO_ENABLED", "true")
+    monkeypatch.setenv("OIDC_ISSUER", "https://idp.example.com/realms/main")
+    monkeypatch.setenv("OIDC_CLIENT_ID", "aisoc-web")
+    monkeypatch.setenv("OIDC_REDIRECT_URI", "https://soc.example.com/api/v1/auth/oidc/callback")
+    monkeypatch.setattr(
+        oidc,
+        "_discover",
+        AsyncMock(
+            return_value={
+                "authorization_endpoint": "https://idp.example.com/realms/main/protocol/openid-connect/auth",
+            }
+        ),
+    )
+    monkeypatch.setattr(oidc, "_store_state", AsyncMock())
+
+    scope = {"type": "http", "method": "GET", "path": "/auth/oidc/login", "headers": []}
+    req = Request(scope)
+    resp = asyncio.run(oidc.oidc_login(req, redirect="/dashboard", kc_idp_hint="google"))
+    assert resp.status_code == 307
+    assert "kc_idp_hint=google" in resp.headers["location"]
+    assert "code_challenge_method=S256" in resp.headers["location"]
+
+
+def test_oidc_safe_redirect_blocks_open_redirect_vectors() -> None:
+    from app.auth import oidc
+
+    assert oidc._safe_redirect("/dashboard") == "/dashboard"
+    assert oidc._safe_redirect("/investigate") == "/investigate"
+    assert oidc._safe_redirect("//evil.example/phish") == "/"
+    assert oidc._safe_redirect("https://evil.example/phish") == "/"
+    assert oidc._safe_redirect("/\\evil.example") == "/"
+    assert oidc._safe_redirect("javascript:alert(1)") == "/"
+    assert oidc._safe_redirect("/dashboard\r\nLocation: https://evil.example") == "/"
+    assert oidc._safe_redirect("") == "/"

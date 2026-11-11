@@ -106,13 +106,13 @@ export function BulkTriageBar({ selectedIds, onClearSelection, onApplied }: Bulk
           {selectedIds.length} selected
         </span>
 
-        <label className="text-xs text-gray-400">
+        <label className="text-xs text-fg-muted">
           Status
           <select
             aria-label="Set status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="ml-2 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200"
+            className="ml-2 bg-surface-card border border-surface-border rounded px-2 py-1 text-xs text-fg-primary"
           >
             <option value="">leave as is</option>
             {STATUSES.map((s) => (
@@ -123,13 +123,13 @@ export function BulkTriageBar({ selectedIds, onClearSelection, onApplied }: Bulk
           </select>
         </label>
 
-        <label className="text-xs text-gray-400">
+        <label className="text-xs text-fg-muted">
           Severity
           <select
             aria-label="Set severity"
             value={severity}
             onChange={(e) => setSeverity(e.target.value)}
-            className="ml-2 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-gray-200"
+            className="ml-2 bg-surface-card border border-surface-border rounded px-2 py-1 text-xs text-fg-primary"
           >
             <option value="">leave as is</option>
             {SEVERITIES.map((s) => (
@@ -140,13 +140,13 @@ export function BulkTriageBar({ selectedIds, onClearSelection, onApplied }: Bulk
           </select>
         </label>
 
-        <label className="text-xs text-gray-400 flex items-center gap-1.5">
+        <label className="text-xs text-fg-muted flex items-center gap-1.5">
           <input
             type="checkbox"
             aria-label="Unassign"
             checked={unassign}
             onChange={(e) => setUnassign(e.target.checked)}
-            className="accent-blue-500"
+            className="accent-brand-500"
           />
           Unassign
         </label>
@@ -158,8 +158,8 @@ export function BulkTriageBar({ selectedIds, onClearSelection, onApplied }: Bulk
           className={clsx(
             'text-xs px-3 py-1.5 rounded-md border transition-colors',
             nothingChosen || outcome.kind === 'working'
-              ? 'border-gray-700 bg-gray-800 text-gray-500 cursor-not-allowed'
-              : 'border-blue-500/40 bg-blue-500/20 text-blue-200 hover:bg-blue-500/30',
+              ? 'border-surface-border bg-surface-elevated text-fg-muted cursor-not-allowed'
+              : 'border-blue-500/40 bg-blue-500/20 text-blue-200 hover:bg-brand-400/30',
           )}
         >
           {outcome.kind === 'working' ? 'Applying…' : 'Apply'}
@@ -168,7 +168,7 @@ export function BulkTriageBar({ selectedIds, onClearSelection, onApplied }: Bulk
         <button
           type="button"
           onClick={onClearSelection}
-          className="text-xs px-3 py-1.5 rounded-md border border-gray-700 text-gray-400 hover:text-gray-200"
+          className="text-xs px-3 py-1.5 rounded-md border border-surface-border text-fg-muted hover:text-fg-primary"
         >
           Clear
         </button>
@@ -179,7 +179,7 @@ export function BulkTriageBar({ selectedIds, onClearSelection, onApplied }: Bulk
           second path to the same destination with weaker guarantees is how
           the weaker one becomes the one everybody uses.
         */}
-        <span className="text-[11px] text-gray-500 ml-auto">
+        <span className="text-[11px] text-fg-muted ml-auto">
           To close in bulk, use the noise sweep — it snapshots every row first.
         </span>
       </div>

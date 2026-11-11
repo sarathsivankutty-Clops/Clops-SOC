@@ -40,8 +40,8 @@ export function OperationsDashboard() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-xl font-semibold text-gray-100">SOC operations</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-xl font-semibold text-gray-100 */>SOC operations</h1>
+        <p className="mt-1 text-sm text-fg-subtle">
           Whether the detection pipeline is working, independent of whether it is
           finding anything. Every panel is driven by a live API response; a panel
           with no data says so rather than showing a placeholder.

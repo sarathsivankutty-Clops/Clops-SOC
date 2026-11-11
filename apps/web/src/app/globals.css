@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "../styles/auth.css";
+@import "../styles/cloudifyops.css";
 @config "../../tailwind.config.ts";
 @source "../../src";
 @source "../../../../packages/ui/src";
@@ -28,30 +30,56 @@
 :root,
 [data-theme="dark"] {
   /* Surfaces — page bg up through hovered card */
-  --surface-base: #0a0d14;
-  --surface-raised: #11151f;
-  --surface-card: #141926;
-  --surface-hover: #1a2030;
-  --surface-subtle: #0d1119;
+  --surface-base: #0b1220;
+  --surface-raised: #111b2e;
+  --surface-card: #111b2e;
+  --surface-hover: #172442;
+  --surface-subtle: #1c2840;
+
+  /* [P0 token-repair] Tokens referenced by tailwind.config.ts / components but previously undefined.
+     Values mirror the reference console (--surf2, --bg, --bd2, --ac, --p). */
+  --surface-elevated: #172442;
+  --surface-sunken: #0b1220;
+  --border-strong: #36496a;
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #60a5fa;
+  --brand-500: #3b82f6;
+  --brand-600: #2563eb;
+  --brand-700: #1d4ed8;
+  --brand-800: #1e40af;
+  --brand-900: #1e3a8a;
+  --ai-accent: #a78bfa;
+  --ai-accent-soft: rgba(167, 139, 250, 0.12);
+  /* [HIDDEN-UI FIX severity-split] distinct orange tint for severity-high */
+  --sev-high-fg: #fb923c;
+  --sev-high-bg: rgba(251, 146, 60, 0.12);
 
   /* Landing-only gradient stops (T6.5). Mirrors
      `docs/design/landing-page-design-tokens.md` §2.4. Hex stops match the
      existing `brand.*` palette so a buyer-to-product transition keeps the
      same hue family across the marketing site and the console. */
-  --landing-grad-hero: linear-gradient(to bottom right, #1d4ed8 0%, #0a0d14 80%);
+  --landing-grad-hero: linear-gradient(to bottom right, #1d4ed8 0%, #0b1220 80%);
   --landing-grad-pillars: linear-gradient(to right, #3b82f6 0%, #8b5cf6 100%);
   --landing-grad-cta: linear-gradient(to bottom right, #3b82f6 0%, #1d4ed8 100%);
 
+  /* Navigation & button accent tokens */
+  --nav-active-bg: rgba(59, 130, 246, 0.12);
+  --nav-active-bar: #52b788;
+  --btn-grad: linear-gradient(135deg, #2563eb, #22c55e);
+
   /* Borders / dividers — slate-400 with low alpha so they tint the surface
      instead of cutting hard lines. */
-  --surface-border: rgba(148, 163, 184, 0.12);
-  --surface-divider: rgba(148, 163, 184, 0.08);
+  --surface-border: #2a3a55;
+  --surface-divider: #223150;
 
   /* Foregrounds — high → muted */
-  --fg-primary: #e2e8f0;     /* slate-200,  body text default */
-  --fg-secondary: #cbd5e1;   /* slate-300,  paragraph copy */
-  --fg-muted: #9ca3af;       /* gray-400,   captions, labels */
-  --fg-subtle: #6b7280;      /* gray-500,   timestamps, helper text */
+  --fg-primary: #f1f5f9;     /* slate-100,  body text default */
+  --fg-secondary: #94a3b8;   /* slate-400,  paragraph copy */
+  --fg-muted: #94a3b8;       /* slate-400,  captions, labels */
+  --fg-subtle: #64748b;      /* slate-500,  timestamps, helper text */
   --fg-inverse: #0f172a;     /* slate-900,  text on light buttons */
 
   /* Compatibility: legacy --background / --foreground used by `body`. */
@@ -63,8 +91,8 @@
   --selection-fg: #ffffff;
 
   /* Scrollbar — semi-transparent so the same rule works in both themes. */
-  --scrollbar-thumb: rgba(255, 255, 255, 0.1);
-  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.2);
+  --scrollbar-thumb: rgba(255, 255, 255, 0.12);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.22);
 }
 
 [data-theme="light"] {
@@ -75,14 +103,38 @@
   --surface-card: #ffffff;       /* same as raised, kept distinct so we
                                     can introduce a subtle tint later
                                     without touching consumers */
-  --surface-hover: #eef2f7;      /* slate-100/200, hovered rows */
-  --surface-subtle: #f1f5f9;     /* slate-100, deeper tint */
+  --surface-hover: #f1f5f9;      /* slate-100, hovered rows */
+  --surface-subtle: #f8fafc;     /* slate-50, deeper tint */
 
-  --surface-border: rgba(15, 23, 42, 0.12);
-  --surface-divider: rgba(15, 23, 42, 0.06);
+  /* [P0 token-repair] see dark block. Brand ramp shifted one step darker for contrast on white. */
+  --surface-elevated: #f8fafc;
+  --surface-sunken: #f1f5f9;
+  --border-strong: #cbd5e1;
+  --brand-50: #eff6ff;
+  --brand-100: #dbeafe;
+  --brand-200: #bfdbfe;
+  --brand-300: #93c5fd;
+  --brand-400: #3b82f6;
+  --brand-500: #2563eb;
+  --brand-600: #1d4ed8;
+  --brand-700: #1e40af;
+  --brand-800: #1e3a8a;
+  --brand-900: #172554;
+  --ai-accent: #7c3aed;
+  --ai-accent-soft: #f5f3ff;
+  /* [HIDDEN-UI FIX severity-split] distinct orange tint for severity-high */
+  --sev-high-fg: #c2410c;
+  --sev-high-bg: #fff7ed;
+
+  --nav-active-bg: #eff6ff;
+  --nav-active-bar: #10b981;
+  --btn-grad: linear-gradient(135deg, #2563eb, #22c55e);
+
+  --surface-border: #e2e8f0;
+  --surface-divider: #eef2f7;
 
   --fg-primary: #0f172a;         /* slate-900 */
-  --fg-secondary: #334155;       /* slate-700 */
+  --fg-secondary: #475569;       /* slate-600 */
   --fg-muted: #64748b;           /* slate-500 */
   --fg-subtle: #94a3b8;          /* slate-400 */
   --fg-inverse: #f8fafc;
@@ -96,6 +148,30 @@
   --scrollbar-thumb: rgba(15, 23, 42, 0.18);
   --scrollbar-thumb-hover: rgba(15, 23, 42, 0.32);
 }
+
+/*
+ * [P1 type-scale] The 8-step type scale (sizes taken from the reference
+ * console). Use these via the .fs-* helpers or var(--fs-*) instead of ad-hoc
+ * text-[Npx] values. Page titles use `.co-page-title` (step 7).
+ */
+:root {
+  --fs-1: 10.5px; /* eyebrow, micro labels */
+  --fs-2: 11px;   /* captions, table headers */
+  --fs-3: 12px;   /* secondary / dense text */
+  --fs-4: 12.5px; /* dense body, controls */
+  --fs-5: 13px;   /* body */
+  --fs-6: 16px;   /* section heading */
+  --fs-7: 22px;   /* page title */
+  --fs-8: 28px;   /* KPI / display figure */
+}
+.fs-1 { font-size: var(--fs-1); }
+.fs-2 { font-size: var(--fs-2); }
+.fs-3 { font-size: var(--fs-3); }
+.fs-4 { font-size: var(--fs-4); }
+.fs-5 { font-size: var(--fs-5); }
+.fs-6 { font-size: var(--fs-6); }
+.fs-7 { font-size: var(--fs-7); }
+.fs-8 { font-size: var(--fs-8); }
 
 * {
   box-sizing: border-box;

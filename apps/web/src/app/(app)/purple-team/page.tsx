@@ -5,6 +5,7 @@ import useSWR from 'swr'
 import { demoFallback } from '@/lib/demoFallback';
 import { useTenantId } from '@/components/layout/TenantProvider';
 import { apiHeaders } from '@/lib/api';
+import { DialogBehavior } from '@/components/ui/Dialog';
 
 // Same-origin by default — Next.js rewrites proxy `/api/v1/purple-team/*` to
 // the purple-team service. Override with `NEXT_PUBLIC_PURPLE_TEAM_API` for
@@ -131,7 +132,7 @@ const fetcher = (url: string) =>
   })
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-gray-800 text-gray-400',
+  pending: 'bg-surface-elevated text-fg-muted',
   running: 'bg-blue-900/40 text-blue-300',
   success: 'bg-green-900/40 text-green-300',
   failed: 'bg-red-900/40 text-red-300',
@@ -150,7 +151,7 @@ function coverageColor(c: number): string {
   if (c >= 0.8) return 'bg-green-500'
   if (c >= 0.5) return 'bg-yellow-400'
   if (c > 0) return 'bg-orange-400'
-  return 'bg-gray-700'
+  return 'bg-surface-hover'
 }
 
 const MOCK_COVERAGE: CoverageMatrix = {
@@ -293,9 +294,9 @@ function CoverageHeatmap() {
 
   if (unknown) {
     return (
-      <div className="rounded-lg border border-gray-800 bg-gray-900/60 p-6 text-sm">
-        <p className="font-medium text-gray-200">ATT&amp;CK coverage unknown</p>
-        <p className="mt-1 text-gray-500">
+      <div className="rounded-lg border border-surface-border bg-surface-card/60 p-6 text-sm">
+        <p className="font-medium text-fg-primary">ATT&amp;CK coverage unknown</p>
+        <p className="mt-1 text-fg-subtle">
           {isLoading
             ? 'Loading coverage from the purple-team service…'
             : error
@@ -335,9 +336,9 @@ function CoverageHeatmap() {
             deltaSuffix: 'pp',
           },
         ].map((s) => (
-          <div key={s.label} className="bg-gray-900/60 rounded-lg border border-gray-700 p-3 text-center">
-            <div className="text-xl font-bold text-gray-100">{s.value}</div>
-            <div className="text-xs text-gray-500 mt-1">{s.label}</div>
+          <div key={s.label} className="bg-surface-card/60 rounded-lg border border-surface-border p-3 text-center">
+            <div className="text-xl font-bold text-fg-primary">{s.value}</div>
+            <div className="text-xs text-fg-subtle mt-1">{s.label}</div>
             {hasPrevious && (
               <div
                 className={`text-[10px] font-medium mt-1 ${
@@ -345,7 +346,7 @@ function CoverageHeatmap() {
                     ? 'text-emerald-600'
                     : s.delta < 0
                     ? 'text-red-600'
-                    : 'text-gray-400'
+                    : 'text-fg-muted'
                 }`}
               >
                 {driftDeltaLabel(s.delta, s.deltaSuffix ?? '')} vs last snapshot
@@ -356,10 +357,10 @@ function CoverageHeatmap() {
       </div>
 
       {/* Drift banner — controls + counts of regressions/improvements. */}
-      <div className="bg-gray-900/60 rounded-lg border border-gray-700 p-3 flex flex-wrap items-center gap-4">
+      <div className="bg-surface-card/60 rounded-lg border border-surface-border p-3 flex flex-wrap items-center gap-4">
         <div className="flex-1 min-w-[200px]">
-          <div className="text-xs font-semibold text-gray-300">Detection drift</div>
-          <div className="text-xs text-gray-500 mt-0.5" suppressHydrationWarning>
+          <div className="text-xs font-semibold text-fg-secondary">Detection drift</div>
+          <div className="text-xs text-fg-subtle mt-0.5" suppressHydrationWarning>
             {drift?.current
               ? `Last snapshot ${new Date(drift.current.captured_at).toLocaleString()} (${drift.current.trigger})`
               : 'No snapshots yet — capture one to start tracking drift week-over-week.'}
@@ -395,7 +396,7 @@ function CoverageHeatmap() {
 
       {/* Drift legend — explains the per-cell ring colors. */}
       {hasPrevious && (
-        <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-400">
+        <div className="flex flex-wrap items-center gap-3 text-[11px] text-fg-muted">
           <span className="font-medium">Delta-vs-last-snapshot:</span>
           <span className="inline-flex items-center gap-1">
             <span className="w-3 h-3 rounded ring-2 ring-emerald-500 ring-offset-1" />
@@ -417,13 +418,13 @@ function CoverageHeatmap() {
       )}
 
       {/* Heatmap grid */}
-      <div className="bg-gray-900/60 rounded-lg border border-gray-700 overflow-x-auto">
+      <div className="bg-surface-card/60 rounded-lg border border-surface-border overflow-x-auto">
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-gray-800">
-              <th className="text-left px-3 py-2 font-medium text-gray-400 w-40">Technique</th>
+            <tr className="bg-surface-elevated">
+              <th className="text-left px-3 py-2 font-medium text-fg-muted w-40">Technique</th>
               {tactics.map((t) => (
-                <th key={t} className="px-2 py-2 font-medium text-gray-400 capitalize text-center min-w-[80px]">
+                <th key={t} className="px-2 py-2 font-medium text-fg-muted capitalize text-center min-w-[80px]">
                   {t.replace(/-/g, ' ')}
                 </th>
               ))}
@@ -442,8 +443,8 @@ function CoverageHeatmap() {
               return Array.from(allTechniques).sort().map((tid) => {
                 const tDrift = driftByTid.get(tid)
                 return (
-                  <tr key={tid} className="border-t border-gray-800">
-                    <td className="px-3 py-1.5 font-mono text-gray-300">
+                  <tr key={tid} className="border-t border-surface-border">
+                    <td className="px-3 py-1.5 font-mono text-fg-secondary">
                       {tid}
                       {tDrift && hasPrevious && tDrift.status !== 'unchanged' && (
                         <span
@@ -475,13 +476,13 @@ function CoverageHeatmap() {
                         <td key={tactic} className="px-2 py-1.5 text-center">
                           {cell ? (
                             <div
-                              className={`inline-flex items-center justify-center w-8 h-5 rounded text-white text-[10px] font-semibold ${coverageColor(cell.coverage)} ${ring}`}
+                              className={`inline-flex items-center justify-center w-8 h-5 rounded text-fg-primary text-[10px] font-semibold ${coverageColor(cell.coverage)} ${ring}`}
                               title={tooltipBase + tooltipDelta}
                             >
                               {(cell.coverage * 100).toFixed(0)}%
                             </div>
                           ) : (
-                            <div className="inline-flex items-center justify-center w-8 h-5 rounded bg-gray-800 text-gray-500 text-[10px]">—</div>
+                            <div className="inline-flex items-center justify-center w-8 h-5 rounded bg-surface-elevated text-fg-subtle text-[10px]">—</div>
                           )}
                         </td>
                       )
@@ -505,31 +506,31 @@ function ExecutionsTable({ onReportDetection }: { onReportDetection: (ex: Execut
     { refreshInterval: 10000 }
   )
 
-  if (!tenantId) return <div className="text-sm text-gray-500 p-4">Resolving tenant…</div>
-  if (isLoading) return <div className="text-sm text-gray-500 p-4">Loading executions…</div>
+  if (!tenantId) return <div className="text-sm text-fg-subtle p-4">Resolving tenant…</div>
+  if (isLoading) return <div className="text-sm text-fg-subtle p-4">Loading executions…</div>
   if (error || !data) return <div className="text-sm text-red-500 p-4">Failed to load executions</div>
 
   return (
-    <div className="bg-gray-900/60 rounded-lg border border-gray-700 overflow-hidden">
+    <div className="bg-surface-card/60 rounded-lg border border-surface-border overflow-hidden">
       <table className="w-full text-sm">
         <thead>
-          <tr className="bg-gray-800 border-b border-gray-700">
+          <tr className="bg-surface-elevated border-b border-surface-border">
             {['Source', 'Technique', 'Test Name', 'Status', 'Detected', 'Created'].map((h) => (
-              <th key={h} className="text-left px-4 py-2.5 font-medium text-gray-400 text-xs">{h}</th>
+              <th key={h} className="text-left px-4 py-2.5 font-medium text-fg-muted text-xs">{h}</th>
             ))}
             <th className="px-4 py-2.5"></th>
           </tr>
         </thead>
         <tbody>
           {data.map((ex) => (
-            <tr key={ex.id} className="border-t border-gray-800 hover:bg-gray-800/50">
+            <tr key={ex.id} className="border-t border-surface-border hover:bg-surface-elevated/50">
               <td className="px-4 py-2.5">
                 <span className={`px-2 py-0.5 rounded text-xs font-medium ${ex.source === 'caldera' ? 'bg-purple-900/40 text-purple-300' : 'bg-blue-900/40 text-blue-300'}`}>
                   {ex.source}
                 </span>
               </td>
-              <td className="px-4 py-2.5 font-mono text-xs text-gray-300">{ex.technique_id}</td>
-              <td className="px-4 py-2.5 text-gray-200 max-w-xs truncate">{ex.test_name}</td>
+              <td className="px-4 py-2.5 font-mono text-xs text-fg-secondary">{ex.technique_id}</td>
+              <td className="px-4 py-2.5 text-fg-primary max-w-xs truncate">{ex.test_name}</td>
               <td className="px-4 py-2.5">
                 <span className={`px-2 py-0.5 rounded text-xs font-medium ${STATUS_COLORS[ex.status] ?? ''}`}>
                   {ex.status}
@@ -537,14 +538,14 @@ function ExecutionsTable({ onReportDetection }: { onReportDetection: (ex: Execut
               </td>
               <td className="px-4 py-2.5">
                 {ex.detected === null ? (
-                  <span className="text-gray-500 text-xs">—</span>
+                  <span className="text-fg-subtle text-xs">—</span>
                 ) : ex.detected ? (
                   <span className="text-green-400 font-medium text-xs">Yes</span>
                 ) : (
                   <span className="text-red-400 font-medium text-xs">No</span>
                 )}
               </td>
-              <td className="px-4 py-2.5 text-gray-500 text-xs" suppressHydrationWarning>
+              <td className="px-4 py-2.5 text-fg-subtle text-xs" suppressHydrationWarning>
                 {new Date(ex.created_at).toLocaleString()}
               </td>
               <td className="px-4 py-2.5">
@@ -561,7 +562,7 @@ function ExecutionsTable({ onReportDetection }: { onReportDetection: (ex: Execut
           ))}
           {data.length === 0 && (
             <tr>
-              <td colSpan={7} className="px-4 py-8 text-center text-gray-400 text-sm">
+              <td colSpan={7} className="px-4 py-8 text-center text-fg-muted text-sm">
                 No executions yet. Run an atomic test or Caldera operation.
               </td>
             </tr>
@@ -626,7 +627,7 @@ function TabletopPanel() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-100">Tabletop Sessions</h3>
+        <h3 className="text-sm font-semibold text-fg-primary">Tabletop Sessions</h3>
         <button
           onClick={() => setShowCreate(true)}
           className="px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700"
@@ -636,41 +637,41 @@ function TabletopPanel() {
       </div>
 
       {showCreate && (
-        <div className="bg-gray-900/60 rounded-lg border border-gray-700 p-4 space-y-3">
+        <div className="bg-surface-card/60 rounded-lg border border-surface-border p-4 space-y-3">
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Session Name</label>
+            <label className="block text-xs font-medium text-fg-muted mb-1">Session Name</label>
             <input
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-surface-border-strong bg-surface-elevated text-fg-primary rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
               placeholder="Q2 Threat Hunt Exercise"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Scenario</label>
+            <label className="block text-xs font-medium text-fg-muted mb-1">Scenario</label>
             <textarea
               value={form.scenario}
               onChange={(e) => setForm({ ...form, scenario: e.target.value })}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-surface-border-strong bg-surface-elevated text-fg-primary rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
               placeholder="Describe the attack scenario…"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">
+            <label className="block text-xs font-medium text-fg-muted mb-1">
               ATT&amp;CK Techniques (comma-separated)
             </label>
             <input
               value={form.technique_ids}
               onChange={(e) => setForm({ ...form, technique_ids: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-3 py-2 border border-surface-border-strong bg-surface-elevated text-fg-primary rounded-lg text-sm focus:ring-2 focus:ring-indigo-500"
               placeholder="T1059, T1055, T1003"
             />
           </div>
           <div className="flex gap-2 justify-end">
             <button
               onClick={() => setShowCreate(false)}
-              className="px-3 py-1.5 text-sm text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-800"
+              className="px-3 py-1.5 text-sm text-fg-muted border border-surface-border-strong rounded-lg hover:bg-surface-elevated"
             >
               Cancel
             </button>
@@ -687,19 +688,19 @@ function TabletopPanel() {
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
         {(sessions ?? []).map((s) => (
-          <div key={s.id} className="bg-gray-900/60 rounded-lg border border-gray-700 p-4">
+          <div key={s.id} className="bg-surface-card/60 rounded-lg border border-surface-border p-4">
             <div className="flex items-start justify-between mb-2">
               <div>
-                <div className="font-medium text-gray-100 text-sm">{s.name}</div>
-                <div className="text-xs text-gray-500 mt-0.5">
+                <div className="font-medium text-fg-primary text-sm">{s.name}</div>
+                <div className="text-xs text-fg-subtle mt-0.5">
                   {s.technique_ids.length} techniques • {s.findings.length} findings
                 </div>
               </div>
-              <span className={`px-2 py-0.5 rounded text-xs font-medium ${s.status === 'active' ? 'bg-green-900/40 text-green-300' : 'bg-gray-800 text-gray-400'}`}>
+              <span className={`px-2 py-0.5 rounded text-xs font-medium ${s.status === 'active' ? 'bg-green-900/40 text-green-300' : 'bg-surface-elevated text-fg-muted'}`}>
                 {s.status}
               </span>
             </div>
-            <p className="text-xs text-gray-400 line-clamp-2 mb-3">{s.scenario}</p>
+            <p className="text-xs text-fg-muted line-clamp-2 mb-3">{s.scenario}</p>
             <div className="flex gap-2">
               <button
                 onClick={() => setSelectedSession(s)}
@@ -710,7 +711,7 @@ function TabletopPanel() {
               {s.status === 'active' && (
                 <button
                   onClick={() => completeSession(s.id)}
-                  className="text-xs text-gray-500 hover:text-gray-300"
+                  className="text-xs text-fg-subtle hover:text-fg-secondary"
                 >
                   Mark complete
                 </button>
@@ -719,7 +720,7 @@ function TabletopPanel() {
           </div>
         ))}
         {!sessions?.length && (
-          <div className="col-span-2 text-center py-8 text-gray-400 text-sm">
+          <div className="col-span-2 text-center py-8 text-fg-muted text-sm">
             No tabletop sessions yet.
           </div>
         )}
@@ -728,43 +729,44 @@ function TabletopPanel() {
       {/* Findings panel */}
       {selectedSession && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-          <div className="bg-gray-900 rounded-xl shadow-xl border border-gray-700 w-full max-w-2xl max-h-[80vh] flex flex-col">
-            <div className="px-5 py-4 border-b border-gray-700 flex items-center justify-between">
+            <DialogBehavior onClose={() => setSelectedSession(null)} /> {/* [P6 overlay-dialog] role=dialog, focus trap, Escape */}
+          <div className="bg-surface-card rounded-xl shadow-xl border border-surface-border w-full max-w-2xl max-h-[80vh] flex flex-col">
+            <div className="px-5 py-4 border-b border-surface-border flex items-center justify-between">
               <div>
-                <h2 className="font-semibold text-gray-100">{selectedSession.name}</h2>
-                <p className="text-xs text-gray-500 mt-0.5">{selectedSession.technique_ids.join(', ')}</p>
+                <h2 className="font-semibold text-fg-primary">{selectedSession.name}</h2>
+                <p className="text-xs text-fg-subtle mt-0.5">{selectedSession.technique_ids.join(', ')}</p>
               </div>
-              <button onClick={() => setSelectedSession(null)} className="text-gray-500 hover:text-gray-300 text-xl">×</button>
+              <button onClick={() => setSelectedSession(null)} className="text-fg-subtle hover:text-fg-secondary text-xl">×</button>
             </div>
             <div className="flex-1 overflow-y-auto p-5 space-y-3">
               {selectedSession.findings.length === 0 && (
-                <p className="text-gray-500 text-sm text-center py-4">No findings recorded yet.</p>
+                <p className="text-fg-subtle text-sm text-center py-4">No findings recorded yet.</p>
               )}
               {selectedSession.findings.map((f, i) => (
-                <div key={i} className="flex items-start gap-3 bg-gray-800 rounded-lg p-3">
+                <div key={i} className="flex items-start gap-3 bg-surface-elevated rounded-lg p-3">
                   <span className={`text-xs font-semibold uppercase mt-0.5 ${SEVERITY_COLORS[f.severity] ?? ''}`}>
                     {f.severity}
                   </span>
                   <div className="flex-1">
-                    <p className="text-sm text-gray-200">{f.finding}</p>
-                    {f.owner && <p className="text-xs text-gray-500 mt-0.5">Owner: {f.owner}</p>}
+                    <p className="text-sm text-fg-primary">{f.finding}</p>
+                    {f.owner && <p className="text-xs text-fg-subtle mt-0.5">Owner: {f.owner}</p>}
                   </div>
                 </div>
               ))}
             </div>
             {selectedSession.status === 'active' && (
-              <div className="px-5 py-4 border-t border-gray-700 space-y-2">
+              <div className="px-5 py-4 border-t border-surface-border space-y-2">
                 <div className="flex gap-2">
                   <input
                     value={newFinding}
                     onChange={(e) => setNewFinding(e.target.value)}
-                    className="flex-1 px-3 py-2 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg text-sm"
+                    className="flex-1 px-3 py-2 border border-surface-border-strong bg-surface-elevated text-fg-primary rounded-lg text-sm"
                     placeholder="Add a finding…"
                   />
                   <select
                     value={newFindingSeverity}
                     onChange={(e) => setNewFindingSeverity(e.target.value)}
-                    className="px-2 py-2 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg text-sm"
+                    className="px-2 py-2 border border-surface-border-strong bg-surface-elevated text-fg-primary rounded-lg text-sm"
                   >
                     {['critical', 'high', 'medium', 'low', 'info'].map((s) => (
                       <option key={s} value={s}>{s}</option>
@@ -820,18 +822,19 @@ function ReportDetectionModal({
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
-      <div className="bg-gray-900 rounded-xl shadow-xl border border-gray-700 w-full max-w-md">
-        <div className="px-5 py-4 border-b border-gray-700 flex items-center justify-between">
-          <h2 className="font-semibold text-gray-100">Report Detection Outcome</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-300 text-xl">×</button>
+      <DialogBehavior onClose={onClose} /> {/* [P6 overlay-dialog] role=dialog, focus trap, Escape */}
+      <div className="bg-surface-card rounded-xl shadow-xl border border-surface-border w-full max-w-md">
+        <div className="px-5 py-4 border-b border-surface-border flex items-center justify-between">
+          <h2 className="font-semibold text-fg-primary">Report Detection Outcome</h2>
+          <button onClick={onClose} className="text-fg-subtle hover:text-fg-secondary text-xl">×</button>
         </div>
         <div className="p-5 space-y-4">
-          <p className="text-sm text-gray-400">
-            <span className="font-mono bg-gray-800 px-1 rounded text-gray-200">{execution.technique_id}</span>{' '}
+          <p className="text-sm text-fg-muted">
+            <span className="font-mono bg-surface-elevated px-1 rounded text-fg-primary">{execution.technique_id}</span>{' '}
             {execution.test_name}
           </p>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Detected?</label>
+            <label className="block text-xs font-medium text-fg-muted mb-1">Detected?</label>
             <div className="flex gap-3">
               <label className="flex items-center gap-1.5 text-sm">
                 <input type="radio" checked={detected === true} onChange={() => setDetected(true)} />
@@ -844,28 +847,28 @@ function ReportDetectionModal({
             </div>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Alert ID (optional)</label>
+            <label className="block text-xs font-medium text-fg-muted mb-1">Alert ID (optional)</label>
             <input
               value={alertId}
               onChange={(e) => setAlertId(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-surface-border-strong bg-surface-elevated text-fg-primary rounded-lg text-sm"
               placeholder="ALERT-123"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1">Detection Latency (seconds)</label>
+            <label className="block text-xs font-medium text-fg-muted mb-1">Detection Latency (seconds)</label>
             <input
               value={latency}
               onChange={(e) => setLatency(e.target.value)}
               type="number"
               min="0"
-              className="w-full px-3 py-2 border border-gray-600 bg-gray-800 text-gray-200 rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-surface-border-strong bg-surface-elevated text-fg-primary rounded-lg text-sm"
               placeholder="120"
             />
           </div>
         </div>
-        <div className="px-5 py-4 border-t border-gray-700 flex justify-end gap-2">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-800">
+        <div className="px-5 py-4 border-t border-surface-border flex justify-end gap-2">
+          <button onClick={onClose} className="px-4 py-2 text-sm text-fg-muted border border-surface-border-strong rounded-lg hover:bg-surface-elevated">
             Cancel
           </button>
           <button onClick={save} className="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
@@ -900,15 +903,15 @@ export default function PurpleTeamPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-100">Purple Team</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-gray-100 */>Purple Team</h1>
+          <p className="text-sm text-fg-subtle mt-1">
             Atomic Red Team execution, Caldera integration, ATT&amp;CK coverage heatmap, and tabletop simulator
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-700">
+      <div className="border-b border-surface-border">
         <nav className="-mb-px flex gap-6">
           {TABS.map((t) => (
             <button
@@ -917,7 +920,7 @@ export default function PurpleTeamPage() {
               className={`pb-3 text-sm font-medium border-b-2 transition-colors ${
                 tab === t
                   ? 'border-indigo-500 text-indigo-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-600'
+                  : 'border-transparent text-fg-subtle hover:text-fg-secondary hover:border-surface-border-strong'
               }`}
             >
               {t}

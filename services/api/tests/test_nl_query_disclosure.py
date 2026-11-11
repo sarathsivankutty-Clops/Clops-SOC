@@ -125,6 +125,40 @@ def test_a_fresh_response_discloses_nothing_rather_than_guessing():
 
 
 @pytest.mark.asyncio
+async def test_nl_translation_uses_gateway_credentials_without_a_provider_key(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.setenv("LLM_GATEWAY_URL", "http://litellm:4000/v1")
+    monkeypatch.setenv("LITELLM_MASTER_KEY", "sk-gateway-test")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv("LLM_API_KEY", raising=False)
+    monkeypatch.delenv("OPENAI_BASE_URL", raising=False)
+    monkeypatch.delenv("LLM_BASE_URL", raising=False)
+    monkeypatch.delenv("AISOC_MODEL_PIN_NL", raising=False)
+
+    deterministic = _Translated()
+    enhanced = _Translated(explanation="enhanced")
+    observed: dict[str, str] = {}
+
+    monkeypatch.setattr(nl_query, "deterministic_translate", lambda *args, **kwargs: deterministic)
+
+    async def _enhance(query, *, api_key, fallback):
+        observed["api_key"] = api_key
+        assert fallback is deterministic
+        return enhanced
+
+    monkeypatch.setattr(nl_query, "enhance_with_llm", _enhance)
+    monkeypatch.setattr(nl_query, "enforce_airgap_for_url", lambda url: observed.update(url=url))
+
+    result, engine = await nl_query._translate("show critical events", "logs-*", 24)
+
+    assert engine == "llm"
+    assert result is enhanced
+    assert observed == {
+        "api_key": "sk-gateway-test",
+        "url": "http://litellm:4000/v1/chat/completions",
+    }
+
+
+@pytest.mark.asyncio
 async def test_the_lake_path_discloses_compiled_sql_not_the_esql(monkeypatch: pytest.MonkeyPatch):
     translated = _Translated()
     monkeypatch.setattr(

@@ -35,7 +35,7 @@ const SEVERITY_TEXT: Record<string, string> = {
   high: 'text-orange-300',
   medium: 'text-yellow-300',
   low: 'text-blue-300',
-  info: 'text-gray-300',
+  info: 'text-fg-secondary',
 };
 
 const RECOMMENDATION_ACCENT: Record<string, string> = {
@@ -84,7 +84,7 @@ function fmtDelta(delta: number): string {
 }
 
 function deltaClass(delta: number): string {
-  if (delta === 0) return 'text-gray-500';
+  if (delta === 0) return 'text-fg-subtle';
   // For tactic counts: positive (more activity) is concerning, negative (less) is good.
   return delta > 0 ? 'text-amber-300' : 'text-emerald-300';
 }
@@ -141,8 +141,8 @@ export function ExecutiveDigest() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Executive Digest</h1>
-          <p className="mt-1 text-sm text-gray-400">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-white */>Executive Digest</h1>
+          <p className="mt-1 text-sm text-fg-muted">
             Board-ready weekly snapshot of SOC posture, MTT performance, and tuning recommendations.
           </p>
         </div>
@@ -150,7 +150,7 @@ export function ExecutiveDigest() {
           <select
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-white"
+            className="rounded border border-surface-border-strong bg-surface-elevated px-3 py-1.5 text-sm text-fg-primary"
           >
             {PERIOD_PRESETS.map((p) => (
               <option key={p.days} value={p.days}>
@@ -161,7 +161,7 @@ export function ExecutiveDigest() {
           <button
             type="button"
             onClick={() => mutate()}
-            className="rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+            className="rounded border border-surface-border-strong bg-surface-elevated px-3 py-1.5 text-sm text-fg-primary hover:bg-surface-hover"
           >
             Refresh
           </button>
@@ -188,7 +188,7 @@ export function ExecutiveDigest() {
       )}
 
       {isLoading && !data && (
-        <div className="rounded-xl border border-gray-700 bg-gray-900 p-6 text-sm text-gray-400">
+        <div className="rounded-xl border border-surface-border bg-surface-card p-6 text-sm text-fg-muted">
           Computing digest…
         </div>
       )}
@@ -204,9 +204,9 @@ function DigestBody({ digest }: { digest: ExecutiveDigestPayload }) {
       {/* Period + headline */}
       <section className="rounded-xl border border-violet-500/30 bg-violet-950/20 p-5">
         <p className="text-xs uppercase tracking-wide text-violet-300">Reporting period</p>
-        <p className="mt-1 text-lg font-semibold text-white">{digest.period.label}</p>
-        <p className="mt-3 text-sm leading-relaxed text-gray-200">{digest.headline}</p>
-        <p className="mt-2 text-xs text-gray-500">
+        <p className="mt-1 text-lg font-semibold text-fg-primary">{digest.period.label}</p>
+        <p className="mt-3 text-sm leading-relaxed text-fg-primary">{digest.headline}</p>
+        <p className="mt-2 text-xs text-fg-subtle">
           {fmtDateTime(digest.period.start)} → {fmtDateTime(digest.period.end)}
         </p>
       </section>
@@ -241,13 +241,13 @@ function DigestBody({ digest }: { digest: ExecutiveDigestPayload }) {
               return (
                 <div key={sev} className="flex items-center gap-3 text-sm">
                   <span className={`w-20 capitalize ${SEVERITY_TEXT[sev]}`}>{sev}</span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-800">
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-surface-elevated">
                     <div
                       className="h-full rounded-full bg-violet-500"
                       style={{ width: `${Math.min(100, Math.max(0, pct))}%` }}
                     />
                   </div>
-                  <span className="w-14 text-right text-gray-200 tabular-nums">{count}</span>
+                  <span className="w-14 text-right text-fg-primary tabular-nums">{count}</span>
                 </div>
               );
             })}
@@ -261,7 +261,7 @@ function DigestBody({ digest }: { digest: ExecutiveDigestPayload }) {
             <Stat label="Escalated" value={digest.automation.escalated} accent="text-amber-300" />
             <Stat label="Review pending" value={digest.automation.review_pending} accent="text-sky-300" />
           </dl>
-          <p className="mt-4 text-xs text-gray-500">
+          <p className="mt-4 text-xs text-fg-subtle">
             {digest.automation.total_decisions === 0
               ? 'No remediation decisions logged this period.'
               : `${
@@ -277,14 +277,14 @@ function DigestBody({ digest }: { digest: ExecutiveDigestPayload }) {
       <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <Card title="Top MITRE tactics" subtitle="Vs. prior comparable window">
           {digest.top_tactics.length === 0 ? (
-            <p className="text-sm text-gray-500">No tactic-tagged alerts in this window.</p>
+            <p className="text-sm text-fg-subtle">No tactic-tagged alerts in this window.</p>
           ) : (
-            <ul className="divide-y divide-gray-800">
+            <ul className="divide-y divide-surface-border">
               {digest.top_tactics.map((t) => (
                 <li key={t.tactic} className="flex items-center justify-between py-2 text-sm">
-                  <span className="text-gray-200">{t.tactic}</span>
+                  <span className="text-fg-primary">{t.tactic}</span>
                   <span className="flex items-center gap-3">
-                    <span className="text-white tabular-nums">{t.count}</span>
+                    <span className="text-fg-primary tabular-nums">{t.count}</span>
                     <span className={`text-xs tabular-nums ${deltaClass(t.delta_from_prior)}`}>
                       {fmtDelta(t.delta_from_prior)}
                     </span>
@@ -297,13 +297,13 @@ function DigestBody({ digest }: { digest: ExecutiveDigestPayload }) {
 
         <Card title="Top alert sources" subtitle="Connectors driving the most volume">
           {digest.top_sources.length === 0 ? (
-            <p className="text-sm text-gray-500">No connector-tagged alerts in this window.</p>
+            <p className="text-sm text-fg-subtle">No connector-tagged alerts in this window.</p>
           ) : (
-            <ul className="divide-y divide-gray-800">
+            <ul className="divide-y divide-surface-border">
               {digest.top_sources.map((s) => (
                 <li key={s.connector_type} className="flex items-center justify-between py-2 text-sm">
-                  <span className="text-gray-200">{s.connector_type}</span>
-                  <span className="text-white tabular-nums">{s.count}</span>
+                  <span className="text-fg-primary">{s.connector_type}</span>
+                  <span className="text-fg-primary tabular-nums">{s.count}</span>
                 </li>
               ))}
             </ul>
@@ -317,12 +317,12 @@ function DigestBody({ digest }: { digest: ExecutiveDigestPayload }) {
         subtitle="Top alerts ranked by AI score and severity in the window"
       >
         {digest.high_risk_alerts.length === 0 ? (
-          <p className="text-sm text-gray-500">No high-risk alerts surfaced this period.</p>
+          <p className="text-sm text-fg-subtle">No high-risk alerts surfaced this period.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[640px] text-left text-sm">
               <thead>
-                <tr className="border-b border-gray-700 text-xs uppercase tracking-wide text-gray-500">
+                <tr className="border-b border-surface-border text-xs uppercase tracking-wide text-fg-subtle">
                   <th className="py-2 pr-4 font-medium">Title</th>
                   <th className="py-2 pr-4 font-medium">Severity</th>
                   <th className="py-2 pr-4 font-medium">AI score</th>
@@ -332,20 +332,20 @@ function DigestBody({ digest }: { digest: ExecutiveDigestPayload }) {
               </thead>
               <tbody>
                 {digest.high_risk_alerts.map((a) => (
-                  <tr key={a.alert_id} className="border-b border-gray-800/80">
-                    <td className="py-2.5 pr-4 text-gray-100">{a.title || a.alert_id}</td>
-                    <td className={`py-2.5 pr-4 capitalize ${SEVERITY_TEXT[a.severity] ?? 'text-gray-300'}`}>
+                  <tr key={a.alert_id} className="border-b border-surface-border/80">
+                    <td className="py-2.5 pr-4 text-fg-primary">{a.title || a.alert_id}</td>
+                    <td className={`py-2.5 pr-4 capitalize ${SEVERITY_TEXT[a.severity] ?? 'text-fg-secondary'}`}>
                       {a.severity}
                     </td>
-                    <td className="py-2.5 pr-4 text-gray-200 tabular-nums">
+                    <td className="py-2.5 pr-4 text-fg-primary tabular-nums">
                       {a.ai_score === null || a.ai_score === undefined
                         ? '—'
                         : a.ai_score.toFixed(2)}
                     </td>
-                    <td className="py-2.5 pr-4 text-gray-400">
+                    <td className="py-2.5 pr-4 text-fg-muted">
                       {a.mitre_tactics.length === 0 ? '—' : a.mitre_tactics.join(', ')}
                     </td>
-                    <td className="py-2.5 text-gray-400">{fmtDate(a.event_time)}</td>
+                    <td className="py-2.5 text-fg-muted">{fmtDate(a.event_time)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -360,7 +360,7 @@ function DigestBody({ digest }: { digest: ExecutiveDigestPayload }) {
         subtitle="Auto-generated, deterministic guidance based on this window's signals"
       >
         {digest.recommendations.length === 0 ? (
-          <p className="text-sm text-gray-500">No recommendations triggered for this period.</p>
+          <p className="text-sm text-fg-subtle">No recommendations triggered for this period.</p>
         ) : (
           <ul className="space-y-3">
             {digest.recommendations.map((r, idx) => (
@@ -391,10 +391,10 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-gray-700 bg-gray-900 p-5">
+    <div className="rounded-xl border border-surface-border bg-surface-card p-5">
       <div className="mb-4">
-        <h2 className="text-base font-semibold text-white">{title}</h2>
-        {subtitle && <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>}
+        <h2 className="text-base font-semibold text-fg-primary">{title}</h2>
+        {subtitle && <p className="mt-0.5 text-xs text-fg-subtle">{subtitle}</p>}
       </div>
       {children}
     </div>
@@ -411,10 +411,10 @@ function KpiCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
-      <p className="text-xs text-gray-400">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-white tabular-nums">{value}</p>
-      {sub && <p className="mt-1 text-xs text-gray-500">{sub}</p>}
+    <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+      <p className="text-xs text-fg-muted">{label}</p>
+      <p className="mt-1 text-2xl font-semibold text-fg-primary tabular-nums">{value}</p>
+      {sub && <p className="mt-1 text-xs text-fg-subtle">{sub}</p>}
     </div>
   );
 }
@@ -430,8 +430,8 @@ function Stat({
 }) {
   return (
     <div>
-      <dt className="text-xs text-gray-500">{label}</dt>
-      <dd className={`mt-1 text-xl font-semibold tabular-nums ${accent ?? 'text-white'}`}>{value}</dd>
+      <dt className="text-xs text-fg-subtle">{label}</dt>
+      <dd className={`mt-1 text-xl font-semibold tabular-nums ${accent ?? 'text-fg-primary'}`}>{value}</dd>
     </div>
   );
 }

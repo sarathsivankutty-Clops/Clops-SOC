@@ -24,17 +24,17 @@ export function FimEventsTable({ events, total, page, pageSize, onPageChange }: 
 
   if (events.length === 0) {
     return (
-      <div className="rounded-xl border border-gray-200 bg-white p-10 text-center">
-        <p className="text-sm text-gray-500">No FIM events found for the selected filters.</p>
+      <div className="rounded-xl border border-surface-border bg-white p-10 text-center">
+        <p className="text-sm text-fg-subtle">No FIM events found for the selected filters.</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-2">
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
+      <div className="overflow-hidden rounded-xl border border-surface-border bg-white shadow-sm">
+        <table className="min-w-full divide-y divide-surface-border text-sm">
+          <thead className="bg-surface-subtle">
             <tr>
               <Th>Time</Th>
               <Th>Action</Th>
@@ -45,13 +45,13 @@ export function FimEventsTable({ events, total, page, pageSize, onPageChange }: 
               <Th>SHA-256</Th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100 bg-white">
+          <tbody className="divide-y divide-surface-border bg-white">
             {events.map((e) => (
-              <tr key={e.id} className="hover:bg-gray-50">
+              <tr key={e.id} className="hover:bg-surface-subtle">
                 <Td>
                   <span
                     title={e.event_time}
-                    className="whitespace-nowrap text-gray-500"
+                    className="whitespace-nowrap text-fg-subtle"
                   >
                     {formatDistanceToNow(new Date(e.event_time), { addSuffix: true })}
                   </span>
@@ -60,14 +60,14 @@ export function FimEventsTable({ events, total, page, pageSize, onPageChange }: 
                   <span
                     className={clsx(
                       'rounded-full px-2 py-0.5 text-xs font-semibold',
-                      ACTION_BADGE[e.action] ?? 'bg-gray-100 text-gray-600',
+                      ACTION_BADGE[e.action] ?? 'bg-surface-hover text-fg-secondary',
                     )}
                   >
                     {e.action}
                   </span>
                 </Td>
                 <Td>
-                  <span className="max-w-[260px] truncate font-mono text-xs text-gray-800 block">
+                  <span className="max-w-[260px] truncate font-mono text-xs text-fg-primary block">
                     {e.target_path}
                   </span>
                 </Td>
@@ -77,24 +77,24 @@ export function FimEventsTable({ events, total, page, pageSize, onPageChange }: 
                     <span className="font-mono text-xs">
                       {e.process_name}
                       {e.pid != null && (
-                        <span className="ml-1 text-gray-400">({e.pid})</span>
+                        <span className="ml-1 text-fg-muted">({e.pid})</span>
                       )}
                     </span>
                   ) : (
-                    <span className="text-gray-400">—</span>
+                    <span className="text-fg-muted">—</span>
                   )}
                 </Td>
-                <Td>{e.username ?? <span className="text-gray-400">—</span>}</Td>
+                <Td>{e.username ?? <span className="text-fg-muted">—</span>}</Td>
                 <Td>
                   {e.sha256 ? (
                     <span
                       title={e.sha256}
-                      className="font-mono text-xs text-gray-500"
+                      className="font-mono text-xs text-fg-subtle"
                     >
                       {e.sha256.slice(0, 12)}…
                     </span>
                   ) : (
-                    <span className="text-gray-400">—</span>
+                    <span className="text-fg-muted">—</span>
                   )}
                 </Td>
               </tr>
@@ -104,7 +104,7 @@ export function FimEventsTable({ events, total, page, pageSize, onPageChange }: 
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between text-sm text-gray-600">
+      <div className="flex items-center justify-between text-sm text-fg-secondary">
         <span>
           Showing {(page - 1) * pageSize + 1}–
           {Math.min(page * pageSize, total)} of {total.toLocaleString()} events
@@ -115,7 +115,7 @@ export function FimEventsTable({ events, total, page, pageSize, onPageChange }: 
             disabled={page <= 1}
             onClick={() => onPageChange(page - 1)}
           />
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-fg-subtle">
             Page {page} / {totalPages}
           </span>
           <PaginationButton
@@ -131,14 +131,14 @@ export function FimEventsTable({ events, total, page, pageSize, onPageChange }: 
 
 function Th({ children }: { children: React.ReactNode }) {
   return (
-    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+    <th className="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-fg-subtle">
       {children}
     </th>
   );
 }
 
 function Td({ children }: { children: React.ReactNode }) {
-  return <td className="px-3 py-2.5 text-gray-700">{children}</td>;
+  return <td className="px-3 py-2.5 text-fg-primary">{children}</td>;
 }
 
 function PaginationButton({
@@ -157,8 +157,8 @@ function PaginationButton({
       className={clsx(
         'rounded px-3 py-1 text-xs font-medium transition',
         disabled
-          ? 'cursor-not-allowed text-gray-300'
-          : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+          ? 'cursor-not-allowed text-fg-secondary'
+          : 'bg-surface-hover text-fg-primary hover:bg-surface-border',
       )}
     >
       {label}

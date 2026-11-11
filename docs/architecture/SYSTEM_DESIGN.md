@@ -77,7 +77,7 @@ This document describes the end-to-end architecture of the AiSOC platform after 
                        ┌──────────────────────────────────┐
                        │      services/agents              │
                        │  LangGraph + full ATT&CK + RAG    │
-                       │  (Anthropic Claude 3.7 / GPT-4o)  │
+                       │  (Groq chat + local Ollama vectors)│
                        └──────────────────────────────────┘
 ```
 
@@ -206,7 +206,7 @@ CISA KEV ──┘   │  ─ STIX 2.1 parser       │   │  Qdrant    │
 | `parsers/stix.py` | Normalize STIX 2.1 SDO/SRO objects |
 | `storage/bloom.py` | Redis-backed Bloom filter (configurable size + FP rate) |
 | `storage/opensearch.py` | Index `iocs-*` and `actors-*` |
-| `storage/qdrant.py` | Embed via `text-embedding-3-large` for semantic recall |
+| `storage/qdrant.py` | Embed via the local Ollama model for semantic recall |
 | `storage/neo4j.py` | Persist actor↔TTP and actor↔IOC graph |
 | `feeds/scheduler.py` | APScheduler interval jobs |
 | `feeds/pipeline.py` | Fan-out to all sinks with idempotency |
@@ -435,4 +435,3 @@ ueba/
 ```
 
 17 services in total. The `mcp/`, `osquery-extensions/`, `osquery-tls/`, and `slack-bot/` directories are the v2.2 additions; the rest are described in §2 and §12 above.
-

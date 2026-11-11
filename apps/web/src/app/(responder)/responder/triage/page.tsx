@@ -114,7 +114,7 @@ export default function ResponderTriagePage() {
       <div className="mb-4 flex items-center justify-between">
         <div>
           <h1 className="text-xl font-semibold tracking-tight">Triage queue</h1>
-          <p className="text-xs text-zinc-500 mt-0.5">
+          <p className="text-xs text-fg-subtle mt-0.5">
             {counts.open} open ·{' '}
             <span className="text-red-400">{counts.critical} critical</span> ·{' '}
             <span className="text-orange-400">{counts.high} high</span>
@@ -125,7 +125,7 @@ export default function ResponderTriagePage() {
           onClick={() => void load('refresh')}
           disabled={refreshing}
           aria-label="Refresh queue"
-          className="w-9 h-9 rounded-full border border-zinc-800 hover:border-zinc-700 disabled:opacity-60 flex items-center justify-center text-zinc-300"
+          className="w-9 h-9 rounded-full border border-surface-border hover:border-surface-border disabled:opacity-60 flex items-center justify-center text-fg-secondary"
         >
           <svg
             className={clsx('w-4 h-4', refreshing && 'animate-spin')}
@@ -163,7 +163,7 @@ export default function ResponderTriagePage() {
                     ? tone
                       ? `${tone.bg} ${tone.fg} border-transparent`
                       : 'bg-indigo-500/15 text-indigo-300 border-transparent'
-                    : 'bg-transparent text-zinc-400 border-zinc-800 hover:border-zinc-700',
+                    : 'bg-transparent text-fg-muted border-surface-border hover:border-surface-border',
                 )}
               >
                 {filter.label}
@@ -176,8 +176,8 @@ export default function ResponderTriagePage() {
             className={clsx(
               'shrink-0 text-xs px-3 py-1.5 rounded-full border transition ml-1',
               showResolved
-                ? 'bg-zinc-800 text-zinc-200 border-transparent'
-                : 'bg-transparent text-zinc-500 border-zinc-800 hover:border-zinc-700',
+                ? 'bg-surface-elevated text-fg-primary border-transparent'
+                : 'bg-transparent text-fg-subtle border-surface-border hover:border-surface-border',
             )}
           >
             {showResolved ? 'Showing resolved' : 'Show resolved'}
@@ -218,17 +218,17 @@ function AlertCard({ alert }: { alert: Alert }) {
     <Link
       href={`/responder/triage/${alert.id}`}
       className={clsx(
-        'block rounded-xl bg-zinc-900/70 hover:bg-zinc-900 border border-zinc-800/80 hover:border-zinc-700 transition active:scale-[0.99] border-l-4',
+        'block rounded-xl bg-surface-card/70 hover:bg-surface-card border border-surface-border/80 hover:border-surface-border transition active:scale-[0.99] border-l-4',
         tone.border,
       )}
     >
       <div className="px-4 py-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <h2 className="text-sm font-medium text-zinc-100 leading-snug line-clamp-2">
+            <h2 className="text-sm font-medium text-fg-primary leading-snug line-clamp-2">
               {alert.title}
             </h2>
-            <div className="mt-1.5 flex items-center gap-2 text-[11px] text-zinc-500">
+            <div className="mt-1.5 flex items-center gap-2 text-[11px] text-fg-subtle">
               <span className="truncate">{alert.source}</span>
               {mitre ? (
                 <>
@@ -259,12 +259,12 @@ function AlertCard({ alert }: { alert: Alert }) {
             </span>
           </div>
         </div>
-        <div className="mt-2 flex items-center justify-between text-[11px] text-zinc-500">
+        <div className="mt-2 flex items-center justify-between text-[11px] text-fg-subtle">
           <span>{formatRelative(alert.createdAt)}</span>
           {alert.assignee ? (
             <span className="truncate max-w-[120px]">@{alert.assignee}</span>
           ) : (
-            <span className="text-zinc-600">unassigned</span>
+            <span className="text-fg-secondary">unassigned</span>
           )}
         </div>
       </div>
@@ -278,11 +278,11 @@ function SkeletonList() {
       {Array.from({ length: 5 }).map((_, i) => (
         <li
           key={i}
-          className="rounded-xl bg-zinc-900/40 border border-zinc-800/60 border-l-4 border-l-zinc-800 px-4 py-3"
+          className="rounded-xl bg-surface-card/40 border border-surface-border/60 border-l-4 border-l-zinc-800 px-4 py-3"
         >
-          <div className="h-3.5 w-2/3 bg-zinc-800/80 rounded animate-pulse" />
-          <div className="h-3 w-1/3 bg-zinc-800/60 rounded mt-2.5 animate-pulse" />
-          <div className="h-2.5 w-1/4 bg-zinc-800/60 rounded mt-3 animate-pulse" />
+          <div className="h-3.5 w-2/3 bg-surface-elevated/80 rounded animate-pulse" />
+          <div className="h-3 w-1/3 bg-surface-elevated/60 rounded mt-2.5 animate-pulse" />
+          <div className="h-2.5 w-1/4 bg-surface-elevated/60 rounded mt-3 animate-pulse" />
         </li>
       ))}
     </ul>
@@ -301,10 +301,10 @@ function EmptyState({
       ? 'Queue is clear. Time for coffee.'
       : 'No alerts match this filter.';
   return (
-    <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/30 px-6 py-12 text-center">
-      <div className="w-10 h-10 mx-auto rounded-full bg-zinc-800/60 flex items-center justify-center mb-3">
+    <div className="rounded-xl border border-surface-border/80 bg-surface-card/30 px-6 py-12 text-center">
+      <div className="w-10 h-10 mx-auto rounded-full bg-surface-elevated/60 flex items-center justify-center mb-3">
         <svg
-          className="w-5 h-5 text-zinc-500"
+          className="w-5 h-5 text-fg-subtle"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -317,8 +317,8 @@ function EmptyState({
           />
         </svg>
       </div>
-      <p className="text-sm text-zinc-300">{message}</p>
-      <p className="text-xs text-zinc-500 mt-1">
+      <p className="text-sm text-fg-secondary">{message}</p>
+      <p className="text-xs text-fg-subtle mt-1">
         Auto-refreshes every 30 seconds.
       </p>
     </div>

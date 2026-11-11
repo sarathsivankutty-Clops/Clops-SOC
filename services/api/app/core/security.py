@@ -12,6 +12,26 @@ import jwt
 
 from app.core.config import settings
 
+try:
+    from prometheus_client import Counter as _PromCounter
+
+    AUTH_EVENTS_TOTAL: Any = _PromCounter(
+        "aisoc_auth_events_total",
+        "Authentication lifecycle events across password and SSO flows.",
+        ["flow", "event", "outcome"],
+    )
+except Exception:  # noqa: BLE001
+    AUTH_EVENTS_TOTAL = None
+
+
+def record_auth_metric(flow: str, event: str, outcome: str) -> None:
+    """Increment the Prometheus authentication counter if available."""
+    if AUTH_EVENTS_TOTAL is not None:
+        try:
+            AUTH_EVENTS_TOTAL.labels(flow=flow, event=event, outcome=outcome).inc()
+        except Exception:  # noqa: BLE001
+            pass
+
 # bcrypt has a hard 72-byte limit on inputs. We mirror what passlib used to do
 # but without the version-introspection that breaks against newer bcrypt
 # releases (passlib 1.7.4 reads `_bcrypt.__about__.__version__`, which was

@@ -175,10 +175,10 @@ export default function AdminWaitlistPage() {
   return (
     <div className="space-y-6 p-6">
       <header>
-        <h1 className="text-2xl font-semibold tracking-tight text-white">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-semibold tracking-tight text-white */>
           Managed waitlist
         </h1>
-        <p className="mt-1 text-sm text-gray-400">
+        <p className="mt-1 text-sm text-fg-muted">
           Triage incoming requests for managed tenants on this deployment.
           Promote an entry to mint the tenant, seed the demo dataset, and
           generate the initial admin invite link.
@@ -189,12 +189,12 @@ export default function AdminWaitlistPage() {
         {STATUS_ORDER.map((status) => (
           <div
             key={status}
-            className="rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3"
+            className="rounded-xl border border-surface-border bg-white/[0.02] px-4 py-3"
           >
-            <div className="text-xs uppercase tracking-wide text-gray-500">
+            <div className="text-xs uppercase tracking-wide text-fg-subtle">
               {status}
             </div>
-            <div className="mt-1 text-2xl font-semibold text-white">
+            <div className="mt-1 text-2xl font-semibold text-fg-primary">
               {counts[status]}
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function AdminWaitlistPage() {
               'rounded-full border px-3 py-1.5 text-xs font-medium transition ' +
               (statusFilter === opt.value
                 ? 'border-brand-500/40 bg-brand-500/10 text-brand-200'
-                : 'border-white/10 bg-white/[0.03] text-gray-300 hover:border-white/20 hover:text-white')
+                : 'border-surface-border bg-white/[0.03] text-fg-secondary hover:border-surface-border hover:text-fg-primary')
             }
           >
             {opt.label}
@@ -218,7 +218,7 @@ export default function AdminWaitlistPage() {
         ))}
         <button
           onClick={() => fetchEntries()}
-          className="ml-auto rounded-md border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-gray-300 transition hover:border-white/20 hover:text-white"
+          className="ml-auto rounded-md border border-surface-border bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-fg-secondary transition hover:border-surface-border hover:text-fg-primary"
         >
           Refresh
         </button>
@@ -240,10 +240,10 @@ export default function AdminWaitlistPage() {
         </div>
       )}
 
-      <section className="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02]">
+      <section className="overflow-x-auto rounded-2xl border border-surface-border bg-white/[0.02]">
         <table className="w-full min-w-[960px] border-collapse text-sm">
           <thead>
-            <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-gray-500">
+            <tr className="text-left text-[11px] font-semibold uppercase tracking-wider text-fg-subtle">
               <th className="px-5 py-3">Company / role</th>
               <th className="px-5 py-3">Email</th>
               <th className="px-5 py-3">Stack</th>
@@ -255,14 +255,14 @@ export default function AdminWaitlistPage() {
           <tbody>
             {loading && entries.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-sm text-gray-400">
+                <td colSpan={6} className="px-5 py-8 text-center text-sm text-fg-muted">
                   Loading…
                 </td>
               </tr>
             )}
             {!loading && entries.length === 0 && (
               <tr>
-                <td colSpan={6} className="px-5 py-8 text-center text-sm text-gray-500">
+                <td colSpan={6} className="px-5 py-8 text-center text-sm text-fg-subtle">
                   No entries{statusFilter !== 'all' ? ` with status "${statusFilter}"` : ''}.
                 </td>
               </tr>
@@ -271,14 +271,14 @@ export default function AdminWaitlistPage() {
               <tr
                 key={entry.id}
                 className={
-                  'border-t border-white/5 ' +
+                  'border-t border-surface-border ' +
                   (i % 2 === 0 ? '' : 'bg-white/[0.015]')
                 }
               >
                 <td className="px-5 py-3 align-top">
-                  <div className="font-medium text-white">{entry.company}</div>
-                  <div className="text-xs text-gray-500">{entry.role}</div>
-                  <div className="mt-1 line-clamp-2 max-w-md text-xs text-gray-400">
+                  <div className="font-medium text-fg-primary">{entry.company}</div>
+                  <div className="text-xs text-fg-subtle">{entry.role}</div>
+                  <div className="mt-1 line-clamp-2 max-w-md text-xs text-fg-muted">
                     {entry.motivation}
                   </div>
                 </td>
@@ -293,18 +293,18 @@ export default function AdminWaitlistPage() {
                 <td className="px-5 py-3 align-top">
                   <div className="flex max-w-xs flex-wrap gap-1">
                     {entry.soc_stack.length === 0 && (
-                      <span className="text-xs text-gray-500">—</span>
+                      <span className="text-xs text-fg-subtle">—</span>
                     )}
                     {entry.soc_stack.slice(0, 4).map((stack) => (
                       <span
                         key={stack}
-                        className="rounded-full border border-white/10 bg-white/[0.03] px-2 py-0.5 text-[11px] text-gray-300"
+                        className="rounded-full border border-surface-border bg-white/[0.03] px-2 py-0.5 text-[11px] text-fg-secondary"
                       >
                         {stack}
                       </span>
                     ))}
                     {entry.soc_stack.length > 4 && (
-                      <span className="text-[11px] text-gray-500">
+                      <span className="text-[11px] text-fg-subtle">
                         +{entry.soc_stack.length - 4}
                       </span>
                     )}
@@ -317,7 +317,7 @@ export default function AdminWaitlistPage() {
                       handleStatusChange(entry.id, e.target.value as WaitlistStatus)
                     }
                     disabled={busyRow === entry.id}
-                    className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-xs text-gray-200 focus:border-brand-500/50 focus:outline-none"
+                    className="rounded-md border border-surface-border bg-white/[0.03] px-2 py-1 text-xs text-fg-primary focus:border-brand-500/50 focus:outline-none"
                     aria-label={`Status for ${entry.company}`}
                   >
                     {STATUS_ORDER.map((s) => (
@@ -327,7 +327,7 @@ export default function AdminWaitlistPage() {
                     ))}
                   </select>
                 </td>
-                <td className="px-5 py-3 align-top text-xs text-gray-400">
+                <td className="px-5 py-3 align-top text-xs text-fg-muted">
                   {formatDate(entry.created_at)}
                 </td>
                 <td className="px-5 py-3 text-right align-top">
@@ -343,7 +343,7 @@ export default function AdminWaitlistPage() {
                       (busyRow === entry.id ||
                       entry.status === 'declined' ||
                       entry.provisioned_tenant_id
-                        ? 'cursor-not-allowed border-white/5 bg-white/[0.02] text-gray-600'
+                        ? 'cursor-not-allowed border-surface-border bg-white/[0.02] text-fg-secondary'
                         : 'border-brand-500/40 bg-brand-500/10 text-brand-200 hover:bg-brand-500/20')
                     }
                   >
@@ -360,7 +360,7 @@ export default function AdminWaitlistPage() {
         </table>
       </section>
 
-      <footer className="text-xs text-gray-500">
+      <footer className="text-xs text-fg-subtle">
         Total entries returned: {total}
       </footer>
     </div>
@@ -393,17 +393,17 @@ function InviteCard({ invite, onDismiss }: InviteCardProps) {
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-sm font-semibold text-white">
+          <h2 className="text-sm font-semibold text-fg-primary">
             Tenant provisioned:{' '}
             <span className="font-mono text-brand-300">{invite.tenant_slug}</span>
           </h2>
-          <p className="mt-1 text-xs text-gray-300">
+          <p className="mt-1 text-xs text-fg-secondary">
             Email the initial admin invite link below to{' '}
             <span className="font-mono text-emerald-200">
               {invite.admin_user.email}
             </span>
             . Demo dataset seeded:{' '}
-            <strong className="text-white">
+            <strong className="text-fg-primary">
               {invite.demo_seeded ? 'yes' : 'no'}
             </strong>
             . Credential-key fingerprint:{' '}
@@ -415,16 +415,16 @@ function InviteCard({ invite, onDismiss }: InviteCardProps) {
           <textarea
             readOnly
             rows={2}
-            className="mt-3 w-full rounded-md border border-white/10 bg-black/30 px-3 py-2 font-mono text-xs text-emerald-200"
+            className="mt-3 w-full rounded-md border border-surface-border bg-black/30 px-3 py-2 font-mono text-xs text-emerald-200"
             value={invite.admin_invite.url}
           />
-          <p className="mt-2 text-[11px] text-gray-500">
+          <p className="mt-2 text-[11px] text-fg-subtle">
             Invite expires {new Date(invite.admin_invite.expires_at).toLocaleString()}.
           </p>
         </div>
         <button
           onClick={onDismiss}
-          className="rounded-md border border-white/10 bg-white/[0.03] px-2 py-1 text-xs text-gray-300 hover:border-white/20 hover:text-white"
+          className="rounded-md border border-surface-border bg-white/[0.03] px-2 py-1 text-xs text-fg-secondary hover:border-surface-border hover:text-fg-primary"
         >
           Dismiss
         </button>

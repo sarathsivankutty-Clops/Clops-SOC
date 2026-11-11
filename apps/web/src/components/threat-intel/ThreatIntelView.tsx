@@ -92,7 +92,7 @@ const MOCK_INDICATORS: ThreatIndicator[] = [
 
 const TYPE_CONFIG: Record<KnownIndicatorType, { label: string; color: string }> = {
   ip: { label: 'IP', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20' },
-  domain: { label: 'Domain', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
+  domain: { label: 'Domain', color: 'text-brand-400 bg-brand-500/10 border-blue-500/20' },
   hash: { label: 'Hash', color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' },
   url: { label: 'URL', color: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
   email: { label: 'Email', color: 'text-green-400 bg-green-500/10 border-green-500/20' },
@@ -102,7 +102,7 @@ const TYPE_CONFIG: Record<KnownIndicatorType, { label: string; color: string }> 
   vulnerability: { label: 'CVE', color: 'text-rose-400 bg-rose-500/10 border-rose-500/20' },
 };
 
-const UNKNOWN_TYPE = { label: 'Unknown', color: 'text-gray-400 bg-gray-500/10 border-gray-500/20' };
+const UNKNOWN_TYPE = { label: 'Unknown', color: 'text-fg-secondary bg-gray-500/10 border-surface-border-strong/20' };
 
 /** Chip order when there are no rows to derive one from. */
 const KNOWN_TYPE_ORDER: KnownIndicatorType[] = ['ip', 'domain', 'hash', 'url', 'vulnerability'];
@@ -129,8 +129,8 @@ const SEVERITY_CONFIG: Record<AlertSeverity, string> = {
   critical: 'text-red-400 bg-red-500/10 border-red-500/20',
   high: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
   medium: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
-  low: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
-  info: 'text-slate-400 bg-slate-500/10 border-slate-500/20',
+  low: 'text-brand-400 bg-brand-500/10 border-blue-500/20',
+  info: 'text-fg-secondary bg-slate-500/10 border-surface-border-strong/20',
 };
 
 // ─── Lookup Form ──────────────────────────────────────────────────────────────
@@ -160,8 +160,8 @@ function LookupForm() {
   };
 
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-5">
-      <h3 className="text-sm font-medium text-gray-300 mb-3">IOC Lookup</h3>
+    <div className="bg-surface-card border border-surface-border/70 rounded-xl p-5">
+      <h3 className="text-sm font-medium text-fg-secondary mb-3">IOC Lookup</h3>
       <div className="flex gap-2">
         <input
           type="text"
@@ -169,12 +169,12 @@ function LookupForm() {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleLookup()}
           placeholder="Enter IP, domain, hash, or URL…"
-          className="flex-1 bg-gray-800 border border-gray-700 rounded-lg text-sm text-gray-300 placeholder-gray-600 px-3 py-2 focus:outline-none focus:border-blue-500/50"
+          className="flex-1 bg-surface-elevated border border-surface-border-strong rounded-lg text-sm text-fg-secondary placeholder-fg-muted px-3 py-2 focus:outline-none focus:border-brand-500/50"
         />
         <button
           onClick={handleLookup}
           disabled={isLooking || !query.trim()}
-          className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm px-4 py-2 rounded-lg transition-colors"
+          className="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white text-sm px-4 py-2 rounded-lg transition-colors"
         >
           {isLooking ? 'Looking up…' : 'Lookup'}
         </button>
@@ -203,17 +203,17 @@ function LookupForm() {
         <div className="mt-3 bg-red-500/5 border border-red-500/20 rounded-lg p-3 space-y-2">
           <div className="flex items-center gap-2">
             <span className="text-red-400 font-medium text-sm">Malicious indicator</span>
-            <span className="text-xs text-gray-500">Confidence: {outcome.indicator.confidence}%</span>
+            <span className="text-xs text-fg-muted">Confidence: {outcome.indicator.confidence}%</span>
           </div>
           {outcome.indicator.description ? (
-            <p className="text-xs text-gray-400">{outcome.indicator.description}</p>
+            <p className="text-xs text-fg-secondary">{outcome.indicator.description}</p>
           ) : null}
           <div className="flex flex-wrap gap-1">
             {(outcome.indicator.tags ?? []).map((t) => (
-              <span key={t} className="text-xs bg-gray-800 text-gray-400 px-1.5 py-0.5 rounded">{t}</span>
+              <span key={t} className="text-xs bg-surface-elevated text-fg-secondary px-1.5 py-0.5 rounded">{t}</span>
             ))}
           </div>
-          <div className="text-xs text-gray-500">
+          <div className="text-xs text-fg-muted">
             Sources: {(outcome.indicator.sources ?? []).join(', ')}
           </div>
         </div>
@@ -228,14 +228,14 @@ function IOCRow({ ioc }: { ioc: ThreatIndicator }) {
   const typeCfg = badgeFor(ioc.type);
 
   return (
-    <div className="flex items-center gap-4 py-3 border-b border-gray-800/60 last:border-0 hover:bg-gray-800/20 px-4 -mx-4 transition-colors rounded-lg">
+    <div className="flex items-center gap-4 py-3 border-b border-surface-border/70 last:border-0 hover:bg-surface-elevated/20 px-4 -mx-4 transition-colors rounded-lg">
       <span className={clsx('text-xs font-medium px-2 py-0.5 rounded border shrink-0', typeCfg.color)}>
         {typeCfg.label}
       </span>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-mono text-gray-300 truncate">{ioc.value}</p>
-        <p className="text-xs text-gray-600 mt-0.5 truncate">{ioc.description ?? ''}</p>
+        <p className="text-sm font-mono text-fg-secondary truncate">{ioc.value}</p>
+        <p className="text-xs text-fg-subtle mt-0.5 truncate">{ioc.description ?? ''}</p>
       </div>
 
       <span className={clsx('text-xs font-medium px-2 py-0.5 rounded border shrink-0', SEVERITY_CONFIG[ioc.severity])}>
@@ -244,15 +244,15 @@ function IOCRow({ ioc }: { ioc: ThreatIndicator }) {
 
       <div className="text-right shrink-0">
         <div className="flex items-center gap-1 justify-end">
-          <span className="text-xs text-gray-500">Confidence:</span>
+          <span className="text-xs text-fg-muted">Confidence:</span>
           <span className={clsx(
             'text-xs font-medium',
-            ioc.confidence >= 80 ? 'text-red-400' : ioc.confidence >= 60 ? 'text-yellow-400' : 'text-gray-400'
+            ioc.confidence >= 80 ? 'text-red-400' : ioc.confidence >= 60 ? 'text-yellow-400' : 'text-fg-secondary'
           )}>
             {ioc.confidence}%
           </span>
         </div>
-        <p className="text-xs text-gray-600 mt-0.5" suppressHydrationWarning>
+        <p className="text-xs text-fg-subtle mt-0.5" suppressHydrationWarning>
           {ioc.lastSeen || ioc.firstSeen
             ? format(new Date(ioc.lastSeen ?? ioc.firstSeen ?? 0), 'MMM dd HH:mm')
             : '—'}
@@ -261,7 +261,7 @@ function IOCRow({ ioc }: { ioc: ThreatIndicator }) {
 
       <div className="flex flex-wrap gap-1 max-w-32 shrink-0">
         {ioc.sources.slice(0, 2).map((src) => (
-          <span key={src} className="text-xs bg-gray-800 text-gray-500 px-1.5 py-0.5 rounded">
+          <span key={src} className="text-xs bg-surface-elevated text-fg-muted px-1.5 py-0.5 rounded">
             {src}
           </span>
         ))}
@@ -360,8 +360,8 @@ export function ThreatIntelView() {
     <div className="space-y-5">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold text-gray-100">Threat Intelligence</h1>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-xl font-semibold text-fg-primary */>Threat Intelligence</h1>
+        <p className="text-sm text-fg-muted mt-0.5">
           Indicators of compromise aggregated from multiple intel feeds
         </p>
       </div>
@@ -378,16 +378,16 @@ export function ThreatIntelView() {
        * survived it. */}
       <div className="grid grid-cols-4 gap-3">
         {[
-          { label: 'Indicators collected', value: totalCollected, color: 'text-blue-400' },
-          { label: 'Shown below', value: allIndicators.length, color: 'text-gray-200' },
+          { label: 'Indicators collected', value: totalCollected, color: 'text-brand-400' },
+          { label: 'Shown below', value: allIndicators.length, color: 'text-fg-primary' },
           { label: 'Malicious (of shown)', value: allIndicators.filter(i => i.malicious).length, color: 'text-red-400' },
           { label: 'High confidence (of shown)', value: allIndicators.filter(i => i.confidence >= 80).length, color: 'text-orange-400' },
         ].map((stat) => (
-          <div key={stat.label} className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4">
-            <p className={clsx('text-2xl font-bold mb-1', storeUnknown ? 'text-gray-600' : stat.color)}>
+          <div key={stat.label} className="bg-surface-card border border-surface-border/70 rounded-xl p-4">
+            <p className={clsx('text-2xl font-bold mb-1', storeUnknown ? 'text-fg-subtle' : stat.color)}>
               {storeUnknown ? '—' : stat.value}
             </p>
-            <p className="text-xs text-gray-500">{storeUnknown ? 'not measured' : stat.label}</p>
+            <p className="text-xs text-fg-muted">{storeUnknown ? 'not measured' : stat.label}</p>
           </div>
         ))}
       </div>
@@ -398,7 +398,7 @@ export function ThreatIntelView() {
       {/* Filters */}
       <div className="flex items-center gap-3">
         <div className="relative flex-1 max-w-sm">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
@@ -406,7 +406,7 @@ export function ThreatIntelView() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search indicators…"
-            className="w-full pl-9 pr-4 py-2 bg-gray-900/60 border border-gray-800 rounded-lg text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-blue-500/50"
+            className="w-full pl-9 pr-4 py-2 bg-surface-card border border-surface-border rounded-lg text-sm text-fg-secondary placeholder-fg-muted focus:outline-none focus:border-brand-500/50"
           />
         </div>
 
@@ -418,8 +418,8 @@ export function ThreatIntelView() {
               className={clsx(
                 'text-xs px-3 py-1.5 rounded-lg transition-colors',
                 typeFilter === t
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-400 bg-gray-800/60 hover:bg-gray-800'
+                  ? 'bg-brand-600 text-white'
+                  : 'text-fg-secondary bg-surface-sunken hover:bg-surface-elevated'
               )}
             >
               {/* A chip reading `(0)` is a measured claim about a store the
@@ -432,14 +432,14 @@ export function ThreatIntelView() {
       </div>
 
       {/* IOC List */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4">
+      <div className="bg-surface-card border border-surface-border/70 rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-medium text-gray-300">Indicators of Compromise</h3>
+          <h3 className="text-sm font-medium text-fg-secondary">Indicators of Compromise</h3>
           {/* `storeUnknown` is the same signal the empty state below uses to
               say "this is not a report that no indicators exist". This
               counter said `0 indicators` directly above that sentence. */}
           <span
-            className="text-xs text-gray-500"
+            className="text-xs text-fg-muted"
             title={storeUnknown ? 'The threat-intel service has not answered, so there is no count to show.' : undefined}
           >
             {storeUnknown
@@ -465,7 +465,7 @@ export function ThreatIntelView() {
                     setTypeFilter('all');
                     setSearch('');
                   }}
-                  className="text-xs px-3 py-1.5 rounded-md border border-blue-500/40 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 transition-colors"
+                  className="text-xs px-3 py-1.5 rounded-md border border-brand-500/40 bg-brand-500/10 text-brand-300 hover:bg-brand-500/20 transition-colors"
                 >
                   Clear filters
                 </button>

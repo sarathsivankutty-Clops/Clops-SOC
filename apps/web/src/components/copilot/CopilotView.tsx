@@ -190,7 +190,7 @@ function renderRichText(content: string): React.ReactNode {
       const token = m[0];
       if (token.startsWith('**')) {
         parts.push(
-          <strong key={`b-${m.index}`} className="font-semibold text-white">
+          <strong key={`b-${m.index}`} className="font-semibold text-fg-primary">
             {token.slice(2, -2)}
           </strong>,
         );
@@ -198,7 +198,7 @@ function renderRichText(content: string): React.ReactNode {
         parts.push(
           <code
             key={`c-${m.index}`}
-            className="rounded bg-slate-800/80 px-1.5 py-0.5 font-mono text-[12px] text-emerald-300"
+            className="rounded bg-surface-elevated/80 px-1.5 py-0.5 font-mono text-[12px] text-emerald-300"
           >
             {token.slice(1, -1)}
           </code>,
@@ -234,11 +234,11 @@ function renderRichText(content: string): React.ReactNode {
         <div key={`tbl-${blocks.length}`} className="my-3 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-slate-700/60">
+              <tr className="border-b border-surface-border/60">
                 {headerCells.map((h, idx) => (
                   <th
                     key={idx}
-                    className="px-3 py-2 text-left font-medium text-slate-300"
+                    className="px-3 py-2 text-left font-medium text-fg-secondary"
                   >
                     {inline(h)}
                   </th>
@@ -247,9 +247,9 @@ function renderRichText(content: string): React.ReactNode {
             </thead>
             <tbody>
               {rows.map((r, rIdx) => (
-                <tr key={rIdx} className="border-b border-slate-800/60 last:border-0">
+                <tr key={rIdx} className="border-b border-surface-border/60 last:border-0">
                   {r.map((c, cIdx) => (
-                    <td key={cIdx} className="px-3 py-2 text-slate-300">
+                    <td key={cIdx} className="px-3 py-2 text-fg-secondary">
                       {inline(c)}
                     </td>
                   ))}
@@ -264,7 +264,7 @@ function renderRichText(content: string): React.ReactNode {
 
     if (line.startsWith('# ')) {
       blocks.push(
-        <h2 key={i} className="mt-3 text-lg font-semibold text-white">
+        <h2 key={i} className="mt-3 text-lg font-semibold text-fg-primary">
           {inline(line.slice(2))}
         </h2>,
       );
@@ -276,7 +276,7 @@ function renderRichText(content: string): React.ReactNode {
       blocks.push(
         <blockquote
           key={i}
-          className="my-2 border-l-2 border-slate-600 pl-3 text-sm italic text-slate-400"
+          className="my-2 border-l-2 border-surface-border-strong pl-3 text-sm italic text-fg-muted"
         >
           {inline(line.slice(2))}
         </blockquote>,
@@ -294,7 +294,7 @@ function renderRichText(content: string): React.ReactNode {
       blocks.push(
         <ul
           key={`ul-${blocks.length}`}
-          className="my-2 list-disc space-y-1 pl-5 text-sm text-slate-300"
+          className="my-2 list-disc space-y-1 pl-5 text-sm text-fg-secondary"
         >
           {items.map((it, idx) => (
             <li key={idx}>{inline(it)}</li>
@@ -313,7 +313,7 @@ function renderRichText(content: string): React.ReactNode {
       blocks.push(
         <ol
           key={`ol-${blocks.length}`}
-          className="my-2 list-decimal space-y-1 pl-5 text-sm text-slate-300"
+          className="my-2 list-decimal space-y-1 pl-5 text-sm text-fg-secondary"
         >
           {items.map((it, idx) => (
             <li key={idx}>{inline(it)}</li>
@@ -330,7 +330,7 @@ function renderRichText(content: string): React.ReactNode {
     }
 
     blocks.push(
-      <p key={i} className="my-1 text-sm leading-relaxed text-slate-200">
+      <p key={i} className="my-1 text-sm leading-relaxed text-fg-primary">
         {inline(line)}
       </p>,
     );
@@ -555,7 +555,7 @@ export function CopilotView() {
   return (
     <div className="grid h-[calc(100vh-7rem)] grid-cols-1 gap-4 lg:grid-cols-[18rem_1fr]">
       {/* Sidebar */}
-      <aside className="hidden flex-col gap-3 rounded-xl border border-slate-800/80 bg-slate-900/40 p-3 lg:flex">
+      <aside className="hidden flex-col gap-3 rounded-xl border border-surface-border/80 bg-surface-card/40 p-3 lg:flex">
         <button
           onClick={startNew}
           className="flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-emerald-950 shadow-sm transition-colors hover:bg-emerald-400"
@@ -564,7 +564,7 @@ export function CopilotView() {
         </button>
 
         <div>
-          <h3 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <h3 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-fg-subtle">
             Suggested
           </h3>
           <ul className="space-y-1">
@@ -572,7 +572,7 @@ export function CopilotView() {
               <li key={p.label}>
                 <button
                   onClick={() => void send(p.prompt)}
-                  className="group flex w-full items-start gap-2 rounded-md px-2 py-2 text-left text-sm text-slate-300 transition-colors hover:bg-slate-800/60 hover:text-white"
+                  className="group flex w-full items-start gap-2 rounded-md px-2 py-2 text-left text-sm text-fg-secondary transition-colors hover:bg-surface-elevated/60 hover:text-fg-primary"
                 >
                   <span className="leading-tight">{p.label}</span>
                 </button>
@@ -582,7 +582,7 @@ export function CopilotView() {
         </div>
 
         <div className="mt-2 flex-1 overflow-y-auto">
-          <h3 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+          <h3 className="mb-2 px-1 text-[11px] font-semibold uppercase tracking-wider text-fg-subtle">
             Recent
           </h3>
           {conversationsState.isLoading ? (
@@ -592,7 +592,7 @@ export function CopilotView() {
               <Skeleton className="h-8" />
             </div>
           ) : conversations.length === 0 ? (
-            <p className="px-2 text-xs text-slate-500">
+            <p className="px-2 text-xs text-fg-subtle">
               Past conversations will appear here.
             </p>
           ) : (
@@ -603,8 +603,8 @@ export function CopilotView() {
                     className={clsx(
                       'block w-full truncate rounded-md px-2 py-1.5 text-left text-sm transition-colors',
                       c.id === conversationId
-                        ? 'bg-slate-800 text-white'
-                        : 'text-slate-300 hover:bg-slate-800/60',
+                        ? 'bg-surface-elevated text-fg-primary'
+                        : 'text-fg-secondary hover:bg-surface-elevated/60',
                     )}
                     onClick={() => setConversationId(c.id)}
                     title={c.title}
@@ -619,17 +619,17 @@ export function CopilotView() {
       </aside>
 
       {/* Chat panel */}
-      <section className="flex min-h-0 flex-col rounded-xl border border-slate-800/80 bg-slate-900/40">
+      <section className="flex min-h-0 flex-col rounded-xl border border-surface-border/80 bg-surface-card/40">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-800/80 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-surface-border/80 px-4 py-3">
           <div>
-            <h1 className="text-base font-semibold text-white">AI Copilot</h1>
-            <p className="text-xs text-slate-400">
+            <h1 className="text-base font-semibold text-fg-primary">AI Copilot</h1>
+            <p className="text-xs text-fg-muted">
               Ask about alerts, hosts, MITRE techniques, or your detection
               coverage.
             </p>
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-400" title={status.detail}>
+          <div className="flex items-center gap-2 text-xs text-fg-muted" title={status.detail}>
             <span className={clsx('inline-block h-2 w-2 rounded-full', STATUS_DOT[status.tone])} />
             {status.label}
           </div>
@@ -639,10 +639,10 @@ export function CopilotView() {
         <div ref={scrollerRef} className="min-h-0 flex-1 overflow-y-auto p-4">
           {empty ? (
             <div className="mx-auto flex h-full max-w-2xl flex-col items-center justify-center text-center">
-              <h2 className="text-lg font-semibold text-white">
+              <h2 className="text-lg font-semibold text-fg-primary">
                 Copilot
               </h2>
-              <p className="mt-1 max-w-md text-sm text-slate-400">
+              <p className="mt-1 max-w-md text-sm text-fg-muted">
                 Ask about alerts, hosts, MITRE techniques, or detection
                 coverage. Cite an alert ID, hostname, or technique to scope
                 the answer.
@@ -652,13 +652,13 @@ export function CopilotView() {
                   <button
                     key={p.label}
                     onClick={() => void send(p.prompt)}
-                    className="flex items-start gap-3 rounded-lg border border-slate-800/80 bg-slate-900/60 p-3 text-left transition-colors hover:border-emerald-500/40 hover:bg-slate-800/60"
+                    className="flex items-start gap-3 rounded-lg border border-surface-border/80 bg-surface-card/60 p-3 text-left transition-colors hover:border-emerald-500/40 hover:bg-surface-elevated/60"
                   >
                     <span>
-                      <span className="block text-sm font-medium text-white">
+                      <span className="block text-sm font-medium text-fg-primary">
                         {p.label}
                       </span>
-                      <span className="block text-xs text-slate-400">
+                      <span className="block text-xs text-fg-muted">
                         {p.prompt}
                       </span>
                     </span>
@@ -690,13 +690,13 @@ export function CopilotView() {
                         'max-w-[85%] rounded-2xl px-4 py-3 shadow-sm',
                         m.role === 'user'
                           ? 'bg-emerald-500/15 text-white ring-1 ring-emerald-500/30'
-                          : 'bg-slate-800/70 text-slate-100 ring-1 ring-slate-700/60',
+                          : 'bg-surface-elevated/70 text-fg-primary ring-1 ring-surface-border/60',
                       )}
                     >
                       {m.role === 'assistant' ? (
                         renderRichText(m.content)
                       ) : (
-                        <p className="whitespace-pre-wrap text-sm text-slate-100">
+                        <p className="whitespace-pre-wrap text-sm text-fg-primary">
                           {m.content}
                         </p>
                       )}
@@ -706,9 +706,9 @@ export function CopilotView() {
                           {m.citations.map((c, idx) => (
                             <span
                               key={idx}
-                              className="inline-flex items-center gap-1 rounded-full border border-slate-700/70 bg-slate-900/60 px-2 py-0.5 text-[11px] text-slate-300"
+                              className="inline-flex items-center gap-1 rounded-full border border-surface-border/70 bg-surface-card/60 px-2 py-0.5 text-[11px] text-fg-secondary"
                             >
-                              <span className="text-slate-500">
+                              <span className="text-fg-subtle">
                                 {c.kind ?? 'ref'}:
                               </span>
                               {c.label}
@@ -732,7 +732,7 @@ export function CopilotView() {
                       )}
                     </div>
                     {m.role === 'user' && (
-                      <div className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-slate-700 text-xs font-semibold text-slate-200">
+                      <div className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-surface-hover text-xs font-semibold text-fg-primary">
                         You
                       </div>
                     )}
@@ -744,7 +744,7 @@ export function CopilotView() {
                   <div className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-emerald-500/15 text-[10px] font-semibold uppercase tracking-wider text-emerald-300">
                     ai
                   </div>
-                  <div className="rounded-2xl bg-slate-800/70 px-4 py-3 ring-1 ring-slate-700/60">
+                  <div className="rounded-2xl bg-surface-elevated/70 px-4 py-3 ring-1 ring-surface-border/60">
                     <TypingDots />
                   </div>
                 </li>
@@ -779,15 +779,15 @@ export function CopilotView() {
         </div>
 
         {/* Composer */}
-        <div className="border-t border-slate-800/80 p-3">
-          <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-xl border border-slate-700/70 bg-slate-950/40 p-2 focus-within:border-emerald-500/50">
+        <div className="border-t border-surface-border/80 p-3">
+          <div className="mx-auto flex max-w-3xl items-end gap-2 rounded-xl border border-surface-border/70 bg-surface-base/40 p-2 focus-within:border-emerald-500/50">
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
               rows={1}
               placeholder="Ask anything — try 'investigate WIN-FIN-DB01'…"
-              className="flex-1 resize-none bg-transparent px-2 py-2 text-sm text-slate-100 placeholder-slate-500 outline-none"
+              className="flex-1 resize-none bg-transparent px-2 py-2 text-sm text-fg-primary placeholder-slate-500 outline-none"
             />
             <button
               onClick={() => void send(input)}
@@ -796,17 +796,17 @@ export function CopilotView() {
                 'flex-none rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
                 input.trim() && !sending
                   ? 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400'
-                  : 'bg-slate-800 text-slate-500',
+                  : 'bg-surface-elevated text-fg-subtle',
               )}
             >
               {sending ? '…' : 'Send'}
             </button>
           </div>
-          <p className="mx-auto mt-1.5 max-w-3xl px-1 text-[11px] text-slate-500">
-            Press <kbd className="rounded bg-slate-800 px-1">Enter</kbd> to
+          <p className="mx-auto mt-1.5 max-w-3xl px-1 text-[11px] text-fg-subtle">
+            Press <kbd className="rounded bg-surface-elevated px-1">Enter</kbd> to
             send,{' '}
-            <kbd className="rounded bg-slate-800 px-1">Shift</kbd>+
-            <kbd className="rounded bg-slate-800 px-1">Enter</kbd> for newline.
+            <kbd className="rounded bg-surface-elevated px-1">Shift</kbd>+
+            <kbd className="rounded bg-surface-elevated px-1">Enter</kbd> for newline.
             Responses can include actions you can run from inside the chat.
           </p>
         </div>

@@ -72,20 +72,20 @@ export function AlertPosturePanel() {
   return (
     <section
       aria-labelledby="ops-posture-heading"
-      className="rounded-xl border border-gray-800/60 bg-gray-900/40"
+      className="rounded-xl border border-surface-border/60 bg-surface-card/40"
     >
       <div className="px-4 py-3">
-        <h2 id="ops-posture-heading" className="text-sm font-medium text-gray-300">
+        <h2 id="ops-posture-heading" className="text-sm font-medium text-fg-secondary">
           Alert posture
         </h2>
-        <p className="mt-0.5 text-[11px] text-gray-500">
+        <p className="mt-0.5 text-[11px] text-fg-subtle">
           Current distribution. A snapshot, not a trend — no endpoint buckets
           disposition over time.
         </p>
       </div>
 
       {isLoading && !data ? (
-        <div className="m-4 h-28 animate-pulse rounded bg-gray-800/40" />
+        <div className="m-4 h-28 animate-pulse rounded bg-surface-elevated/40" />
       ) : error ? (
         <ErrorState
           title="Alert statistics unavailable"
@@ -105,23 +105,23 @@ export function AlertPosturePanel() {
         <div className="space-y-4 px-4 pb-4">
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-gray-500">Total</p>
-              <p className="text-2xl font-semibold text-gray-100">
+              <p className="text-[11px] uppercase tracking-wider text-fg-subtle">Total</p>
+              <p className="text-2xl font-semibold text-fg-primary">
                 {data.total.toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-gray-500">New (24h)</p>
+              <p className="text-[11px] uppercase tracking-wider text-fg-subtle">New (24h)</p>
               <p className="text-2xl font-semibold text-blue-300">
                 {data.new_last_24h.toLocaleString()}
               </p>
             </div>
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-gray-500">Critical open</p>
+              <p className="text-[11px] uppercase tracking-wider text-fg-subtle">Critical open</p>
               <p
                 className={clsx(
                   'text-2xl font-semibold',
-                  data.critical_open > 0 ? 'text-red-300' : 'text-gray-100',
+                  data.critical_open > 0 ? 'text-red-300' : 'text-fg-primary',
                 )}
               >
                 {data.critical_open.toLocaleString()}
@@ -161,16 +161,16 @@ function StackedBar({
   if (entries.length === 0 || total === 0) {
     return (
       <div>
-        <p className="mb-1.5 text-[11px] uppercase tracking-wider text-gray-500">{label}</p>
-        <p className="text-xs text-gray-600">No breakdown reported.</p>
+        <p className="mb-1.5 text-[11px] uppercase tracking-wider text-fg-subtle">{label}</p>
+        <p className="text-xs text-fg-secondary">No breakdown reported.</p>
       </div>
     );
   }
 
   return (
     <div>
-      <p className="mb-1.5 text-[11px] uppercase tracking-wider text-gray-500">{label}</p>
-      <div className="flex h-2 overflow-hidden rounded-full bg-gray-800">
+      <p className="mb-1.5 text-[11px] uppercase tracking-wider text-fg-subtle">{label}</p>
+      <div className="flex h-2 overflow-hidden rounded-full bg-surface-elevated">
         {entries.map(([key, n]) => (
           <div
             key={key}
@@ -187,8 +187,8 @@ function StackedBar({
         {entries.map(([key, n]) => (
           <li key={key} className="flex items-center gap-1.5 text-[11px]">
             <span className={clsx('h-1.5 w-1.5 rounded-full', colorFor(key))} aria-hidden="true" />
-            <span className="text-gray-400">{humanise(key)}</span>
-            <span className="text-gray-300">{n.toLocaleString()}</span>
+            <span className="text-fg-muted">{humanise(key)}</span>
+            <span className="text-fg-secondary">{n.toLocaleString()}</span>
           </li>
         ))}
       </ul>

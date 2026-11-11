@@ -139,8 +139,8 @@ export function CostDashboardView() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white">Cost Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-400">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-white */>Cost Dashboard</h1>
+          <p className="mt-1 text-sm text-fg-muted">
             LLM spend, automation activity, and BYOK savings for the current tenant. Spend figures
             are what the LLM gateway reported it charged. Anything it could not price is shown as
             an estimate or as not measured — never as zero.
@@ -154,7 +154,7 @@ export function CostDashboardView() {
             id="cost-window"
             value={days}
             onChange={(e) => setDays(Number(e.target.value))}
-            className="rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-white"
+            className="rounded border border-surface-border-strong bg-surface-elevated px-3 py-1.5 text-sm text-fg-primary"
           >
             {WINDOW_PRESETS.map((p) => (
               <option key={p.days} value={p.days}>
@@ -165,7 +165,7 @@ export function CostDashboardView() {
           <button
             type="button"
             onClick={() => mutate()}
-            className="rounded border border-gray-600 bg-gray-800 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700"
+            className="rounded border border-surface-border-strong bg-surface-elevated px-3 py-1.5 text-sm text-fg-primary hover:bg-surface-hover"
           >
             Refresh
           </button>
@@ -179,7 +179,7 @@ export function CostDashboardView() {
       )}
 
       {isLoading && !data && (
-        <div className="rounded-xl border border-gray-700 bg-gray-900 p-6 text-sm text-gray-400">
+        <div className="rounded-xl border border-surface-border bg-surface-card p-6 text-sm text-fg-muted">
           Computing cost snapshot…
         </div>
       )}
@@ -242,9 +242,9 @@ function PeriodHero({ data }: { data: CostDashboard }) {
   return (
     <section className="rounded-xl border border-violet-500/30 bg-violet-950/20 p-5">
       <p className="text-xs uppercase tracking-wide text-violet-300">Reporting period</p>
-      <p className="mt-1 text-lg font-semibold text-white">{period.label}</p>
-      <p className="mt-3 text-sm leading-relaxed text-gray-200">{summary}</p>
-      <p className="mt-2 text-xs text-gray-500">
+      <p className="mt-1 text-lg font-semibold text-fg-primary">{period.label}</p>
+      <p className="mt-3 text-sm leading-relaxed text-fg-primary">{summary}</p>
+      <p className="mt-2 text-xs text-fg-subtle">
         {fmtDate(period.start)} → {fmtDate(period.end)} · {period.window_days}-day window
       </p>
     </section>
@@ -300,7 +300,7 @@ function DailySpend({ data }: { data: CostDashboard }) {
   return (
     <Card title="Daily measured LLM spend" subtitle="One bar per UTC day in the window — bars are scaled to the peak day">
       {daily_costs.length === 0 ? (
-        <p className="text-sm text-gray-500">No LLM activity recorded for this window.</p>
+        <p className="text-sm text-fg-subtle">No LLM activity recorded for this window.</p>
       ) : (
         <div data-testid="daily-spend">
           <div className="flex h-32 items-end gap-1">
@@ -326,7 +326,7 @@ function DailySpend({ data }: { data: CostDashboard }) {
               );
             })}
           </div>
-          <div className="mt-2 flex justify-between text-xs text-gray-500">
+          <div className="mt-2 flex justify-between text-xs text-fg-subtle">
             <span>{fmtDate(daily_costs[0]!.day)}</span>
             <span>peak {max > 0 ? fmtUsd(max) : '—'}</span>
             <span>{fmtDate(daily_costs[daily_costs.length - 1]!.day)}</span>
@@ -351,12 +351,12 @@ function ModelTable({ data }: { data: CostDashboard }) {
       subtitle="Measured cost vs imputed list price, per model. An alias row shows what the gateway resolved it to."
     >
       {by_model.length === 0 ? (
-        <p className="text-sm text-gray-500">No per-model rows recorded for this window.</p>
+        <p className="text-sm text-fg-subtle">No per-model rows recorded for this window.</p>
       ) : (
         <div className="overflow-x-auto" data-testid="model-table">
           <table className="w-full min-w-[800px] text-left text-sm">
             <thead>
-              <tr className="border-b border-gray-700 text-xs uppercase tracking-wide text-gray-500">
+              <tr className="border-b border-surface-border text-xs uppercase tracking-wide text-fg-subtle">
                 <th className="py-2 pr-4 font-medium">Model</th>
                 <th className="py-2 pr-4 font-medium text-right">Calls</th>
                 <th className="py-2 pr-4 font-medium text-right">Prompt tokens</th>
@@ -368,30 +368,30 @@ function ModelTable({ data }: { data: CostDashboard }) {
             </thead>
             <tbody>
               {by_model.map((m) => (
-                <tr key={m.model} className="border-b border-gray-800/80">
-                  <td className="py-2.5 pr-4 font-mono text-xs text-gray-100">
+                <tr key={m.model} className="border-b border-surface-border/80">
+                  <td className="py-2.5 pr-4 font-mono text-xs text-fg-primary">
                     {m.model}
                     {m.resolved_model && (
-                      <span className="block text-[10px] text-gray-500">→ {m.resolved_model}</span>
+                      <span className="block text-[10px] text-fg-subtle">→ {m.resolved_model}</span>
                     )}
                   </td>
-                  <td className="py-2.5 pr-4 text-right text-gray-200 tabular-nums">
+                  <td className="py-2.5 pr-4 text-right text-fg-primary tabular-nums">
                     {fmtNumber(m.calls)}
                   </td>
-                  <td className="py-2.5 pr-4 text-right text-gray-300 tabular-nums">
+                  <td className="py-2.5 pr-4 text-right text-fg-secondary tabular-nums">
                     {fmtNumber(m.total_prompt_tokens)}
                   </td>
-                  <td className="py-2.5 pr-4 text-right text-gray-300 tabular-nums">
+                  <td className="py-2.5 pr-4 text-right text-fg-secondary tabular-nums">
                     {fmtNumber(m.total_completion_tokens)}
                   </td>
-                  <td className="py-2.5 pr-4 text-right text-white tabular-nums">
+                  <td className="py-2.5 pr-4 text-right text-fg-primary tabular-nums">
                     {fmtSpend(
                       m.total_cost_usd,
                       m.measured_call_count,
                       m.estimated_cost_usd,
                       m.estimated_call_count,
                     )}
-                    <span className="block text-[10px] font-normal text-gray-500">
+                    <span className="block text-[10px] font-normal text-fg-subtle">
                       {spendProvenance(
                         m.measured_call_count,
                         m.estimated_call_count,
@@ -399,15 +399,15 @@ function ModelTable({ data }: { data: CostDashboard }) {
                       )}
                     </span>
                   </td>
-                  <td className="py-2.5 pr-4 text-right text-gray-400 tabular-nums">
+                  <td className="py-2.5 pr-4 text-right text-fg-muted tabular-nums">
                     {!m.imputed_is_estimable ? '—' : fmtUsd(m.imputed_public_cost_usd)}
                     {m.unpriced_tokens > 0 && (
-                      <span className="block text-[10px] text-gray-500">
+                      <span className="block text-[10px] text-fg-subtle">
                         {!m.imputed_is_estimable ? 'no published price' : `excludes ${fmtNumber(m.unpriced_tokens)} unpriced tokens`}
                       </span>
                     )}
                   </td>
-                  <td className="py-2.5 text-right text-gray-400 tabular-nums">
+                  <td className="py-2.5 text-right text-fg-muted tabular-nums">
                     {fmtMs(m.avg_latency_ms)}
                   </td>
                 </tr>
@@ -425,17 +425,17 @@ function CasesAndActions({ data }: { data: CostDashboard }) {
     <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <Card title="Top-cost investigations" subtitle="Cases ranked by measured LLM spend in the window">
         {data.top_cases.length === 0 ? (
-          <p className="text-sm text-gray-500">No case-attributed runs recorded for this window.</p>
+          <p className="text-sm text-fg-subtle">No case-attributed runs recorded for this window.</p>
         ) : (
-          <ul className="divide-y divide-gray-800" data-testid="top-cases">
+          <ul className="divide-y divide-surface-border" data-testid="top-cases">
             {data.top_cases.map((c) => (
               <li key={c.case_id} className="flex items-center justify-between gap-3 py-2 text-sm">
-                <span className="truncate font-mono text-xs text-gray-200">{c.case_id}</span>
+                <span className="truncate font-mono text-xs text-fg-primary">{c.case_id}</span>
                 <span className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500 tabular-nums">
+                  <span className="text-xs text-fg-subtle tabular-nums">
                     {fmtNumber(c.runs)} runs · {fmtNumber(c.total_tokens)} tokens
                   </span>
-                  <span className="w-20 text-right text-white tabular-nums">
+                  <span className="w-20 text-right text-fg-primary tabular-nums">
                     {fmtSpend(
                       c.total_cost_usd,
                       c.measured_call_count,
@@ -452,13 +452,13 @@ function CasesAndActions({ data }: { data: CostDashboard }) {
 
       <Card title="Top SOC actions" subtitle="Most-frequent audit-log actions (proxy for automation throughput)">
         {data.action_counts.length === 0 ? (
-          <p className="text-sm text-gray-500">No audit events recorded for this window.</p>
+          <p className="text-sm text-fg-subtle">No audit events recorded for this window.</p>
         ) : (
-          <ul className="divide-y divide-gray-800" data-testid="action-counts">
+          <ul className="divide-y divide-surface-border" data-testid="action-counts">
             {data.action_counts.map((a) => (
               <li key={a.action} className="flex items-center justify-between py-2 text-sm">
-                <span className="font-mono text-xs text-gray-200">{a.action}</span>
-                <span className="text-white tabular-nums">{fmtNumber(a.count)}</span>
+                <span className="font-mono text-xs text-fg-primary">{a.action}</span>
+                <span className="text-fg-primary tabular-nums">{fmtNumber(a.count)}</span>
               </li>
             ))}
           </ul>
@@ -472,10 +472,10 @@ function ByokPanel({ data }: { data: CostDashboard }) {
   const { byok_savings: b } = data;
   const accent = b.is_byok_active
     ? 'border-emerald-500/30 bg-emerald-950/20'
-    : 'border-gray-700 bg-gray-900';
+    : 'border-surface-border bg-surface-card';
   const badge = b.is_byok_active
     ? { text: 'BYOK active', cls: 'bg-emerald-500/20 text-emerald-200' }
-    : { text: 'Hosted provider', cls: 'bg-gray-700/60 text-gray-300' };
+    : { text: 'Hosted provider', cls: 'bg-surface-hover/60 text-fg-secondary' };
 
   return (
     <section
@@ -485,8 +485,8 @@ function ByokPanel({ data }: { data: CostDashboard }) {
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-wide text-gray-400">BYOK savings</p>
-          <p className="mt-1 text-lg font-semibold text-white">
+          <p className="text-xs uppercase tracking-wide text-fg-muted">BYOK savings</p>
+          <p className="mt-1 text-lg font-semibold text-fg-primary">
             {!b.imputed_is_estimable
               ? 'Not estimable — no model in this window has a published list price'
               : b.is_byok_active
@@ -517,10 +517,10 @@ function ByokPanel({ data }: { data: CostDashboard }) {
           label="Estimated savings"
           value={!b.imputed_is_estimable ? '—' : `~${fmtUsd(b.savings_usd)}`}
           hint={!b.imputed_is_estimable ? 'not estimable' : 'estimate'}
-          accent={b.is_byok_active && b.imputed_is_estimable ? 'text-emerald-300' : 'text-gray-300'}
+          accent={b.is_byok_active && b.imputed_is_estimable ? 'text-emerald-300' : 'text-fg-secondary'}
         />
       </dl>
-      <p className="mt-4 text-xs text-gray-500">
+      <p className="mt-4 text-xs text-fg-subtle">
         Imputed cost re-prices prompt + completion tokens against each model&apos;s public list price,
         and only for models that have one — there is no default rate, so a model nobody publishes a
         price for contributes nothing here rather than a guess. Savings approximate what an equivalent
@@ -554,27 +554,27 @@ function StoragePanel({ data }: { data: CostDashboard }) {
   if (!s.measured) {
     return (
       <section
-        className="rounded-xl border border-gray-700 bg-gray-900 p-5"
+        className="rounded-xl border border-surface-border bg-surface-card p-5"
         data-testid="storage-panel"
         data-storage="not-measured"
       >
-        <p className="text-xs uppercase tracking-wide text-gray-400">Storage cost</p>
-        <p className="mt-1 text-lg font-semibold text-white">Not measured</p>
-        <p className="mt-3 text-sm text-gray-400">{s.unmeasured_reason}</p>
+        <p className="text-xs uppercase tracking-wide text-fg-muted">Storage cost</p>
+        <p className="mt-1 text-lg font-semibold text-fg-primary">Not measured</p>
+        <p className="mt-3 text-sm text-fg-muted">{s.unmeasured_reason}</p>
       </section>
     );
   }
 
   return (
     <section
-      className="rounded-xl border border-gray-700 bg-gray-900 p-5"
+      className="rounded-xl border border-surface-border bg-surface-card p-5"
       data-testid="storage-panel"
       data-storage="projected"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-wide text-gray-400">Storage cost</p>
-          <p className="mt-1 text-lg font-semibold text-white">
+          <p className="text-xs uppercase tracking-wide text-fg-muted">Storage cost</p>
+          <p className="mt-1 text-lg font-semibold text-fg-primary">
             ~{fmtUsd(s.monthly_usd ?? 0)}/mo projected at full retention
           </p>
         </div>
@@ -601,7 +601,7 @@ function StoragePanel({ data }: { data: CostDashboard }) {
       </dl>
       <table className="mt-4 w-full text-left text-sm" data-testid="storage-tiers">
         <thead>
-          <tr className="border-b border-gray-800 text-xs uppercase tracking-wide text-gray-500">
+          <tr className="border-b border-surface-border text-xs uppercase tracking-wide text-fg-subtle">
             <th className="py-2 font-medium">Tier</th>
             <th className="py-2 text-right font-medium">Retention</th>
             <th className="py-2 text-right font-medium">Resident</th>
@@ -611,17 +611,17 @@ function StoragePanel({ data }: { data: CostDashboard }) {
         </thead>
         <tbody>
           {s.tiers.map((t) => (
-            <tr key={t.tier} className="border-b border-gray-900 last:border-0">
-              <td className="py-2 text-gray-300">{t.tier.replace('_', ' ')}</td>
-              <td className="py-2 text-right text-gray-400">{t.retention_days}d</td>
-              <td className="py-2 text-right text-gray-400">{fmtGb(t.resident_gb)}</td>
-              <td className="py-2 text-right text-gray-400">{t.rate_usd_per_gb_month}</td>
-              <td className="py-2 text-right text-gray-300">{fmtUsd(t.monthly_usd)}</td>
+            <tr key={t.tier} className="border-b border-surface-border last:border-0">
+              <td className="py-2 text-fg-secondary">{t.tier.replace('_', ' ')}</td>
+              <td className="py-2 text-right text-fg-muted">{t.retention_days}d</td>
+              <td className="py-2 text-right text-fg-muted">{fmtGb(t.resident_gb)}</td>
+              <td className="py-2 text-right text-fg-muted">{t.rate_usd_per_gb_month}</td>
+              <td className="py-2 text-right text-fg-secondary">{fmtUsd(t.monthly_usd)}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      <p className="mt-4 text-xs text-gray-500">{s.disclaimer}</p>
+      <p className="mt-4 text-xs text-fg-subtle">{s.disclaimer}</p>
     </section>
   );
 }
@@ -638,10 +638,10 @@ function Card({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-gray-700 bg-gray-900 p-5">
+    <div className="rounded-xl border border-surface-border bg-surface-card p-5">
       <div className="mb-4">
-        <h2 className="text-base font-semibold text-white">{title}</h2>
-        {subtitle && <p className="mt-0.5 text-xs text-gray-500">{subtitle}</p>}
+        <h2 className="text-base font-semibold text-fg-primary">{title}</h2>
+        {subtitle && <p className="mt-0.5 text-xs text-fg-subtle">{subtitle}</p>}
       </div>
       {children}
     </div>
@@ -658,10 +658,10 @@ function KpiCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-lg border border-gray-700 bg-gray-800 p-4">
-      <p className="text-xs text-gray-400">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-white tabular-nums">{value}</p>
-      {sub && <p className="mt-1 text-xs text-gray-500">{sub}</p>}
+    <div className="rounded-lg border border-surface-border bg-surface-elevated p-4">
+      <p className="text-xs text-fg-muted">{label}</p>
+      <p className="mt-1 text-2xl font-semibold text-fg-primary tabular-nums">{value}</p>
+      {sub && <p className="mt-1 text-xs text-fg-subtle">{sub}</p>}
     </div>
   );
 }
@@ -679,9 +679,9 @@ function Stat({
 }) {
   return (
     <div>
-      <dt className="text-xs text-gray-500">{label}</dt>
-      <dd className={`mt-1 text-xl font-semibold tabular-nums ${accent ?? 'text-white'}`}>{value}</dd>
-      {hint && <p className="mt-0.5 text-[10px] text-gray-500">{hint}</p>}
+      <dt className="text-xs text-fg-subtle">{label}</dt>
+      <dd className={`mt-1 text-xl font-semibold tabular-nums ${accent ?? 'text-fg-primary'}`}>{value}</dd>
+      {hint && <p className="mt-0.5 text-[10px] text-fg-subtle">{hint}</p>}
     </div>
   );
 }

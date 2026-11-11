@@ -39,7 +39,7 @@ export function LiveQueueBadge() {
     if (!error) return null;
     return (
       <span
-        className="ml-auto inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-bold tabular-nums bg-gray-700 text-gray-300"
+        className="ml-auto inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full text-xs font-bold tabular-nums bg-surface-hover text-fg-secondary"
         role="status"
         aria-label="Queue size unknown — the queue service did not answer"
         title="Queue size unknown — the queue service did not answer"

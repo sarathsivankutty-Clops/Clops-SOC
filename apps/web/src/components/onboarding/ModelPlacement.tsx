@@ -23,14 +23,14 @@ import { llmApi, type LlmRuntime } from '@/lib/api';
 const TONE: Record<string, { label: string; className: string }> = {
   gpu: { label: 'On a GPU', className: 'border-emerald-700/60 bg-emerald-950/30 text-emerald-200' },
   partial: { label: 'Partly on a GPU', className: 'border-amber-700/60 bg-amber-950/30 text-amber-200' },
-  cpu: { label: 'On the CPU', className: 'border-slate-600 bg-slate-800/40 text-slate-200' },
+  cpu: { label: 'On the CPU', className: 'border-surface-border-strong bg-surface-elevated/40 text-fg-primary' },
   // Distinct from `unknown`, because the remedies are opposites. `unknown`
   // means a model exists and is not resident, and the advice is to wait or
   // run a triage; `no_model` means the download never happened, where that
   // advice is useless and the operator needs to go and look at ollama-pull.
   no_model: { label: 'No model downloaded', className: 'border-amber-700/60 bg-amber-950/30 text-amber-200' },
-  unknown: { label: 'Not loaded right now', className: 'border-slate-600 bg-slate-800/40 text-slate-300' },
-  unreachable: { label: 'No local model', className: 'border-slate-600 bg-slate-800/40 text-slate-300' },
+  unknown: { label: 'Not loaded right now', className: 'border-surface-border-strong bg-surface-elevated/40 text-fg-secondary' },
+  unreachable: { label: 'No local model', className: 'border-surface-border-strong bg-surface-elevated/40 text-fg-secondary' },
 };
 
 export function ModelPlacement() {
@@ -44,15 +44,15 @@ export function ModelPlacement() {
   );
 
   if (isLoading) {
-    return <p className="mt-2 text-sm text-slate-500">Asking the model where it is running…</p>;
+    return <p className="mt-2 text-sm text-fg-subtle">Asking the model where it is running…</p>;
   }
 
   if (error || !data) {
     return (
-      <p className="mt-2 text-sm text-slate-400">
+      <p className="mt-2 text-sm text-fg-muted">
         Could not determine where the model is running. Triage is unaffected; this panel is
         informational.{' '}
-        <Link href="/settings" className="underline hover:text-slate-200">
+        <Link href="/settings" className="underline hover:text-fg-primary">
           Configure a provider
         </Link>
       </p>
@@ -70,13 +70,13 @@ export function ModelPlacement() {
         )}
       </div>
 
-      <p className="text-sm text-slate-400">{data.detail}</p>
+      <p className="text-sm text-fg-muted">{data.detail}</p>
 
       {data.options.length > 0 && (
-        <ul className="space-y-1 text-sm text-slate-400">
+        <ul className="space-y-1 text-sm text-fg-muted">
           {data.options.map((option) => (
             <li key={option} className="flex gap-2">
-              <span aria-hidden className="text-slate-600">
+              <span aria-hidden className="text-fg-secondary">
                 ·
               </span>
               <span>{option}</span>
@@ -87,7 +87,7 @@ export function ModelPlacement() {
 
       <Link
         href="/settings?tab=deployment"
-        className="mt-1 inline-block rounded-md border border-slate-600 px-3 py-1.5 text-sm text-slate-200 transition hover:border-slate-400 hover:bg-slate-800"
+        className="mt-1 inline-block rounded-md border border-surface-border-strong px-3 py-1.5 text-sm text-fg-primary transition hover:border-surface-border-strong hover:bg-surface-elevated"
       >
         Use my own provider
       </Link>

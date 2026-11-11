@@ -64,7 +64,15 @@ def _pull_program() -> str:
     return command[0].replace("$$", "$")
 
 
-def _run(program: str, *, list_rc: int, show_rc: int, pull_rc: int) -> subprocess.CompletedProcess[str]:
+def _run(
+    program: str,
+    *,
+    list_rc: int,
+    show_rc: int,
+    pull_rc: int,
+    fast_model: str = f"ollama_chat/{MODEL}",
+    deep_model: str = f"ollama_chat/{MODEL}",
+) -> subprocess.CompletedProcess[str]:
     """Run the program with an `ollama` that answers however the case needs."""
     with tempfile.TemporaryDirectory() as raw:
         binaries = pathlib.Path(raw)
@@ -100,6 +108,9 @@ def _run(program: str, *, list_rc: int, show_rc: int, pull_rc: int) -> subproces
                 **os.environ,
                 "PATH": f"{binaries}:{os.environ.get('PATH', '')}",
                 "AISOC_LLM_LOCAL_MODEL": MODEL,
+                "AISOC_LLM_MODEL_FAST": fast_model,
+                "AISOC_LLM_MODEL_DEEP": deep_model,
+                "AISOC_EMBEDDING_MODEL": "nomic-embed-text",
                 "OLLAMA_CALLS": str(calls),
             },
         )
@@ -179,3 +190,19 @@ def test_an_ollama_that_never_answers_is_not_fatal_either(program: str) -> None:
 
     assert result.returncode == 0, f"a dead Ollama still fails the boot.\nstdout:\n{result.stdout}"
     assert "could not be downloaded" in result.stdout
+
+
+def test_hosted_chat_aliases_skip_the_unused_local_chat_model(program: str) -> None:
+    result = _run(
+        program,
+        list_rc=0,
+        show_rc=1,
+        pull_rc=0,
+        fast_model="groq/openai/gpt-oss-20b",
+        deep_model="groq/openai/gpt-oss-20b",
+    )
+
+    assert result.returncode == 0
+    assert "skipping the bundled chat model" in result.stdout
+    assert f"ollama pull {MODEL}" not in result.stderr
+    assert "ollama pull nomic-embed-text" in result.stderr

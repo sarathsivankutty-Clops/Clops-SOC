@@ -72,7 +72,7 @@ export function AgreementPanel() {
   if (isLoading || !data) {
     return (
       <Shell>
-        <p className="text-sm text-gray-500">Loading agreement…</p>
+        <p className="text-sm text-fg-subtle">Loading agreement…</p>
       </Shell>
     );
   }
@@ -125,21 +125,21 @@ export function AgreementPanel() {
         />
       </dl>
 
-      <p className="mt-3 text-xs text-gray-500">
+      <p className="mt-3 text-xs text-fg-subtle">
         Last {thresholds.window_days} days. {w.unlabeled} closure
         {w.unlabeled === 1 ? '' : 's'} carried no disposition this platform can name and
         {w.unlabeled === 1 ? ' is' : ' are'} excluded from every rate above.
       </p>
 
-      <div className="mt-4 rounded-md border border-gray-800 bg-gray-950/60 p-3">
-        <p className="text-[11px] uppercase tracking-wide text-gray-500">
+      <div className="mt-4 rounded-md border border-surface-border bg-surface-base/60 p-3">
+        <p className="text-[11px] uppercase tracking-wide text-fg-subtle">
           Most recent {recent.labelled} decision{recent.labelled === 1 ? '' : 's'}
         </p>
-        <p className="mt-1 text-sm text-gray-300">
+        <p className="mt-1 text-sm text-fg-secondary">
           Agreement {formatRate(recent.agreement_rate)} ({recent.agreed} of {recent.answered}), recall{' '}
           {formatRate(recent.malicious_recall)} ({recent.malicious_caught} of {recent.malicious_support}).
         </p>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-fg-subtle">
           Scored apart from the window, because a decline that started this week is still
           absorbed by a month of earlier agreement.
         </p>
@@ -158,12 +158,12 @@ function meets(value: number | null, floor: number): boolean | null {
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <section
-      className="rounded-lg border border-gray-800 bg-gray-950/40 p-4"
+      className="rounded-lg border border-surface-border bg-surface-base/40 p-4"
       aria-label="Agreement with analysts"
     >
       <header className="mb-3">
-        <h2 className="text-sm font-semibold text-gray-100">Agreement with analysts</h2>
-        <p className="mt-0.5 text-xs text-gray-500">
+        <h2 className="text-sm font-semibold text-fg-primary">Agreement with analysts</h2>
+        <p className="mt-0.5 text-xs text-fg-subtle">
           Measured on shadow decisions your analysts have since closed, here or in the source SIEM.
         </p>
       </header>
@@ -185,18 +185,18 @@ function Metric({
 }) {
   return (
     <div>
-      <dt className="text-[11px] uppercase tracking-wide text-gray-500">{label}</dt>
+      <dt className="text-[11px] uppercase tracking-wide text-fg-subtle">{label}</dt>
       <dd
         className={clsx(
           'font-mono text-lg tabular-nums',
           // No colour at all when there is nothing to judge. Painting an
           // unmeasured figure red would read as a failing one.
-          met === null ? 'text-gray-400' : met ? 'text-emerald-300' : 'text-amber-300',
+          met === null ? 'text-fg-muted' : met ? 'text-emerald-300' : 'text-amber-300',
         )}
       >
         {value}
       </dd>
-      <p className="text-[11px] text-gray-500">{detail}</p>
+      <p className="text-[11px] text-fg-subtle">{detail}</p>
     </div>
   );
 }
@@ -205,12 +205,12 @@ function Breakdown({ title, rows }: { title: string; rows: AgreementScope[] }) {
   if (rows.length === 0) return null;
   return (
     <div className="mt-4">
-      <p className="text-[11px] uppercase tracking-wide text-gray-500">{title}</p>
-      <ul className="mt-1 divide-y divide-gray-800/70">
+      <p className="text-[11px] uppercase tracking-wide text-fg-subtle">{title}</p>
+      <ul className="mt-1 divide-y divide-surface-border/70">
         {rows.slice(0, 6).map((row) => (
           <li key={row.key} className="flex items-baseline justify-between gap-3 py-1.5 text-sm">
-            <span className="truncate text-gray-300">{row.key}</span>
-            <span className="shrink-0 font-mono text-xs tabular-nums text-gray-400">
+            <span className="truncate text-fg-secondary">{row.key}</span>
+            <span className="shrink-0 font-mono text-xs tabular-nums text-fg-muted">
               {formatRate(row.window.agreement_rate)} · {row.window.answered} answered
             </span>
           </li>

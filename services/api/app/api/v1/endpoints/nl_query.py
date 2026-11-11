@@ -48,7 +48,6 @@ from pydantic import BaseModel, Field
 
 from app.api.v1.deps import AuthUser, require_permission
 from app.core.airgap import AirgapViolation, enforce_airgap_for_url
-from app.core.config import settings
 from app.db.clickhouse import (
     LakeQueryError,
     LakeQueryTimeoutError,
@@ -66,7 +65,7 @@ from app.services.event_warehouse import (
 )
 from app.services.event_warehouse.elasticsearch import elastic_auth_header
 from app.services.lake_hunt import HuntCompileError, compile_hunt
-from app.services.model_aliases import chat_completions_url, resolve_model_alias
+from app.services.model_aliases import chat_completions_url, resolve_api_key, resolve_model_alias
 
 if TYPE_CHECKING:
     # Static-only re-export so type checkers can see the dataclass fields and
@@ -286,8 +285,8 @@ async def _translate(
     Returns a tuple of ``(TranslatedQuery, engine)`` where ``engine`` is
     either ``"deterministic"`` or ``"llm"``. The deterministic translator is
     always run first so that the response is guaranteed to be grammar-valid;
-    if an LLM API key is configured *and* the air-gap policy allows the
-    outbound call, we attempt to enhance the result with an LLM-generated
+    if the configured model route has credentials *and* the air-gap policy
+    allows the call, we attempt to enhance the result with an LLM-generated
     translation, but fall back to the deterministic output on any error.
     """
 
@@ -302,7 +301,8 @@ async def _translate(
         time_range_hours=time_range_hours,
     )
 
-    api_key = getattr(settings, "OPENAI_API_KEY", None) or getattr(settings, "LLM_API_KEY", None)
+    model = resolve_model_alias("nl")
+    api_key = resolve_api_key(model)
     if not api_key:
         return deterministic, "deterministic"
 
@@ -313,7 +313,7 @@ async def _translate(
     # network, and the guard was refusing a call that never leaves the
     # deployment while saying nothing about the one that would.
     try:
-        completions_url = chat_completions_url(resolve_model_alias("nl"))
+        completions_url = chat_completions_url(model)
     except Exception:  # noqa: BLE001
         # No gateway configured, so there is no LLM path to check. The
         # deterministic translation is the honest answer, and it is the

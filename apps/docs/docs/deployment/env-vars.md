@@ -285,7 +285,7 @@ Source: [`services/agents/app/`](https://github.com/beenuar/AiSOC/tree/main/serv
 | `OPENAI_BASE_URL` / `LLM_BASE_URL` | — | Explicit override. Outranks `LLM_GATEWAY_URL` for every role; you own the key pairing when you set it. |
 | `AISOC_MODEL_PIN_<ROLE>` | `aisoc-<role>` | Per-role model. Set a concrete provider model to call a provider directly with no gateway. Roles: `triage`, `recon`, `investigation`, `copilot`, `summary`, `report`, `nl`. |
 | `OPENAI_MODEL` | `aisoc-summary` | BYOK / "explain this alert" path **only** — never a task role's model. Ships as an alias because the default deployment routes through the gateway, which 400s anything `infra/litellm/config.yaml` does not define. |
-| `AISOC_EMBEDDING_BASE_URL` / `AISOC_EMBEDDING_MODEL` | — / `text-embedding-3-large` | MITRE RAG embeddings. Deliberately outside the gateway, whose model list is chat aliases only. |
+| `AISOC_EMBEDDING_MODEL` | `nomic-embed-text` | Local Ollama model used to embed MITRE ATT&CK techniques. The bundled `ollama-pull` service downloads it; it does not use a provider API key. |
 | `DATABASE_URL` | `postgresql+asyncpg://aisoc:aisoc@localhost:5432/aisoc` | Postgres DSN for the Investigation Ledger |
 | `QDRANT_URL` | `http://localhost:6333` | Vector store for case memory and RAG |
 | `ENRICHMENT_SERVICE_URL` | `http://enrichment:8011` | URL of the enrichment service (Go) |
@@ -501,6 +501,18 @@ leave them empty and let same-origin proxying handle it, which is the default.
 | `NEXT_PUBLIC_DEMO_MODE` | *(empty)* | Compiles the image as a demo build. `AISOC_DEMO_MODE` overrides it at run time |
 | `NEXT_PUBLIC_MARKETING_HOME` | *(empty)* | Compiles the image with the marketing page at `/`. `AISOC_MARKETING_HOME` overrides it at run time |
 | `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | — | Must match the realtime service's `VAPID_PUBLIC_KEY` |
+| `NEXT_PUBLIC_IDP_PROVIDER` | `local` | Active frontend `IdentityProvider` implementation (`local`, `keycloak`, `oidc`, or `saml`) |
+| `NEXT_PUBLIC_IDP_ENABLED` | `false` | Provider-neutral switch to enable external IdP federation via `/auth/oidc/login` |
+| `NEXT_PUBLIC_SSO_IDP_HINT` | `google` | Provider-neutral upstream IdP hint forwarded as `kc_idp_hint` to `/auth/oidc/login` |
+| `NEXT_PUBLIC_KEYCLOAK_ENABLED` | `false` | Backward-compatible alias for `NEXT_PUBLIC_IDP_ENABLED` |
+| `NEXT_PUBLIC_KEYCLOAK_GOOGLE_IDP_HINT` | `google` | Backward-compatible alias for `NEXT_PUBLIC_SSO_IDP_HINT` |
+| `NEXT_PUBLIC_BLOCK_PERSONAL_EMAILS` | `true` | Blocks personal email domains on the login form before submission |
+| `NEXT_PUBLIC_DISALLOWED_EMAIL_DOMAINS` | *(built-in list)* | Comma-separated override list of disallowed personal email domains |
+| `NEXT_PUBLIC_SIDEBAR_FULL_INTELLIGENCE` | `false` | When `true`, renders all 12 Intelligence sub-items under `More tools` instead of only `Investigations` |
+| `NEXT_PUBLIC_ORG_TEMPLATE_ENABLED` | `true` | Enables the organisation design template and logos on the console login and header |
+| `NEXT_PUBLIC_ORG_LOGO_DARK` | `/assets/logo-dark.png` | Relative public path to the dark-theme organisation logo |
+| `NEXT_PUBLIC_ORG_LOGO_LIGHT` | `/assets/logo-light.png` | Relative public path to the light-theme organisation logo |
+| `NEXT_PUBLIC_ORG_FAVICON` | `/favicon.ico` | Relative public path to the organisation favicon |
 
 See [Single-host deployment](./single-host.md) for the whole path end to end.
 

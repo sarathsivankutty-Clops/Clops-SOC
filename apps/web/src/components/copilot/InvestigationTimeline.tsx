@@ -118,51 +118,51 @@ function confidenceBadge(c: number): string {
 
 function DecisionTooltip({ decision }: { decision: TimelineDecision }) {
   return (
-    <div className="absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 w-72 rounded-lg border border-slate-700 bg-slate-900 p-3 text-xs shadow-xl">
-      <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-slate-400">
+    <div className="absolute bottom-full left-1/2 z-50 mb-2 -translate-x-1/2 w-72 rounded-lg border border-surface-border bg-surface-card p-3 text-xs shadow-xl">
+      <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-fg-muted">
         Decision provenance
       </div>
       {decision.reason && (
-        <p className="mb-1 text-slate-200">
-          <span className="font-medium text-slate-400">Reason: </span>
+        <p className="mb-1 text-fg-primary">
+          <span className="font-medium text-fg-muted">Reason: </span>
           {decision.reason}
         </p>
       )}
       {decision.confidence !== null && (
         <p className="mb-1">
-          <span className="font-medium text-slate-400">Confidence: </span>
+          <span className="font-medium text-fg-muted">Confidence: </span>
           <span className={confidenceBadge(decision.confidence)}>
             {(decision.confidence * 100).toFixed(0)}%
           </span>
         </p>
       )}
       {decision.next_phase && (
-        <p className="mb-1 text-slate-200">
-          <span className="font-medium text-slate-400">Next phase: </span>
+        <p className="mb-1 text-fg-primary">
+          <span className="font-medium text-fg-muted">Next phase: </span>
           {decision.next_phase}
         </p>
       )}
       {decision.tool_name && (
-        <p className="mb-1 text-slate-200">
-          <span className="font-medium text-slate-400">Tool: </span>
-          <code className="rounded bg-slate-800 px-1 text-teal-300">
+        <p className="mb-1 text-fg-primary">
+          <span className="font-medium text-fg-muted">Tool: </span>
+          <code className="rounded bg-surface-elevated px-1 text-teal-300">
             {decision.tool_name}
           </code>
         </p>
       )}
       {decision.tool_args && (
         <details className="mb-1">
-          <summary className="cursor-pointer text-slate-400 hover:text-slate-200">
+          <summary className="cursor-pointer text-fg-muted hover:text-fg-primary">
             Args ▸
           </summary>
-          <pre className="mt-1 overflow-auto rounded bg-slate-800 p-1 text-slate-300">
+          <pre className="mt-1 overflow-auto rounded bg-surface-elevated p-1 text-fg-secondary">
             {JSON.stringify(decision.tool_args, null, 2)}
           </pre>
         </details>
       )}
       {decision.tool_result_summary && (
-        <p className="text-slate-200">
-          <span className="font-medium text-slate-400">Result: </span>
+        <p className="text-fg-primary">
+          <span className="font-medium text-fg-muted">Result: </span>
           {decision.tool_result_summary}
         </p>
       )}
@@ -203,18 +203,18 @@ function TimelineNodeCard({
   return (
     <div
       className={`relative flex gap-3 rounded-lg px-3 py-2 transition-colors cursor-pointer
-        ${isFocused ? "bg-slate-700/60 ring-1 ring-slate-500" : "hover:bg-slate-800/60"}`}
+        ${isFocused ? "bg-surface-hover/60 ring-1 ring-surface-border-strong" : "hover:bg-surface-elevated/60"}`}
       onClick={onClick}
     >
       {/* vertical connector */}
       {!isLast && (
-        <div className="absolute left-5 top-9 bottom-0 w-0.5 bg-slate-700" />
+        <div className="absolute left-5 top-9 bottom-0 w-0.5 bg-surface-hover" />
       )}
 
       {/* dot */}
       <div className="relative z-10 mt-1 flex h-4 w-4 flex-shrink-0 items-center justify-center">
         <button
-          className={`h-3 w-3 rounded-full ring-2 ring-slate-900 ${kindColor(node.kind)} transition-transform ${isFocused ? "scale-150" : "hover:scale-125"}`}
+          className={`h-3 w-3 rounded-full ring-2 ring-surface-border ${kindColor(node.kind)} transition-transform ${isFocused ? "scale-150" : "hover:scale-125"}`}
           title={kindLabel(node.kind)}
         />
       </div>
@@ -222,13 +222,13 @@ function TimelineNodeCard({
       {/* content */}
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline gap-2 flex-wrap">
-          <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-fg-muted">
             {kindLabel(node.kind)}
           </span>
-          <span className="text-[10px] text-slate-500">
+          <span className="text-[10px] text-fg-subtle">
             {new Date(node.ts).toLocaleTimeString()}
           </span>
-          <span className="text-[10px] text-slate-600">
+          <span className="text-[10px] text-fg-secondary">
             +{formatDuration(node.duration_ms)}
           </span>
           <span className="text-[10px] font-mono text-indigo-400">{node.agent}</span>
@@ -244,7 +244,7 @@ function TimelineNodeCard({
 
           {node.has_artifact && (
             <button
-              className="text-[10px] text-slate-400 hover:text-white"
+              className="text-[10px] text-fg-muted hover:text-fg-primary"
               title="Open transcript artifact"
               onClick={(e) => {
                 e.stopPropagation();
@@ -256,12 +256,12 @@ function TimelineNodeCard({
           )}
         </div>
 
-        <p className="mt-0.5 text-sm text-slate-200 leading-snug line-clamp-2">
+        <p className="mt-0.5 text-sm text-fg-primary leading-snug line-clamp-2">
           {node.summary}
         </p>
 
         {/* scrubber position hint */}
-        <div className="mt-1 text-[9px] text-slate-600">
+        <div className="mt-1 text-[9px] text-fg-secondary">
           t+{offsetPct.toFixed(1)}%
         </div>
 
@@ -330,7 +330,7 @@ function ScrubberBar({
     <div className="mb-4 px-3">
       <div
         ref={barRef}
-        className="relative h-3 cursor-crosshair rounded-full bg-slate-700"
+        className="relative h-3 cursor-crosshair rounded-full bg-surface-hover"
         onClick={handleClick}
         title="Click to jump to a point in the timeline"
       >
@@ -366,13 +366,13 @@ function ScrubberBar({
               : 0;
           return (
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-white/80 pointer-events-none"
+              className="absolute top-0 bottom-0 w-0.5 bg-surface-elevated pointer-events-none"
               style={{ left: `${pct}%` }}
             />
           );
         })()}
       </div>
-      <div className="mt-1 flex justify-between text-[10px] text-slate-600">
+      <div className="mt-1 flex justify-between text-[10px] text-fg-secondary">
         <span>0s</span>
         <span>{formatDuration(totalDurationMs)}</span>
       </div>
@@ -633,7 +633,7 @@ export default function InvestigationTimeline({
 
   if (loading) {
     return (
-      <div className="flex h-48 items-center justify-center text-slate-400 text-sm">
+      <div className="flex h-48 items-center justify-center text-fg-muted text-sm">
         Loading timeline…
       </div>
     );
@@ -650,7 +650,7 @@ export default function InvestigationTimeline({
   if (!data) return null;
 
   return (
-    <div className="flex flex-col gap-2 text-slate-100">
+    <div className="flex flex-col gap-2 text-fg-primary">
       {/* Header */}
       <div className="flex items-center justify-between px-3 pb-1">
         <div>
@@ -661,12 +661,12 @@ export default function InvestigationTimeline({
                 ${data.status === "completed" ? "bg-emerald-900/70 text-emerald-300" :
                   data.status === "running" ? "bg-blue-900/70 text-blue-300 animate-pulse" :
                   data.status === "failed" ? "bg-red-900/70 text-red-300" :
-                  "bg-slate-700 text-slate-300"}`}
+                  "bg-surface-hover text-fg-secondary"}`}
             >
               {data.status}
             </span>
           </p>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-[11px] text-fg-muted">
             {nodes.length} events · {formatDuration(data.total_duration_ms)} ·{" "}
             {data.attempt_count} attempt{data.attempt_count !== 1 ? "s" : ""}
           </p>
@@ -678,7 +678,7 @@ export default function InvestigationTimeline({
               sequence, so re-serialising a parsed body here would break
               verification for a reason the auditor could not see. */}
           <button
-            className="text-xs text-slate-400 hover:text-white disabled:opacity-40"
+            className="text-xs text-fg-muted hover:text-fg-primary disabled:opacity-40"
             disabled={bundleState === 'downloading'}
             onClick={downloadBundle}
             title="Signed, replayable record of this investigation"
@@ -688,7 +688,7 @@ export default function InvestigationTimeline({
 
           {focusedSeq !== null && (
             <button
-              className="text-xs text-slate-400 hover:text-white"
+              className="text-xs text-fg-muted hover:text-fg-primary"
               onClick={() => setFocusedSeq(null)}
             >
               ✕ clear focus
@@ -739,7 +739,7 @@ export default function InvestigationTimeline({
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-slate-800 px-3 pt-2 text-[10px] text-slate-500">
+      <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-surface-border px-3 pt-2 text-[10px] text-fg-subtle">
         {Object.entries(KIND_COLORS).map(([k, cls]) => (
           <span key={k} className="flex items-center gap-1">
             <span className={`inline-block h-2 w-2 rounded-full ${cls}`} />

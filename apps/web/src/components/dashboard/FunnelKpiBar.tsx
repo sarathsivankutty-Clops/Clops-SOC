@@ -116,29 +116,29 @@ function Tile({ label, value, delta, lowerIsBetter = false, unit, sampleCount }:
         : delta > 0;
   const deltaColor =
     isGood === null
-      ? 'text-gray-500'
+      ? 'text-fg-subtle'
       : isGood
         ? 'text-green-400'
         : 'text-red-400';
 
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4 min-w-0">
-      <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider truncate">
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-xl p-4 min-w-0">
+      <p className="text-[11px] text-fg-subtle font-medium uppercase tracking-wider truncate">
         {label}
       </p>
       <p
         className={clsx(
           'mt-1 tabular-nums truncate',
           unmeasured
-            ? 'text-2xl font-bold text-gray-500'
-            : 'text-2xl font-bold text-gray-100',
+            ? 'text-2xl font-bold text-fg-subtle'
+            : 'text-2xl font-bold text-fg-primary',
         )}
       >
         {unmeasured ? '—' : value}
       </p>
       <div className="flex items-baseline gap-2 mt-1">
         {unmeasured ? (
-          <span className="text-[11px] text-gray-500 truncate">
+          <span className="text-[11px] text-fg-subtle truncate">
             not measured{unit ? ` · no ${unit}` : ''}
           </span>
         ) : (
@@ -146,7 +146,7 @@ function Tile({ label, value, delta, lowerIsBetter = false, unit, sampleCount }:
             <span className={clsx('text-xs font-medium tabular-nums', deltaColor)}>
               {formatDelta(delta)}
             </span>
-            {unit && <span className="text-[11px] text-gray-600 truncate">{unit}</span>}
+            {unit && <span className="text-[11px] text-fg-subtle truncate">{unit}</span>}
           </>
         )}
       </div>
@@ -156,12 +156,12 @@ function Tile({ label, value, delta, lowerIsBetter = false, unit, sampleCount }:
 
 function LoadingTile({ label }: { label: string }) {
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4 min-w-0">
-      <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wider truncate">
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-xl p-4 min-w-0">
+      <p className="text-[11px] text-fg-subtle font-medium uppercase tracking-wider truncate">
         {label}
       </p>
-      <div className="mt-2 h-7 w-20 rounded bg-gray-800/60 animate-pulse" />
-      <div className="mt-2 h-3 w-12 rounded bg-gray-800/40 animate-pulse" />
+      <div className="mt-2 h-7 w-20 rounded bg-surface-hover animate-pulse" />
+      <div className="mt-2 h-3 w-12 rounded bg-surface-hover animate-pulse" />
     </div>
   );
 }
@@ -205,14 +205,14 @@ export function FunnelKpiBar({
       <div>
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h2 className="text-base font-semibold text-gray-100">
+            <h2 className="text-base font-semibold text-fg-primary">
               Operations Funnel
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-fg-subtle mt-0.5">
               Live tenant pipeline: events → correlations → alerts
             </p>
           </div>
-          <span className="text-xs text-gray-500">Last {period}</span>
+          <span className="text-xs text-fg-subtle">Last {period}</span>
         </div>
         <div className="rounded-xl border border-red-900/60 bg-red-950/40 px-4 py-3 text-sm text-red-200">
           <p className="font-semibold">Funnel metrics unavailable</p>
@@ -229,8 +229,8 @@ export function FunnelKpiBar({
     return (
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-semibold text-gray-100">Operations Funnel</h2>
-          <span className="text-xs text-gray-500">Last {period}</span>
+          <h2 className="text-base font-semibold text-fg-primary">Operations Funnel</h2>
+          <span className="text-xs text-fg-subtle">Last {period}</span>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {TILE_LABELS.map((l) => (
@@ -247,14 +247,14 @@ export function FunnelKpiBar({
     <div>
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-base font-semibold text-gray-100">
+          <h2 className="text-base font-semibold text-fg-primary">
             Operations Funnel
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-fg-subtle mt-0.5">
             Live tenant pipeline: events → correlations → alerts
           </p>
         </div>
-        <span className="text-xs text-gray-500">Last {period}</span>
+        <span className="text-xs text-fg-subtle">Last {period}</span>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">

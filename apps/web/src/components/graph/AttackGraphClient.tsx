@@ -11,7 +11,7 @@ const AttackGraphView = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[60vh] items-center justify-center text-gray-400">
+      <div className="flex h-[60vh] items-center justify-center text-fg-secondary">
         Loading attack graph…
       </div>
     ),
@@ -24,7 +24,7 @@ export default function AttackGraphClient() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-[60vh] items-center justify-center text-gray-400">
+        <div className="flex h-[60vh] items-center justify-center text-fg-secondary">
           Loading attack graph…
         </div>
       }

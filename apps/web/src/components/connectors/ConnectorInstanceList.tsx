@@ -48,7 +48,7 @@ const STATUS_CONFIG: Record<
   },
   inactive: {
     label: 'Inactive',
-    color: 'text-gray-400 bg-gray-500/10 border-gray-500/20',
+    color: 'text-fg-secondary bg-gray-500/10 border-surface-border-strong/20',
     dot: 'bg-gray-500',
   },
   error: {
@@ -185,15 +185,15 @@ function ConnectorCard({
     : '';
 
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-5 hover:border-gray-700/60 transition-colors flex flex-col">
+    <div className="bg-surface-card border border-surface-border/70 rounded-xl p-5 hover:border-surface-border-strong transition-colors flex flex-col">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 bg-gray-800 rounded-xl flex items-center justify-center text-[10px] font-semibold uppercase tracking-wider text-gray-400 flex-shrink-0">
+          <div className="w-10 h-10 bg-surface-elevated rounded-xl flex items-center justify-center text-[10px] font-semibold uppercase tracking-wider text-fg-secondary flex-shrink-0">
             {abbreviateType(connector.type)}
           </div>
           <div className="min-w-0">
-            <h3 className="text-sm font-medium text-gray-200 truncate">{connector.name}</h3>
-            <p className="text-xs text-gray-500 truncate">{connector.type}</p>
+            <h3 className="text-sm font-medium text-fg-primary truncate">{connector.name}</h3>
+            <p className="text-xs text-fg-muted truncate">{connector.type}</p>
           </div>
         </div>
         <span
@@ -209,7 +209,7 @@ function ConnectorCard({
       </div>
 
       {connector.description && (
-        <p className="text-xs text-gray-500 mb-4 line-clamp-2">{connector.description}</p>
+        <p className="text-xs text-fg-muted mb-4 line-clamp-2">{connector.description}</p>
       )}
 
       {/* Schema-drift, filter-drop, and freshness SLO badges. Only render
@@ -249,7 +249,7 @@ function ConnectorCard({
                 'text-[10px] px-2 py-0.5 rounded-full border inline-flex items-center gap-1',
                 driftRecent
                   ? 'text-amber-300 bg-amber-500/10 border-amber-500/30'
-                  : 'text-gray-400 bg-gray-800/60 border-gray-700/50',
+                  : 'text-fg-secondary bg-surface-sunken border-surface-border',
               )}
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -273,7 +273,7 @@ function ConnectorCard({
           {eventsDropped > 0 && (
             <span
               title={`${eventsDropped.toLocaleString()} event${eventsDropped === 1 ? '' : 's'} dropped by pre-ingest filter rules`}
-              className="text-[10px] px-2 py-0.5 rounded-full border inline-flex items-center gap-1 text-blue-300 bg-blue-500/10 border-blue-500/30"
+              className="text-[10px] px-2 py-0.5 rounded-full border inline-flex items-center gap-1 text-brand-300 bg-brand-500/10 border-brand-500/30"
             >
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -290,15 +290,15 @@ function ConnectorCard({
       )}
 
       <div className="grid grid-cols-2 gap-2 mb-4">
-        <div className="bg-gray-800/60 rounded-lg p-2">
-          <p className="text-xs text-gray-500">Events ingested</p>
-          <p className="text-sm font-medium text-gray-300">
+        <div className="bg-surface-sunken rounded-lg p-2">
+          <p className="text-xs text-fg-muted">Events ingested</p>
+          <p className="text-sm font-medium text-fg-secondary">
             {alertCount.toLocaleString()}
           </p>
         </div>
-        <div className="bg-gray-800/60 rounded-lg p-2">
-          <p className="text-xs text-gray-500">Last sync</p>
-          <p className="text-sm font-medium text-gray-300">
+        <div className="bg-surface-sunken rounded-lg p-2">
+          <p className="text-xs text-fg-muted">Last sync</p>
+          <p className="text-sm font-medium text-fg-secondary">
             {formatLastSync(connector.lastSync)}
           </p>
         </div>
@@ -309,7 +309,7 @@ function ConnectorCard({
           type="button"
           onClick={() => onTest(connector.id)}
           disabled={testing}
-          className="flex-1 text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-2 rounded-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+          className="flex-1 text-xs bg-surface-elevated hover:bg-surface-hover text-fg-secondary px-3 py-2 rounded-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
         >
           {testing && (
             <span className="animate-spin w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full" />
@@ -320,7 +320,7 @@ function ConnectorCard({
           type="button"
           disabled
           title="Connector editing UI is planned for v1.1"
-          className="flex-1 text-xs bg-gray-800/40 text-gray-500 px-3 py-2 rounded-lg border border-gray-700/40 cursor-not-allowed select-none"
+          className="flex-1 text-xs bg-surface-sunken/50 text-fg-muted px-3 py-2 rounded-lg border border-surface-border-strong/40 cursor-not-allowed select-none"
         >
           Configure
           <span className="ml-1.5 text-[10px] font-medium text-amber-400">v1.1</span>
@@ -330,7 +330,7 @@ function ConnectorCard({
             type="button"
             onClick={() => onDelete(connector)}
             aria-label={`Delete ${connector.name}`}
-            className="text-xs text-gray-500 hover:text-red-400 px-2 py-2 rounded-lg transition-colors"
+            className="text-xs text-fg-muted hover:text-red-400 px-2 py-2 rounded-lg transition-colors"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -401,9 +401,9 @@ export function ConnectorInstanceList({
 
   if (failed) {
     return (
-      <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-gray-800/60 bg-gray-900/40 px-4 py-12 text-center">
+      <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-surface-border/70 bg-surface-sunken/60 px-4 py-12 text-center">
         <p className="text-sm text-amber-200/80">The connector list could not be loaded.</p>
-        <p className="text-[11px] text-gray-600">
+        <p className="text-[11px] text-fg-subtle">
           Treat this as unknown rather than as an empty estate — see the message above, and
           retry from there.
         </p>
@@ -433,7 +433,7 @@ export function ConnectorInstanceList({
           <button
             type="button"
             onClick={onAdd}
-            className="bg-blue-600 hover:bg-blue-500 text-white text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+            className="bg-brand-600 hover:bg-brand-500 text-white text-sm px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -464,16 +464,16 @@ export function ConnectorInstanceList({
       <button
         type="button"
         onClick={onAdd}
-        className="bg-gray-900/30 border border-dashed border-gray-700/60 rounded-xl p-5 flex flex-col items-center justify-center gap-3 hover:border-gray-600/60 hover:bg-gray-900/50 transition-colors text-left"
+        className="bg-surface-sunken/40 border border-dashed border-surface-border-strong rounded-xl p-5 flex flex-col items-center justify-center gap-3 hover:border-surface-border-strong/60 hover:bg-surface-card transition-colors text-left"
       >
-        <div className="w-10 h-10 bg-gray-800/60 rounded-xl flex items-center justify-center text-gray-500">
+        <div className="w-10 h-10 bg-surface-sunken rounded-xl flex items-center justify-center text-fg-muted">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
         </div>
         <div className="text-center">
-          <p className="text-sm text-gray-300">Add Connector</p>
-          <p className="text-xs text-gray-600 mt-0.5">Connect a new security tool</p>
+          <p className="text-sm text-fg-secondary">Add Connector</p>
+          <p className="text-xs text-fg-subtle mt-0.5">Connect a new security tool</p>
         </div>
       </button>
     </div>

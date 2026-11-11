@@ -72,4 +72,13 @@ describe('TopBar', () => {
 
     window.removeEventListener('keydown', listener);
   });
+
+  it('renders the configurable organisation logo in the header when enabled', () => {
+    pathnameMock.mockReturnValue('/dashboard');
+    renderTopBar();
+
+    const logo = screen.getByTestId('org-topbar-logo') as HTMLImageElement;
+    expect(logo).toBeInTheDocument();
+    expect(logo.getAttribute('src')).toBe('/assets/logo-dark.png');
+  });
 });

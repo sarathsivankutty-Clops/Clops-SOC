@@ -39,7 +39,7 @@ function renderInline(text: string, keyPrefix: string): ReactNode[] {
       const key = `${keyPrefix}i${index}`;
       if (segment.length > 4 && segment.startsWith('**') && segment.endsWith('**')) {
         return (
-          <strong key={key} className="font-semibold text-gray-100">
+          <strong key={key} className="font-semibold text-fg-primary">
             {segment.slice(2, -2)}
           </strong>
         );
@@ -48,7 +48,7 @@ function renderInline(text: string, keyPrefix: string): ReactNode[] {
         return (
           <code
             key={key}
-            className="rounded bg-gray-800/70 px-1 py-0.5 font-mono text-[0.9em] text-gray-200"
+            className="rounded bg-surface-elevated px-1 py-0.5 font-mono text-[0.9em] text-fg-primary"
           >
             {segment.slice(1, -1)}
           </code>
@@ -82,7 +82,7 @@ export function NarrativeMarkdown({ source }: { source: string }) {
     .filter((block) => block !== '');
 
   return (
-    <div className="space-y-2 text-sm leading-relaxed text-gray-300">
+    <div className="space-y-2 text-sm leading-relaxed text-fg-secondary">
       {blocks.flatMap((block, blockIndex) =>
         runsFor(block).map((run, runIndex) => {
           const key = `b${blockIndex}r${runIndex}`;

@@ -3,14 +3,10 @@
 /**
  * Global command palette (⌘K / Ctrl+K).
  *
- * Mirrors the sidebar navigation, exposes quick actions (refresh, toggle
- * Copilot dock, copy current URL, switch tenant placeholder) and a section
- * for "recent pages" sourced from `localStorage`. Built on top of `cmdk`
+ * Consumes navigation metadata from `routeRegistry.ts` (`getCommandPaletteNavigationItems()`),
+ * exposes quick actions (refresh, toggle Copilot dock, copy current URL) and a
+ * section for "recent pages" sourced from `localStorage`. Built on top of `cmdk`
  * for solid keyboard ergonomics out of the box.
- *
- * The palette is mounted once in `AppShell` so every authenticated route
- * has access to it. We deliberately keep it client-only and decoupled from
- * the sidebar so we don't ship a giant bundle when users never open it.
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -18,12 +14,17 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Command } from 'cmdk';
 import { AnimatePresence, motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import {
+  getCommandPaletteNavigationItems,
+  resolveRouteMetadata,
+} from '@/config/routeRegistry';
+import { emitNavigationAnalytics } from '@/lib/navigation-analytics';
 
 interface PaletteAction {
   id: string;
   label: string;
   hint?: string;
-  keywords?: string[];
+  keywords?: readonly string[];
   shortcut?: string[];
   perform: () => void | Promise<void>;
 }
@@ -63,20 +64,6 @@ function writeRecent(path: string) {
   }
 }
 
-const NAV_ITEMS: { label: string; href: string; keywords: string[] }[] = [
-  { label: 'Dashboard',       href: '/dashboard',    keywords: ['home', 'overview', 'metrics'] },
-  { label: 'Alerts',          href: '/alerts',       keywords: ['notifications', 'incidents'] },
-  { label: 'Cases',           href: '/cases',        keywords: ['investigations', 'tickets'] },
-  { label: 'Hunt',            href: '/hunt',         keywords: ['threat hunting', 'search', 'kql', 'esql'] },
-  { label: 'Explore',         href: '/explore',      keywords: ['data explorer', 'lake', 'sql', 'bi', 'query', 'identity', 'intel'] },
-  { label: 'Detection Rules', href: '/detection',    keywords: ['rules', 'detections', 'sigma'] },
-  { label: 'Threat Intel',    href: '/threat-intel', keywords: ['ioc', 'feeds', 'cti'] },
-  { label: 'Attack Graph',    href: '/graph',        keywords: ['graph', 'paths', 'cytoscape'] },
-  { label: 'AI Copilot',      href: '/copilot',      keywords: ['assistant', 'chat', 'ai'] },
-  { label: 'Connectors',      href: '/connectors',   keywords: ['integrations', 'sources'] },
-  { label: 'Settings',        href: '/settings',     keywords: ['preferences', 'profile', 'tenant'] },
-];
-
 export function CommandPalette() {
   const [open, setOpen] = useState(false);
   const [recent, setRecent] = useState<string[]>([]);
@@ -95,11 +82,21 @@ export function CommandPalette() {
         if ((target as Element).closest('.monaco-editor')) return;
       }
       e.preventDefault();
-      setOpen((prev) => !prev);
+      setOpen((prev) => {
+        const next = !prev;
+        if (next) {
+          emitNavigationAnalytics({
+            event: 'command_palette_opened',
+            href: pathname ?? '/',
+            source: 'keyboard',
+          });
+        }
+        return next;
+      });
     }
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [pathname]);
 
   // Refresh "recent" each time we open so the list reflects other tabs / sessions.
   useEffect(() => {
@@ -123,16 +120,18 @@ export function CommandPalette() {
     [router, close],
   );
 
+  const navItems = useMemo(() => getCommandPaletteNavigationItems(), []);
+
   const groups = useMemo<PaletteGroup[]>(() => {
     const navGroup: PaletteGroup = {
       id: 'navigation',
       heading: 'Navigation',
-      items: NAV_ITEMS.map((item) => ({
-        id: `nav:${item.href}`,
-        label: item.label,
-        hint: item.href,
+      items: navItems.map((item) => ({
+        id: `nav:${item.path}`,
+        label: item.title,
+        hint: item.path,
         keywords: item.keywords,
-        perform: () => navigate(item.href),
+        perform: () => navigate(item.path),
       })),
     };
 
@@ -147,17 +146,9 @@ export function CommandPalette() {
           shortcut: ['⌘', 'J'],
           keywords: ['ai', 'copilot', 'assistant', 'investigate'],
           perform: () => {
-            // Tell the floating dock to open. Lives in CopilotDock.tsx.
             window.dispatchEvent(new Event('aisoc:open-copilot'));
             close();
           },
-        },
-        {
-          id: 'action:full-copilot',
-          label: 'Open AI Copilot page',
-          hint: 'Full conversation view',
-          keywords: ['copilot', 'ai', 'chat'],
-          perform: () => navigate('/copilot'),
         },
         {
           id: 'action:refresh',
@@ -194,10 +185,10 @@ export function CommandPalette() {
           items: recent
             .filter((href) => href !== pathname)
             .map((href) => {
-              const match = NAV_ITEMS.find((item) => href.startsWith(item.href));
+              const resolved = resolveRouteMetadata(href);
               return {
                 id: `recent:${href}`,
-                label: match ? match.label : href,
+                label: resolved.title || href,
                 hint: href,
                 perform: () => navigate(href),
               };
@@ -206,7 +197,7 @@ export function CommandPalette() {
       : null;
 
     return recentGroup ? [navGroup, quickGroup, recentGroup] : [navGroup, quickGroup];
-  }, [recent, pathname, navigate, close]);
+  }, [navItems, recent, pathname, navigate, close]);
 
   return (
     <AnimatePresence>
@@ -235,16 +226,17 @@ export function CommandPalette() {
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -8, opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.14, ease: 'easeOut' }}
-            className="relative w-full max-w-xl rounded-xl border border-gray-700/70 bg-[#0d121b] shadow-2xl shadow-black/50 overflow-hidden"
+            className="relative w-full max-w-xl rounded-xl border border-surface-border/70 bg-[#0d121b] shadow-2xl shadow-black/50 overflow-hidden"
           >
             <Command
               label="AiSOC command palette"
               loop
               className="flex flex-col"
             >
-              <div className="flex items-center gap-2 border-b border-gray-800/80 px-4 py-3">
+              <div className="flex items-center gap-2 border-b border-surface-border/80 px-4 py-3">
                 <svg
-                  className="w-4 h-4 text-gray-500 shrink-0"
+                  aria-hidden="true"
+                  className="w-4 h-4 text-fg-subtle shrink-0"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -259,15 +251,15 @@ export function CommandPalette() {
                 <Command.Input
                   autoFocus
                   placeholder="Type a command, search a page, or ask the Copilot…"
-                  className="flex-1 bg-transparent text-sm text-gray-200 placeholder-gray-500 outline-none"
+                  className="flex-1 bg-transparent text-sm text-fg-primary placeholder-gray-500 outline-none"
                 />
-                <kbd className="rounded border border-gray-700 bg-gray-900/70 px-1.5 py-0.5 text-[10px] font-mono text-gray-500">
+                <kbd className="rounded border border-surface-border bg-surface-card/70 px-1.5 py-0.5 text-[10px] font-mono text-fg-subtle">
                   ESC
                 </kbd>
               </div>
 
               <Command.List className="max-h-[60vh] overflow-y-auto py-2">
-                <Command.Empty className="px-4 py-6 text-center text-xs text-gray-500">
+                <Command.Empty className="px-4 py-6 text-center text-xs text-fg-subtle">
                   No matches. Try “alerts”, “hunt”, or “copilot”.
                 </Command.Empty>
 
@@ -275,7 +267,7 @@ export function CommandPalette() {
                   <Command.Group
                     key={group.id}
                     heading={group.heading}
-                    className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500"
+                    className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wider text-fg-subtle"
                   >
                     {group.items.map((item) => (
                       <Command.Item
@@ -284,11 +276,11 @@ export function CommandPalette() {
                         onSelect={() => {
                           void item.perform();
                         }}
-                        className="group flex items-center gap-3 rounded-md px-3 py-2 text-sm text-gray-300 cursor-pointer aria-selected:bg-blue-600/15 aria-selected:text-blue-200"
+                        className="group flex items-center gap-3 rounded-md px-3 py-2 text-sm text-fg-secondary cursor-pointer aria-selected:bg-blue-600/15 aria-selected:text-blue-200"
                       >
                         <span className="flex-1 truncate">{item.label}</span>
                         {item.hint && (
-                          <span className="text-[11px] text-gray-600 group-aria-selected:text-blue-300/80 truncate max-w-[40%] text-right">
+                          <span className="text-[11px] text-fg-secondary group-aria-selected:text-blue-300/80 truncate max-w-[40%] text-right">
                             {item.hint}
                           </span>
                         )}
@@ -297,7 +289,7 @@ export function CommandPalette() {
                             {item.shortcut.map((key) => (
                               <kbd
                                 key={key}
-                                className="rounded border border-gray-700 bg-gray-900/60 px-1 py-0.5 text-[10px] font-mono text-gray-400"
+                                className="rounded border border-surface-border bg-surface-card/60 px-1 py-0.5 text-[10px] font-mono text-fg-muted"
                               >
                                 {key}
                               </kbd>
@@ -310,15 +302,15 @@ export function CommandPalette() {
                 ))}
               </Command.List>
 
-              <div className="flex items-center justify-between border-t border-gray-800/80 px-4 py-2 text-[11px] text-gray-600">
+              <div className="flex items-center justify-between border-t border-surface-border/80 px-4 py-2 text-[11px] text-fg-secondary">
                 <div className="flex items-center gap-3">
                   <span className="flex items-center gap-1">
-                    <kbd className="rounded border border-gray-700 bg-gray-900/70 px-1 py-0.5 font-mono text-gray-500">↑</kbd>
-                    <kbd className="rounded border border-gray-700 bg-gray-900/70 px-1 py-0.5 font-mono text-gray-500">↓</kbd>
+                    <kbd className="rounded border border-surface-border bg-surface-card/70 px-1 py-0.5 font-mono text-fg-subtle">↑</kbd>
+                    <kbd className="rounded border border-surface-border bg-surface-card/70 px-1 py-0.5 font-mono text-fg-subtle">↓</kbd>
                     navigate
                   </span>
                   <span className="flex items-center gap-1">
-                    <kbd className="rounded border border-gray-700 bg-gray-900/70 px-1 py-0.5 font-mono text-gray-500">↵</kbd>
+                    <kbd className="rounded border border-surface-border bg-surface-card/70 px-1 py-0.5 font-mono text-fg-subtle">↵</kbd>
                     select
                   </span>
                 </div>

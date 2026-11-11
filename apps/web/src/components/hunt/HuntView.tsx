@@ -44,12 +44,25 @@ import { Skeleton } from '@/components/ui/Skeleton';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { demoFallback } from '@/lib/demoFallback';
+import { AiSpinner } from '@/components/ui/AiSpinner';
 
 // Monaco is heavy and SSR-incompatible; load it client-side only.
 const MonacoEditor = dynamic(
   () => import('@monaco-editor/react').then((mod) => mod.default),
   { ssr: false, loading: () => <Skeleton className="h-64 w-full rounded-lg" /> },
 );
+
+const AttackGraphInline = dynamic(
+  () => import('@/components/graph/AttackGraphView').then((mod) => mod.AttackGraphView),
+  { ssr: false, loading: () => <Skeleton className="h-96 w-full rounded-xl" /> },
+);
+
+const ThreatIntelInline = dynamic(
+  () => import('@/components/threat-intel/ThreatIntelView').then((mod) => mod.ThreatIntelView),
+  { ssr: false, loading: () => <Skeleton className="h-96 w-full rounded-xl" /> },
+);
+
+type HuntSubTab = 'logs' | 'graph' | 'ioc' | 'feeds';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -210,12 +223,12 @@ const SEVERITY_BADGE: Record<AlertSeverity, string> = {
   critical: 'bg-red-500/15 text-red-300 ring-red-500/30',
   high: 'bg-orange-500/15 text-orange-300 ring-orange-500/30',
   medium: 'bg-yellow-500/15 text-yellow-300 ring-yellow-500/30',
-  low: 'bg-blue-500/15 text-blue-300 ring-blue-500/30',
-  info: 'bg-slate-500/15 text-slate-300 ring-slate-500/30',
+  low: 'bg-brand-500/15 text-brand-300 ring-blue-500/30',
+  info: 'bg-slate-500/15 text-fg-secondary ring-surface-border-strong/30',
 };
 
 function severityClass(s?: AlertSeverity) {
-  return s ? SEVERITY_BADGE[s] : 'bg-slate-500/15 text-slate-300 ring-slate-500/30';
+  return s ? SEVERITY_BADGE[s] : 'bg-slate-500/15 text-fg-secondary ring-surface-border-strong/30';
 }
 
 function copyToClipboard(text: string) {
@@ -249,17 +262,17 @@ function NLHero({ value, onChange, onSubmit, pending }: NLHeroProps) {
   const trimmed = value.trim();
 
   return (
-    <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/40 via-slate-900/40 to-slate-900/40 p-6 shadow-[0_0_60px_-30px_rgba(16,185,129,0.4)]">
+    <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-gradient-to-br from-brand-500/10 via-surface-card to-surface-card p-6 shadow-[0_0_60px_-30px_rgba(16,185,129,0.4)]">
       <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-400">
         <svg className="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden>
           <path d="M10 3.5a.75.75 0 01.75.75v.578l4.97 1.243a.75.75 0 01.531.97l-1.5 5.25a.75.75 0 01-.5.51l-3.501 1.167V16h2.5a.75.75 0 010 1.5h-6.5a.75.75 0 010-1.5h2.5v-2.032l-3.5-1.166a.75.75 0 01-.5-.51l-1.5-5.25a.75.75 0 01.53-.971l4.97-1.243V4.25A.75.75 0 0110 3.5z" />
         </svg>
         AiSOC Hunt
       </div>
-      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+      <h1 className="mt-2 text-2xl font-semibold tracking-tight text-fg-primary sm:text-3xl">
         Hunt at the speed of thought.
       </h1>
-      <p className="mt-1.5 max-w-2xl text-sm text-slate-300">
+      <p className="mt-1.5 max-w-2xl text-sm text-fg-secondary">
         Ask in plain English and we&apos;ll translate it to ES|QL, KQL, and SPL.
         Save the questions that matter, schedule the ones that should run themselves.
       </p>
@@ -276,7 +289,7 @@ function NLHero({ value, onChange, onSubmit, pending }: NLHeroProps) {
         </label>
         <div className="relative flex-1">
           <svg
-            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+            className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-muted"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -293,7 +306,7 @@ function NLHero({ value, onChange, onSubmit, pending }: NLHeroProps) {
             autoComplete="off"
             spellCheck={false}
             disabled={pending}
-            className="w-full rounded-lg border border-slate-700/70 bg-slate-950/60 py-2.5 pl-9 pr-3 text-sm text-slate-100 placeholder:text-slate-500 focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-60"
+            className="w-full rounded-lg border border-surface-border-strong bg-surface-sunken py-2.5 pl-9 pr-3 text-sm text-fg-primary placeholder:text-fg-muted focus:border-emerald-500/60 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-60"
           />
         </div>
         <button
@@ -302,7 +315,7 @@ function NLHero({ value, onChange, onSubmit, pending }: NLHeroProps) {
           className={clsx(
             'flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-colors',
             pending || !trimmed
-              ? 'cursor-not-allowed bg-slate-800 text-slate-500'
+              ? 'cursor-not-allowed bg-surface-elevated text-fg-muted'
               : 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400',
           )}
         >
@@ -318,7 +331,7 @@ function NLHero({ value, onChange, onSubmit, pending }: NLHeroProps) {
       </form>
 
       <div className="mt-5">
-        <div className="text-[11px] uppercase tracking-wider text-slate-500">
+        <div className="text-[11px] uppercase tracking-wider text-fg-muted">
           Try one of these
         </div>
         <div className="mt-2 flex flex-wrap gap-2">
@@ -329,7 +342,7 @@ function NLHero({ value, onChange, onSubmit, pending }: NLHeroProps) {
               onClick={() => onSubmit(pill.label)}
               disabled={pending}
               className={clsx(
-                'group inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-900/70 px-3 py-1.5 text-xs text-slate-200 transition-colors',
+                'group inline-flex items-center gap-2 rounded-full border border-surface-border-strong bg-surface-card px-3 py-1.5 text-xs text-fg-primary transition-colors',
                 pending
                   ? 'cursor-not-allowed opacity-60'
                   : 'hover:border-emerald-500/50 hover:bg-emerald-500/10 hover:text-emerald-200',
@@ -388,7 +401,7 @@ function SavedHuntsPanel({
     );
 
   return (
-    <ul className="divide-y divide-slate-800/60">
+    <ul className="divide-y divide-surface-border/60">
       {items.map((h) => (
         <li
           key={h.id}
@@ -396,12 +409,12 @@ function SavedHuntsPanel({
             'group flex items-start gap-2 px-3 py-2.5 transition-colors',
             selectedId === h.id
               ? 'bg-emerald-500/5 border-l-2 border-l-emerald-500'
-              : 'hover:bg-slate-800/30',
+              : 'hover:bg-surface-elevated/30',
           )}
         >
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="rounded border border-slate-700/70 bg-slate-800/50 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-slate-300">
+              <span className="rounded border border-surface-border-strong bg-surface-sunken/70 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-fg-secondary">
                 NL · {h.language}
               </span>
               {h.schedule && (
@@ -416,13 +429,13 @@ function SavedHuntsPanel({
                 </span>
               )}
             </div>
-            <p className="mt-1 truncate text-sm font-medium text-slate-100" title={h.name}>
+            <p className="mt-1 truncate text-sm font-medium text-fg-primary" title={h.name}>
               {h.name}
             </p>
-            <p className="mt-0.5 line-clamp-2 text-[11px] text-slate-400" title={h.nl_query}>
+            <p className="mt-0.5 line-clamp-2 text-[11px] text-fg-secondary" title={h.nl_query}>
               {h.nl_query}
             </p>
-            <p className="mt-1 text-[11px] text-slate-500" suppressHydrationWarning>
+            <p className="mt-1 text-[11px] text-fg-muted" suppressHydrationWarning>
               {h.last_run_at
                 ? `Last run ${formatDistanceToNow(new Date(h.last_run_at), { addSuffix: true })}`
                 : `Saved ${formatDistanceToNow(new Date(h.created_at), { addSuffix: true })}`}
@@ -438,7 +451,7 @@ function SavedHuntsPanel({
             </button>
             <button
               onClick={() => onDelete(h)}
-              className="rounded-md p-1 text-slate-600 opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
+              className="rounded-md p-1 text-fg-subtle opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
               title="Delete"
               aria-label={`Delete saved hunt ${h.name}`}
             >
@@ -492,7 +505,7 @@ function SavedList({
     );
 
   return (
-    <ul className="divide-y divide-slate-800/60">
+    <ul className="divide-y divide-surface-border/60">
       {items.map((s) => (
         <li
           key={s.id}
@@ -500,7 +513,7 @@ function SavedList({
             'group flex items-start gap-2 px-3 py-2.5 transition-colors',
             selectedId === s.id
               ? 'bg-emerald-500/5 border-l-2 border-l-emerald-500'
-              : 'hover:bg-slate-800/30',
+              : 'hover:bg-surface-elevated/30',
           )}
         >
           <button
@@ -508,21 +521,21 @@ function SavedList({
             className="flex-1 text-left"
           >
             <div className="flex items-center gap-2">
-              <span className="rounded border border-slate-700/70 bg-slate-800/50 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-slate-300">
+              <span className="rounded border border-surface-border-strong bg-surface-sunken/70 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-fg-secondary">
                 {s.language}
               </span>
               {s.pinned && (
                 <span className="text-[10px] text-amber-300">pinned</span>
               )}
             </div>
-            <p className="mt-1 truncate text-sm text-slate-200">{s.name}</p>
-            <p className="mt-0.5 text-[11px] text-slate-500" suppressHydrationWarning>
+            <p className="mt-1 truncate text-sm text-fg-primary">{s.name}</p>
+            <p className="mt-0.5 text-[11px] text-fg-muted" suppressHydrationWarning>
               {formatDistanceToNow(new Date(s.createdAt), { addSuffix: true })}
             </p>
           </button>
           <button
             onClick={() => onDelete(s.id)}
-            className="rounded-md p-1 text-slate-600 opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
+            className="rounded-md p-1 text-fg-subtle opacity-0 transition-all hover:bg-red-500/10 hover:text-red-400 group-hover:opacity-100"
             title="Delete"
             aria-label="Delete saved search"
           >
@@ -550,10 +563,10 @@ function ResultRow({ result }: { result: HuntResult }) {
     .filter(([, v]) => v != null && v !== '');
 
   return (
-    <li className="border-b border-slate-800/60 last:border-b-0">
+    <li className="border-b border-surface-border/70 last:border-b-0">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-800/30"
+        className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-surface-elevated/30"
       >
         <span
           className={clsx(
@@ -564,25 +577,25 @@ function ResultRow({ result }: { result: HuntResult }) {
           {result.severity ?? 'event'}
         </span>
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-400">
-            <span className="font-mono text-slate-300" suppressHydrationWarning>
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-fg-secondary">
+            <span className="font-mono text-fg-secondary" suppressHydrationWarning>
               {format(new Date(result.timestamp), 'MMM dd HH:mm:ss')}
             </span>
-            <span className="text-slate-600">·</span>
-            <span className="rounded bg-slate-800/60 px-1.5 py-0.5 text-[10px] text-slate-400">
+            <span className="text-fg-subtle">·</span>
+            <span className="rounded bg-surface-sunken px-1.5 py-0.5 text-[10px] text-fg-secondary">
               {result.source}
             </span>
             {summary.map(([k, v]) => (
-              <span key={k} className="truncate text-slate-400">
+              <span key={k} className="truncate text-fg-secondary">
                 <span className="text-emerald-400">{k}=</span>
-                <span className="text-slate-300">{String(v)}</span>
+                <span className="text-fg-secondary">{String(v)}</span>
               </span>
             ))}
           </div>
         </div>
         <svg
           className={clsx(
-            'h-4 w-4 flex-none text-slate-500 transition-transform',
+            'h-4 w-4 flex-none text-fg-muted transition-transform',
             open && 'rotate-180',
           )}
           fill="none"
@@ -593,12 +606,12 @@ function ResultRow({ result }: { result: HuntResult }) {
         </svg>
       </button>
       {open && (
-        <div className="border-t border-slate-800/40 bg-slate-950/40 px-4 py-3">
+        <div className="border-t border-surface-border/40 bg-surface-sunken/50 px-4 py-3">
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-2">
             {fieldEntries.map(([k, v]) => (
               <div key={k} className="flex min-w-0 gap-2 text-xs">
                 <span className="flex-none text-emerald-400 font-mono">{k}</span>
-                <span className="truncate font-mono text-slate-300">
+                <span className="truncate font-mono text-fg-secondary">
                   {typeof v === 'object' ? JSON.stringify(v) : String(v)}
                 </span>
               </div>
@@ -607,7 +620,7 @@ function ResultRow({ result }: { result: HuntResult }) {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <button
               onClick={() => copyToClipboard(JSON.stringify(result.fields, null, 2))}
-              className="rounded border border-slate-700/70 bg-slate-800/40 px-2 py-1 text-[11px] text-slate-300 transition-colors hover:border-slate-600 hover:bg-slate-700/40"
+              className="rounded border border-surface-border-strong bg-surface-sunken/50 px-2 py-1 text-[11px] text-fg-secondary transition-colors hover:border-surface-border-strong hover:bg-surface-hover"
             >
               Copy JSON
             </button>
@@ -617,7 +630,7 @@ function ResultRow({ result }: { result: HuntResult }) {
                 const url = host ? `/graph?entity=${encodeURIComponent(String(host))}` : '/graph';
                 window.location.href = url;
               }}
-              className="rounded border border-slate-700/70 bg-slate-800/40 px-2 py-1 text-[11px] text-slate-300 transition-colors hover:border-slate-600 hover:bg-slate-700/40"
+              className="rounded border border-surface-border-strong bg-surface-sunken/50 px-2 py-1 text-[11px] text-fg-secondary transition-colors hover:border-surface-border-strong hover:bg-surface-hover"
             >
               Pivot to graph →
             </button>
@@ -631,6 +644,7 @@ function ResultRow({ result }: { result: HuntResult }) {
 // ─── Main view ────────────────────────────────────────────────────────────────
 
 export function HuntView() {
+  const [huntSubTab, setHuntSubTab] = useState<HuntSubTab>('logs');
   const [language, setLanguage] = useState<Lang>('kql');
   const [query, setQuery] = useState<string>(STARTERS.kql);
   const [preset, setPreset] = useState<string>('24h');
@@ -981,7 +995,50 @@ export function HuntView() {
   const showHero = !heroDismissed;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-4">
+      {/* Top Header & 4-Tab Bar (matches #p-hunting in design-mockup/index.html) */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-[17px] font-semibold tracking-[-0.015em] text-fg-primary">
+            Threat Hunting
+          </h2>
+          <p className="text-[12.5px] text-fg-secondary">
+            Search every connected source at once, ask in plain English, and pivot through entities.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-1 border-b border-surface-border">
+        {(
+          [
+            { id: 'logs', label: 'Log explorer' },
+            { id: 'graph', label: 'Entity graph' },
+            { id: 'ioc', label: 'IOC lookup' },
+            { id: 'feeds', label: 'Threat intel' },
+          ] as const
+        ).map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setHuntSubTab(t.id)}
+            className={clsx(
+              'px-3.5 py-2 text-[13px] font-medium border-b-2 -mb-px transition-colors',
+              huntSubTab === t.id
+                ? 'border-brand-500 text-brand-400 font-semibold'
+                : 'border-transparent text-fg-muted hover:text-fg-primary',
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {huntSubTab === 'graph' ? (
+        <AttackGraphInline />
+      ) : huntSubTab === 'ioc' || huntSubTab === 'feeds' ? (
+        <ThreatIntelInline />
+      ) : (
+        <>
       {/* Hero block — visible on first load or when explicitly recalled. */}
       {showHero ? (
         <NLHero
@@ -993,17 +1050,17 @@ export function HuntView() {
       ) : (
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
-            <h1 className="text-xl font-semibold text-white">Threat Hunting</h1>
+            <h1 className="text-xl font-semibold text-fg-primary">Threat Hunting</h1>
             {nlSubmittedQuery ? (
               <p
-                className="mt-1 max-w-3xl truncate text-sm text-slate-400"
+                className="mt-1 max-w-3xl truncate text-sm text-fg-secondary"
                 title={nlSubmittedQuery}
               >
                 <span className="text-emerald-400">Asking:</span>{' '}
                 {nlSubmittedQuery}
               </p>
             ) : (
-              <p className="mt-1 text-sm text-slate-400">
+              <p className="mt-1 text-sm text-fg-secondary">
                 Pivot across logs, alerts, processes, and assets in any language.
               </p>
             )}
@@ -1011,7 +1068,7 @@ export function HuntView() {
           <div className="flex items-center gap-2 text-xs">
             <button
               onClick={() => setHeroDismissed(false)}
-              className="rounded-md border border-slate-700/70 bg-slate-800/50 px-2.5 py-1 text-xs text-slate-200 transition-colors hover:border-emerald-500/40 hover:text-emerald-300"
+              className="rounded-md border border-surface-border-strong bg-surface-sunken/70 px-2.5 py-1 text-xs text-fg-primary transition-colors hover:border-emerald-500/40 hover:text-emerald-300"
             >
               ✦ Ask another question
             </button>
@@ -1045,7 +1102,7 @@ export function HuntView() {
       <div className="grid grid-cols-12 gap-5">
         {/* Sidebar: saved hunts (NL) + saved searches (raw). */}
         <aside className="col-span-12 space-y-4 lg:col-span-3">
-          <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-slate-900/40">
+          <div className="overflow-hidden rounded-xl border border-emerald-500/20 bg-surface-card">
             <div className="flex items-center justify-between border-b border-emerald-500/10 bg-emerald-500/5 px-3 py-2.5">
               <h3 className="text-xs font-semibold uppercase tracking-wide text-emerald-300">
                 Saved hunts
@@ -1069,9 +1126,9 @@ export function HuntView() {
             />
           </div>
 
-          <div className="overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/40">
-            <div className="flex items-center justify-between border-b border-slate-800/80 px-3 py-2.5">
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-300">
+          <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
+            <div className="flex items-center justify-between border-b border-surface-border px-3 py-2.5">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-fg-secondary">
                 Saved searches
               </h3>
               <button
@@ -1082,7 +1139,7 @@ export function HuntView() {
                   setQuery(STARTERS[language]);
                   lastStarter.current = STARTERS[language];
                 }}
-                className="text-xs text-slate-400 hover:text-slate-200"
+                className="text-xs text-fg-secondary hover:text-fg-primary"
               >
                 + New
               </button>
@@ -1111,10 +1168,10 @@ export function HuntView() {
           )}
 
           {/* Editor */}
-          <div className="overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/40">
-            <div className="flex flex-wrap items-center gap-2 border-b border-slate-800/80 px-3 py-2">
+          <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
+            <div className="flex flex-wrap items-center gap-2 border-b border-surface-border px-3 py-2">
               {/* Language tabs */}
-              <div className="flex rounded-lg border border-slate-800/80 bg-slate-950/40 p-0.5">
+              <div className="flex rounded-lg border border-surface-border bg-surface-sunken/50 p-0.5">
                 {LANGS.map((l) => (
                   <button
                     key={l.id}
@@ -1122,8 +1179,8 @@ export function HuntView() {
                     className={clsx(
                       'rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
                       language === l.id
-                        ? 'bg-slate-800 text-white shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200',
+                        ? 'bg-surface-elevated text-fg-primary shadow-sm'
+                        : 'text-fg-secondary hover:text-fg-primary',
                     )}
                   >
                     {l.label}
@@ -1132,14 +1189,14 @@ export function HuntView() {
               </div>
 
               {/* Time range */}
-              <div className="ml-2 flex items-center gap-1.5 text-xs text-slate-400">
+              <div className="ml-2 flex items-center gap-1.5 text-xs text-fg-secondary">
                 <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <select
                   value={preset}
                   onChange={(e) => setPreset(e.target.value)}
-                  className="rounded-md border border-slate-700/70 bg-slate-950/40 px-2 py-1 text-xs text-slate-200 focus:border-emerald-500/40 focus:outline-none"
+                  className="rounded-md border border-surface-border-strong bg-surface-sunken/50 px-2 py-1 text-xs text-fg-primary focus:border-emerald-500/40 focus:outline-none"
                 >
                   {TIME_PRESETS.map((p) => (
                     <option key={p.id} value={p.id}>
@@ -1156,7 +1213,7 @@ export function HuntView() {
                     'rounded-md border px-3 py-1.5 text-xs font-medium transition-colors',
                     nlSubmittedQuery
                       ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200 hover:border-emerald-500/70 hover:bg-emerald-500/20'
-                      : 'border-slate-700/70 bg-slate-800/50 text-slate-200 hover:border-slate-600 hover:bg-slate-700/40',
+                      : 'border-surface-border-strong bg-surface-sunken/70 text-fg-primary hover:border-surface-border-strong hover:bg-surface-hover',
                   )}
                   title={nlSubmittedQuery ? 'Save this NL hunt' : 'Save this raw query'}
                 >
@@ -1168,7 +1225,7 @@ export function HuntView() {
                   className={clsx(
                     'flex items-center gap-2 rounded-md px-3.5 py-1.5 text-xs font-semibold transition-colors',
                     running || !query.trim()
-                      ? 'cursor-not-allowed bg-slate-800 text-slate-500'
+                      ? 'cursor-not-allowed bg-surface-elevated text-fg-muted'
                       : 'bg-emerald-500 text-emerald-950 hover:bg-emerald-400',
                   )}
                 >
@@ -1211,12 +1268,12 @@ export function HuntView() {
           </div>
 
           {/* Results */}
-          <div className="overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/40">
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-800/80 px-4 py-2.5">
-              <h3 className="text-sm font-semibold text-slate-200">
+          <div className="overflow-hidden rounded-xl border border-surface-border bg-surface-card">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-surface-border px-4 py-2.5">
+              <h3 className="text-sm font-semibold text-fg-primary">
                 Hunt results
                 {results && (
-                  <span className="ml-2 text-xs font-normal text-slate-400">
+                  <span className="ml-2 text-xs font-normal text-fg-secondary">
                     {results.total.toLocaleString()} hits ·{' '}
                     {results.tookMs === null
                       ? 'latency not measured'
@@ -1229,7 +1286,7 @@ export function HuntView() {
                   onClick={() =>
                     copyToClipboard(JSON.stringify(results.hits, null, 2))
                   }
-                  className="text-xs text-slate-400 transition-colors hover:text-slate-200"
+                  className="text-xs text-fg-secondary transition-colors hover:text-fg-primary"
                 >
                   Copy all as JSON
                 </button>
@@ -1273,14 +1330,14 @@ export function HuntView() {
                 <p className="text-sm font-medium text-emerald-300">
                   No matches in the selected window
                 </p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-fg-muted">
                   {nlSubmittedQuery
                     ? 'The translator parsed your question (see editor) but found no events. Try a wider time range.'
                     : 'Either the data is clean, or the query is too tight.'}
                 </p>
               </div>
             ) : (
-              <ul className="divide-y divide-slate-800/60">
+              <ul className="divide-y divide-surface-border/60">
                 {results.hits.map((r) => (
                   <ResultRow key={r.id} result={r} />
                 ))}
@@ -1289,6 +1346,8 @@ export function HuntView() {
           </div>
         </section>
       </div>
+        </>
+      )}
     </div>
   );
 }

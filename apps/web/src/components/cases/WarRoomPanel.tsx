@@ -37,7 +37,7 @@ function SyncState({ room }: { room: WarRoom }) {
   if (!room.last_synced_at) {
     // Distinct from "synced and had nothing to say". An analyst must be able
     // to tell a room nobody has swept from a case nobody has touched.
-    return <span className="text-gray-500">waiting for the first sync</span>;
+    return <span className="text-fg-muted">waiting for the first sync</span>;
   }
   return (
     <span className="text-emerald-400">
@@ -77,15 +77,15 @@ export function WarRoomPanel({ caseId }: { caseId: string }) {
   const rooms = data ?? [];
 
   return (
-    <section className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4 space-y-3" aria-label="War room">
+    <section className="bg-surface-card border border-surface-border rounded-xl p-4 space-y-3" aria-label="War room">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-gray-200">War room</h2>
+        <h2 className="text-sm font-semibold text-fg-primary">War room</h2>
         <div className="flex items-center gap-2">
           <button
             type="button"
             disabled={opening}
             onClick={() => void open('slack')}
-            className="text-xs px-3 py-1.5 rounded-md border border-blue-500/40 bg-blue-500/10 text-blue-300 hover:bg-blue-500/20 disabled:opacity-50"
+            className="text-xs px-3 py-1.5 rounded-md border border-blue-500/40 bg-blue-500/10 text-blue-300 hover:bg-brand-400/20 disabled:opacity-50"
           >
             {opening ? 'Opening…' : 'Open in Slack'}
           </button>
@@ -93,7 +93,7 @@ export function WarRoomPanel({ caseId }: { caseId: string }) {
             type="button"
             disabled={opening}
             onClick={() => void open('teams')}
-            className="text-xs px-3 py-1.5 rounded-md border border-gray-700 text-gray-300 hover:bg-gray-800 disabled:opacity-50"
+            className="text-xs px-3 py-1.5 rounded-md border border-surface-border text-fg-secondary hover:bg-surface-elevated disabled:opacity-50"
           >
             Open in Teams
           </button>
@@ -107,13 +107,13 @@ export function WarRoomPanel({ caseId }: { caseId: string }) {
       )}
 
       {isLoading ? (
-        <p className="text-xs text-gray-500">Loading…</p>
+        <p className="text-xs text-fg-muted">Loading…</p>
       ) : error ? (
         <p className="text-xs text-red-400" role="alert">
           Couldn&apos;t load war rooms for this case.
         </p>
       ) : rooms.length === 0 ? (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-fg-muted">
           No war room yet. Opening one creates a channel, invites the assignees and mirrors the case
           timeline into it.
         </p>
@@ -121,10 +121,10 @@ export function WarRoomPanel({ caseId }: { caseId: string }) {
         <ul className="space-y-2">
           {rooms.map((room) => (
             <li key={room.id} className="text-xs flex items-center justify-between gap-3">
-              <span className="text-gray-300 truncate">
-                <span className="uppercase text-[10px] text-gray-500 mr-2">{room.provider}</span>
+              <span className="text-fg-secondary truncate">
+                <span className="uppercase text-[10px] text-fg-muted mr-2">{room.provider}</span>
                 {room.channel_name || room.channel_id}
-                {room.state === 'closed' && <span className="text-gray-600 ml-2">(closed)</span>}
+                {room.state === 'closed' && <span className="text-fg-subtle ml-2">(closed)</span>}
               </span>
               <SyncState room={room} />
             </li>

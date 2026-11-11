@@ -90,13 +90,13 @@ function KpiCard({
   hint?: string;
 }) {
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 flex flex-col gap-1">
-      <span className="text-xs text-gray-400 uppercase tracking-wider">{label}</span>
-      <span className={`text-2xl font-bold ${color ?? "text-white"}`}>
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-lg p-4 flex flex-col gap-1">
+      <span className="text-xs text-fg-muted uppercase tracking-wider">{label}</span>
+      <span className={`text-2xl font-bold ${color ?? "text-fg-primary"}`}>
         {value}
-        {unit && <span className="text-sm font-normal text-gray-400 ml-1">{unit}</span>}
+        {unit && <span className="text-sm font-normal text-fg-muted ml-1">{unit}</span>}
       </span>
-      {hint && <span className="text-[10px] text-gray-500">{hint}</span>}
+      {hint && <span className="text-[10px] text-fg-subtle">{hint}</span>}
     </div>
   );
 }
@@ -131,7 +131,7 @@ function MeanHoursCard({
       <KpiCard
         label={label}
         value="—"
-        color="text-gray-500"
+        color="text-fg-subtle"
         hint={sampleCount === 0 ? `not measured · no closures in ${window}` : undefined}
       />
     );
@@ -184,7 +184,7 @@ function RateCard({
       <KpiCard
         label={label}
         value="—"
-        color="text-gray-500"
+        color="text-fg-subtle"
         hint={sampleCount === 0 ? `not measured · no ${denominatorLabel} in ${window}` : undefined}
       />
     );
@@ -229,7 +229,7 @@ function AttackHeatmap({ cells }: { cells: AttackHeatmapCell[] }) {
 
   if (cells.length === 0) {
     return (
-      <div className="text-gray-500 text-sm flex items-center justify-center h-32">
+      <div className="text-fg-subtle text-sm flex items-center justify-center h-32">
         No ATT&amp;CK data in the selected period.
       </div>
     );
@@ -239,22 +239,22 @@ function AttackHeatmap({ cells }: { cells: AttackHeatmapCell[] }) {
     <div className="space-y-4">
       {Object.entries(tacticGroups).map(([tactic, techniques]) => (
         <div key={tactic}>
-          <div className="text-xs font-semibold text-gray-300 mb-1 uppercase tracking-wide">
+          <div className="text-xs font-semibold text-fg-secondary mb-1 uppercase tracking-wide">
             {tactic}
           </div>
           <div className="flex flex-wrap gap-1">
             {techniques.map((cell) => {
               const intensity = Math.max(0.15, cell.count / maxCount);
-              const bgClass = TACTIC_COLORS[tactic] ?? "bg-gray-800";
+              const bgClass = TACTIC_COLORS[tactic] ?? "bg-surface-hover";
               return (
                 <div
                   key={cell.technique}
                   title={`${cell.technique}: ${cell.count} alerts`}
-                  className={`${bgClass} border border-gray-600 rounded px-2 py-1 text-xs text-gray-200 cursor-default`}
+                  className={`${bgClass} border border-surface-border-strong rounded px-2 py-1 text-xs text-fg-secondary cursor-default`}
                   style={{ opacity: intensity }}
                 >
                   {cell.technique}
-                  <span className="ml-1 text-gray-400">({cell.count})</span>
+                  <span className="ml-1 text-fg-muted">({cell.count})</span>
                 </div>
               );
             })}
@@ -312,10 +312,10 @@ export function SOCMetricsDashboard() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white">SOC Performance Metrics</h2>
+        <h2 className="text-lg font-semibold text-fg-primary">SOC Performance Metrics</h2>
         <button
           onClick={refresh}
-          className="text-xs text-gray-400 hover:text-gray-200 px-3 py-1 border border-gray-700 rounded transition-colors"
+          className="text-xs text-fg-muted hover:text-fg-secondary px-3 py-1 border border-surface-border rounded transition-colors"
         >
           Refresh
         </button>
@@ -415,11 +415,11 @@ export function SOCMetricsDashboard() {
       )}
 
       {/* Confidence Calibration Curve */}
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-300 mb-1">
+      <div className="bg-surface-card border border-surface-border shadow-xs rounded-lg p-4">
+        <h3 className="text-sm font-semibold text-fg-secondary mb-1">
           Agent Confidence Calibration (7d)
         </h3>
-        <p className="text-xs text-gray-500 mb-4">
+        <p className="text-xs text-fg-subtle mb-4">
           Predicted confidence vs. actual true-positive rate. Diagonal alignment indicates
           well-calibrated confidence.
         </p>
@@ -427,8 +427,8 @@ export function SOCMetricsDashboard() {
       </div>
 
       {/* ATT&CK Heatmap */}
-      <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-300 mb-4">
+      <div className="bg-surface-card border border-surface-border shadow-xs rounded-lg p-4">
+        <h3 className="text-sm font-semibold text-fg-secondary mb-4">
           ATT&amp;CK Technique Heatmap
         </h3>
         <AttackHeatmap cells={heatmap} />
@@ -473,16 +473,16 @@ function CostTelemetryPanel() {
         : null;
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-lg p-4">
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-lg p-4">
       <div className="flex items-center justify-between mb-1">
-        <h3 className="text-sm font-semibold text-gray-300">
+        <h3 className="text-sm font-semibold text-fg-secondary">
           Investigation Cost Telemetry (30d)
         </h3>
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-fg-subtle">
           Tokens · Latency · Spend per model, aggregated across runs
         </span>
       </div>
-      <p className="text-xs text-gray-500 mb-4">
+      <p className="text-xs text-fg-subtle mb-4">
         Source of truth for TCO transparency. Per-run breakdowns are available on
         each investigation detail view.
       </p>
@@ -495,9 +495,9 @@ function CostTelemetryPanel() {
       )}
 
       {isLoading && !isValidCost ? (
-        <div className="h-32 animate-pulse bg-gray-800 rounded" />
+        <div className="h-32 animate-pulse bg-surface-hover rounded" />
       ) : !totals || totals.runs === 0 ? (
-        <div className="text-gray-500 text-sm flex items-center justify-center h-24">
+        <div className="text-fg-subtle text-sm flex items-center justify-center h-24">
           No investigation runs with cost telemetry in the last 30 days.
         </div>
       ) : (
@@ -542,7 +542,7 @@ function CostTelemetryPanel() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-xs">
               <thead>
-                <tr className="text-gray-500 border-b border-gray-800">
+                <tr className="text-fg-subtle border-b border-surface-border">
                   <th className="text-left py-2 pr-4 font-medium">Model</th>
                   <th className="text-right py-2 pr-4 font-medium">Runs</th>
                   <th className="text-right py-2 pr-4 font-medium">Calls</th>
@@ -558,28 +558,28 @@ function CostTelemetryPanel() {
                   return (
                     <tr
                       key={row.model}
-                      className="border-b border-gray-800/50 last:border-0"
+                      className="border-b border-surface-border/50 last:border-0"
                     >
-                      <td className="py-2 pr-4 text-gray-200 font-mono">
+                      <td className="py-2 pr-4 text-fg-secondary font-mono">
                         {row.model}
                       </td>
-                      <td className="py-2 pr-4 text-right text-gray-400">
+                      <td className="py-2 pr-4 text-right text-fg-muted">
                         {row.runs}
                       </td>
-                      <td className="py-2 pr-4 text-right text-gray-400">
+                      <td className="py-2 pr-4 text-right text-fg-muted">
                         {row.calls}
                       </td>
-                      <td className="py-2 pr-4 text-right text-gray-400 font-mono">
+                      <td className="py-2 pr-4 text-right text-fg-muted font-mono">
                         {formatTokens(row.total_prompt_tokens)}
                       </td>
-                      <td className="py-2 pr-4 text-right text-gray-400 font-mono">
+                      <td className="py-2 pr-4 text-right text-fg-muted font-mono">
                         {formatTokens(row.total_completion_tokens)}
                       </td>
-                      <td className="py-2 pr-4 text-right text-white font-mono">
+                      <td className="py-2 pr-4 text-right text-fg-primary font-mono">
                         {formatUsd(row.total_cost_usd)}
                       </td>
                       <td className="py-2 min-w-[120px]">
-                        <div className="h-2 bg-gray-800 rounded overflow-hidden">
+                        <div className="h-2 bg-surface-hover rounded overflow-hidden">
                           <div
                             className="h-full bg-blue-700"
                             style={{ width: `${sharePct}%` }}
@@ -601,7 +601,7 @@ function CostTelemetryPanel() {
 function CalibrationCurve({ buckets }: { buckets: CalibrationBucket[] }) {
   if (!buckets || buckets.length === 0) {
     return (
-      <div className="text-gray-500 text-sm flex items-center justify-center h-40">
+      <div className="text-fg-subtle text-sm flex items-center justify-center h-40">
         Not enough labeled investigations to compute calibration yet.
       </div>
     );
@@ -612,7 +612,7 @@ function CalibrationCurve({ buckets }: { buckets: CalibrationBucket[] }) {
   return (
     <div className="space-y-2">
       {/* Header row */}
-      <div className="grid grid-cols-12 gap-2 text-xs text-gray-500 px-1">
+      <div className="grid grid-cols-12 gap-2 text-xs text-fg-subtle px-1">
         <div className="col-span-3">Confidence Bin</div>
         <div className="col-span-6">Predicted vs Actual TP Rate</div>
         <div className="col-span-2 text-right">Actual</div>
@@ -644,10 +644,10 @@ function CalibrationCurve({ buckets }: { buckets: CalibrationBucket[] }) {
               1,
             )}%; ${bucket.sample_count} samples`}
           >
-            <div className="col-span-3 text-gray-400">
+            <div className="col-span-3 text-fg-muted">
               {lo}-{hi}%
             </div>
-            <div className="col-span-6 relative h-5 bg-gray-800 rounded">
+            <div className="col-span-6 relative h-5 bg-surface-hover rounded">
               {/* Predicted band */}
               <div
                 className="absolute top-0 bottom-0 bg-blue-900 opacity-40 rounded"
@@ -676,7 +676,7 @@ function CalibrationCurve({ buckets }: { buckets: CalibrationBucket[] }) {
             >
               {(actual * 100).toFixed(1)}%
             </div>
-            <div className="col-span-1 text-right text-gray-500 font-mono">
+            <div className="col-span-1 text-right text-fg-subtle font-mono">
               {bucket.sample_count}
             </div>
           </div>

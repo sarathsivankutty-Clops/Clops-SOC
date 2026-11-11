@@ -136,20 +136,20 @@ export function DelegationsPanel() {
 
   return (
     <div data-testid="delegations-panel">
-      <div className="border-b border-gray-800 px-6 py-4">
-        <h2 className="text-base font-semibold text-gray-100">Delegations</h2>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="border-b border-surface-border px-6 py-4">
+        <h2 className="text-base font-semibold text-fg-primary">Delegations</h2>
+        <p className="mt-1 text-sm text-fg-muted">
           Standing grants your organisation holds into the tenants it manages.
           Each one is authority over somebody else&apos;s data.
         </p>
       </div>
 
       <div className="space-y-5 px-6 py-5">
-        <div className="flex flex-col gap-3 rounded-lg border border-gray-800 bg-gray-950/40 p-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col gap-3 rounded-lg border border-surface-border bg-surface-sunken/50 p-4 sm:flex-row sm:items-end">
           <label className="flex-1 text-sm">
-            <span className="mb-1 block text-gray-400">Managed tenant</span>
+            <span className="mb-1 block text-fg-secondary">Managed tenant</span>
             <select
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100 disabled:opacity-40"
+              className="w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary disabled:opacity-40"
               value={draftChild}
               disabled={children.length === 0 || busy}
               aria-label="Managed tenant"
@@ -164,9 +164,9 @@ export function DelegationsPanel() {
             </select>
           </label>
           <label className="text-sm sm:w-48">
-            <span className="mb-1 block text-gray-400">Role</span>
+            <span className="mb-1 block text-fg-secondary">Role</span>
             <select
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100"
+              className="w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary"
               value={draftRole}
               aria-label="Granted role"
               onChange={(e) => setDraftRole(e.target.value)}
@@ -179,10 +179,10 @@ export function DelegationsPanel() {
             </select>
           </label>
           <label className="text-sm sm:w-48">
-            <span className="mb-1 block text-gray-400">Expires</span>
+            <span className="mb-1 block text-fg-secondary">Expires</span>
             <input
               type="date"
-              className="w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100"
+              className="w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary"
               value={draftExpiry}
               aria-label="Expires on"
               onChange={(e) => setDraftExpiry(e.target.value)}
@@ -192,13 +192,13 @@ export function DelegationsPanel() {
             type="button"
             onClick={() => void grant()}
             disabled={busy || children.length === 0}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 disabled:opacity-50"
           >
             {busy ? 'Working…' : 'Grant'}
           </button>
         </div>
 
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-fg-muted">
           You can only grant a role you hold yourself. A role above yours is
           refused by the server, and the reason it gives is shown as-is.
         </p>
@@ -210,7 +210,7 @@ export function DelegationsPanel() {
             unaffected, and tenants are shown by id rather than name.
           </p>
         ) : children.length === 0 ? (
-          <p className="text-xs text-gray-500">You manage no child tenants, so there is nothing to delegate.</p>
+          <p className="text-xs text-fg-muted">You manage no child tenants, so there is nothing to delegate.</p>
         ) : null}
 
         {loadError ? (
@@ -223,9 +223,9 @@ export function DelegationsPanel() {
             description="Nobody in your organisation holds a standing grant into a managed tenant."
           />
         ) : (
-          <div className="overflow-hidden rounded-lg border border-gray-800">
+          <div className="overflow-hidden rounded-lg border border-surface-border">
             <table className="w-full text-sm">
-              <thead className="bg-gray-900/60 text-xs uppercase tracking-wide text-gray-500">
+              <thead className="bg-surface-card text-xs uppercase tracking-wide text-fg-muted">
                 <tr>
                   <th className="px-4 py-2 text-left">Tenant</th>
                   <th className="px-4 py-2 text-left">Role</th>
@@ -234,19 +234,19 @@ export function DelegationsPanel() {
                   <th className="px-4 py-2 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800 bg-gray-950/40">
+              <tbody className="divide-y divide-surface-border bg-surface-sunken/50">
                 {delegations.map((delegation) => (
                   <tr key={delegation.id}>
-                    <td className="px-4 py-3 font-medium text-gray-100">
+                    <td className="px-4 py-3 font-medium text-fg-primary">
                       {nameFor(delegation.child_tenant_id)}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-300">{delegation.granted_role}</td>
-                    <td className="px-4 py-3 text-xs text-gray-400" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-xs text-fg-secondary">{delegation.granted_role}</td>
+                    <td className="px-4 py-3 text-xs text-fg-secondary" suppressHydrationWarning>
                       {format(new Date(delegation.created_at), 'PPP')}
                     </td>
                     <td className="px-4 py-3 text-xs" suppressHydrationWarning>
                       {delegation.expires_at ? (
-                        <span className="text-gray-400">
+                        <span className="text-fg-secondary">
                           {format(new Date(delegation.expires_at), 'PPP')}
                         </span>
                       ) : (

@@ -8,6 +8,7 @@ import { FailureBanner } from '@/components/ui/FailureBanner';
 import { describeApiFailure } from '@/lib/failure';
 import { authedFetcher, rbacApi, type RbacRole } from '@/lib/api';
 import toast from 'react-hot-toast';
+import { DialogBehavior } from '@/components/ui/Dialog';
 
 interface Permission {
   id: string;
@@ -23,19 +24,19 @@ type Role = RbacRole;
 // read roles) from a 500 (the API is broken) from a 422 (the console is).
 
 const CATEGORY_COLORS: Record<string, string> = {
-  cases: 'bg-blue-500/20 text-blue-300',
+  cases: 'bg-blue-500/20 text-brand-300',
   alerts: 'bg-red-500/20 text-red-300',
   playbooks: 'bg-purple-500/20 text-purple-300',
   detections: 'bg-orange-500/20 text-orange-300',
   connectors: 'bg-teal-500/20 text-teal-300',
   api_keys: 'bg-yellow-500/20 text-yellow-300',
-  audit: 'bg-gray-500/20 text-gray-300',
+  audit: 'bg-gray-500/20 text-fg-secondary',
   compliance: 'bg-green-500/20 text-green-300',
   admin: 'bg-pink-500/20 text-pink-300',
 };
 
 function PermissionBadge({ perm }: { perm: Permission }) {
-  const cls = CATEGORY_COLORS[perm.category ?? ''] ?? 'bg-gray-500/20 text-gray-300';
+  const cls = CATEGORY_COLORS[perm.category ?? ''] ?? 'bg-gray-500/20 text-fg-secondary';
   return (
     <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${cls}`} title={perm.description ?? ''}>
       {perm.name}
@@ -45,25 +46,25 @@ function PermissionBadge({ perm }: { perm: Permission }) {
 
 function RoleCard({ role, onEdit, onDelete }: { role: Role; onEdit: (r: Role) => void; onDelete: (r: Role) => void }) {
   return (
-    <div className="rounded-xl border border-gray-800/60 bg-gray-900/60 p-5">
+    <div className="rounded-xl border border-surface-border/70 bg-surface-card p-5">
       <div className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-base font-semibold text-gray-100">{role.label || role.name}</span>
-            {role.label && <span className="font-mono text-xs text-gray-500">{role.name}</span>}
+            <span className="text-base font-semibold text-fg-primary">{role.label || role.name}</span>
+            {role.label && <span className="font-mono text-xs text-fg-muted">{role.name}</span>}
             {role.is_system && (
               <span className="rounded bg-indigo-100 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-700">
                 system
               </span>
             )}
           </div>
-          {role.description && <p className="mt-0.5 text-sm text-gray-400">{role.description}</p>}
+          {role.description && <p className="mt-0.5 text-sm text-fg-secondary">{role.description}</p>}
         </div>
         {!role.is_system && (
           <div className="flex shrink-0 gap-2">
             <button
               onClick={() => onEdit(role)}
-              className="rounded px-2 py-1 text-xs text-gray-400 hover:bg-gray-800"
+              className="rounded px-2 py-1 text-xs text-fg-secondary hover:bg-surface-elevated"
             >
               Edit
             </button>
@@ -76,7 +77,7 @@ function RoleCard({ role, onEdit, onDelete }: { role: Role; onEdit: (r: Role) =>
           </div>
         )}
       </div>
-      <div className="mt-3 flex items-center gap-3 text-xs text-gray-400">
+      <div className="mt-3 flex items-center gap-3 text-xs text-fg-secondary">
         <span title="Users holding this role in this workspace">
           {role.user_count} user{role.user_count === 1 ? '' : 's'}
         </span>
@@ -86,7 +87,7 @@ function RoleCard({ role, onEdit, onDelete }: { role: Role; onEdit: (r: Role) =>
           </span>
         )}
         {role.is_system && !role.is_sso_default && (
-          <span className="rounded bg-gray-700/60 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-gray-300">
+          <span className="rounded bg-surface-hover/60 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-fg-secondary">
             protected · non-deletable
           </span>
         )}
@@ -98,12 +99,12 @@ function RoleCard({ role, onEdit, onDelete }: { role: Role; onEdit: (r: Role) =>
           (byCat.get(cat) ?? byCat.set(cat, []).get(cat)!).push(p);
         }
         return role.permissions.length === 0 ? (
-          <p className="mt-3 text-xs italic text-gray-600">No permissions assigned</p>
+          <p className="mt-3 text-xs italic text-fg-subtle">No permissions assigned</p>
         ) : (
           <div className="mt-3 space-y-2">
             {[...byCat.entries()].sort().map(([cat, perms]) => (
               <div key={cat}>
-                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-gray-500">{cat}</p>
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-fg-muted">{cat}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {perms.map((p) => <PermissionBadge key={p.id} perm={p} />)}
                 </div>
@@ -177,30 +178,31 @@ function RoleForm({ allPermissions, initial, onClose }: RoleFormProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <DialogBehavior onClose={onClose} /> {/* [P6 overlay-dialog] role=dialog, focus trap, Escape */}
       <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
         <div className="flex items-center justify-between border-b px-6 py-4">
           <h2 className="text-lg font-semibold">{initial ? `Edit Role — ${initial.name}` : 'Create Role'}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700">✕</button>
+          <button onClick={onClose} className="text-fg-secondary hover:text-fg-primary">✕</button>
         </div>
         <div className="space-y-4 px-6 py-4">
           {error && <p className="rounded bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">{error}</p>}
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Name (machine id, immutable)</label>
+            <label className="mb-1 block text-sm font-medium text-fg-primary">Name (machine id, immutable)</label>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
               readOnly={Boolean(initial)}
-              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 read-only:bg-gray-100 read-only:text-gray-500"
+              className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 read-only:bg-surface-hover read-only:text-fg-muted"
               placeholder="e.g. threat-hunter"
             />
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-fg-muted">
               {initial
                 ? 'The machine name reaches tokens, audit records and URLs — it cannot be renamed. Edit the display label instead.'
                 : 'Lowercase slug: letters, digits and dashes (e.g. threat-hunter). Reserved names (admin, viewer, infosec…) are refused.'}
             </p>
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Display label</label>
+            <label className="mb-1 block text-sm font-medium text-fg-primary">Display label</label>
             <input
               value={label}
               onChange={(e) => setLabel(e.target.value)}
@@ -209,7 +211,7 @@ function RoleForm({ allPermissions, initial, onClose }: RoleFormProps) {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-gray-700">Description</label>
+            <label className="mb-1 block text-sm font-medium text-fg-primary">Description</label>
             <input
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -218,13 +220,13 @@ function RoleForm({ allPermissions, initial, onClose }: RoleFormProps) {
             />
           </div>
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
+            <label className="mb-2 block text-sm font-medium text-fg-primary">
               Permissions ({selectedNames.size} selected)
             </label>
             <div className="max-h-64 space-y-3 overflow-y-auto rounded-lg border p-3">
               {categories.map((cat) => (
                 <div key={cat}>
-                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">{cat}</p>
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-fg-muted">{cat}</p>
                   <div className="flex flex-wrap gap-2">
                     {allPermissions
                       .filter((p) => (p.category ?? 'other') === cat)
@@ -234,9 +236,9 @@ function RoleForm({ allPermissions, initial, onClose }: RoleFormProps) {
                             type="checkbox"
                             checked={selectedNames.has(perm.name)}
                             onChange={() => toggle(perm.name)}
-                            className="rounded border-gray-300 text-indigo-600"
+                            className="rounded border-surface-border text-indigo-600"
                           />
-                          <span className="text-xs text-gray-700">{perm.name}</span>
+                          <span className="text-xs text-fg-primary">{perm.name}</span>
                         </label>
                       ))}
                   </div>
@@ -246,7 +248,7 @@ function RoleForm({ allPermissions, initial, onClose }: RoleFormProps) {
           </div>
         </div>
         <div className="flex justify-end gap-3 border-t px-6 py-4">
-          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-gray-600 hover:bg-gray-100">
+          <button onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-fg-subtle hover:bg-surface-hover">
             Cancel
           </button>
           <button
@@ -362,8 +364,8 @@ export function RBACView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-gray-100">Roles & Permissions</h2>
-          <p className="mt-0.5 text-sm text-gray-500">Manage access control for your organization.</p>
+          <h2 className="text-xl font-bold text-fg-primary">Roles & Permissions</h2>
+          <p className="mt-0.5 text-sm text-fg-muted">Manage access control for your organization.</p>
         </div>
         {isAdmin && (
           <button
@@ -385,9 +387,9 @@ export function RBACView() {
             message={describeApiFailure(rolesError, { subject: 'role list' })}
             onRetry={() => reloadRoles()}
           />
-          <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-gray-800/60 bg-gray-900/40 px-4 py-12 text-center">
+          <div className="flex flex-col items-center justify-center gap-1 rounded-xl border border-surface-border/70 bg-surface-sunken/60 px-4 py-12 text-center">
             <p className="text-sm text-amber-200/80">The role list could not be loaded.</p>
-            <p className="text-[11px] text-gray-600">
+            <p className="text-[11px] text-fg-subtle">
               Treat this as unknown rather than as a tenant with no roles defined.
             </p>
           </div>
@@ -397,7 +399,7 @@ export function RBACView() {
       {!roles && !rolesError && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-xl bg-gray-800/60" />
+            <div key={i} className="h-32 animate-pulse rounded-xl bg-surface-sunken" />
           ))}
         </div>
       )}
@@ -421,7 +423,7 @@ export function RBACView() {
                 <button
                   type="button"
                   onClick={() => setShowCreate(true)}
-                  className="rounded-lg border border-gray-700 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-800 transition-colors"
+                  className="rounded-lg border border-surface-border-strong px-4 py-2 text-sm font-medium text-fg-primary hover:bg-surface-elevated transition-colors"
                 >
                   + New Role
                 </button>

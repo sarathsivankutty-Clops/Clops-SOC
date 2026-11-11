@@ -223,13 +223,13 @@ export function AutonomyScorecard({
 
   return (
     <div
-      className="rounded-lg border border-gray-800 bg-gray-950/40 p-4"
+      className="rounded-lg border border-surface-border bg-surface-sunken/50 p-4"
       role="group"
       aria-label="Autonomy posture scorecard"
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-wide text-gray-500">Current posture</p>
+          <p className="text-xs uppercase tracking-wide text-fg-muted">Current posture</p>
           <div className="mt-1 flex items-center gap-2">
             <span
               className={clsx(
@@ -241,7 +241,7 @@ export function AutonomyScorecard({
             >
               {isCopilot ? 'Copilot' : 'Autopilot'}
             </span>
-            <span className="text-xs text-gray-400">{postureSummary(card)}</span>
+            <span className="text-xs text-fg-secondary">{postureSummary(card)}</span>
           </div>
         </div>
         <dl className="flex gap-4 text-right">
@@ -262,9 +262,9 @@ export function AutonomyScorecard({
           .map(([blast, n]) => (
             <span
               key={blast}
-              className="rounded-full border border-gray-700 bg-gray-900 px-2.5 py-1 text-[11px] text-gray-300"
+              className="rounded-full border border-surface-border-strong bg-surface-card px-2.5 py-1 text-[11px] text-fg-secondary"
             >
-              {blast}: <span className="font-mono text-gray-100">{n}</span>
+              {blast}: <span className="font-mono text-fg-primary">{n}</span>
             </span>
           ))}
       </div>
@@ -293,12 +293,12 @@ function EffectiveControl({ effective }: { effective?: AutonomyEffective | null 
   const source = TIER_SOURCE_LABEL[effective.tier_source] ?? effective.tier_source;
 
   return (
-    <div className="mt-3 rounded-lg border border-gray-800 bg-gray-950/60 p-3">
-      <p className="text-[11px] uppercase tracking-wide text-gray-500">What gates execution</p>
-      <p className="mt-1 text-xs text-gray-300">
+    <div className="mt-3 rounded-lg border border-surface-border bg-surface-sunken p-3">
+      <p className="text-[11px] uppercase tracking-wide text-fg-muted">What gates execution</p>
+      <p className="mt-1 text-xs text-fg-secondary">
         Autonomy tier{' '}
-        <span className="font-mono text-gray-100">{effective.tier_label}</span>{' '}
-        <span className="text-gray-500">({source})</span>.{' '}
+        <span className="font-mono text-fg-primary">{effective.tier_label}</span>{' '}
+        <span className="text-fg-muted">({source})</span>.{' '}
         {effective.max_automatic_impact === null
           ? 'This tier executes nothing without a human, not even a read.'
           : `Without a human it executes up to ${effective.max_automatic_impact.replace('_', ' ')} impact, and only where the action's own contract allows it.`}
@@ -307,7 +307,7 @@ function EffectiveControl({ effective }: { effective?: AutonomyEffective | null 
         <p className="mt-2 text-[11px] text-amber-300/80">{effective.advisory_note}</p>
       ) : null}
       {effective.unimplemented_actions.length > 0 ? (
-        <p className="mt-2 text-[11px] text-gray-500">
+        <p className="mt-2 text-[11px] text-fg-muted">
           No executor is registered for{' '}
           <span className="font-mono">{effective.unimplemented_actions.join(', ')}</span>. Thresholds
           for these change nothing.
@@ -331,19 +331,19 @@ function EarnedAutonomy({ grants }: { grants: AutonomyGrant[] }) {
   if (grants.length === 0) return null;
 
   return (
-    <div className="mt-4 border-t border-gray-800 pt-3">
-      <p className="text-[11px] uppercase tracking-wide text-gray-500">Autonomy granted</p>
+    <div className="mt-4 border-t border-surface-border pt-3">
+      <p className="text-[11px] uppercase tracking-wide text-fg-muted">Autonomy granted</p>
       <ul className="mt-2 space-y-1.5">
         {grants.map((grant) => (
           <li key={grant.id} className="flex flex-wrap items-baseline gap-2 text-sm">
-            <span className="font-mono text-xs text-gray-300">
+            <span className="font-mono text-xs text-fg-secondary">
               {grant.capability} · {grant.scope_key}
             </span>
             <span
               className={clsx(
                 'rounded px-1.5 py-0.5 text-[11px] ring-1 ring-inset',
                 grant.state === 'demoted'
-                  ? 'bg-gray-500/10 text-gray-400 ring-gray-600/40'
+                  ? 'bg-gray-500/10 text-fg-secondary ring-surface-border-strong/40'
                   : grant.is_override
                     ? 'bg-amber-500/10 text-amber-300 ring-amber-500/30'
                     : 'bg-emerald-500/10 text-emerald-300 ring-emerald-500/30',
@@ -355,7 +355,7 @@ function EarnedAutonomy({ grants }: { grants: AutonomyGrant[] }) {
                   ? 'operator override'
                   : 'earned'}
             </span>
-            <span className="text-[11px] text-gray-500">
+            <span className="text-[11px] text-fg-muted">
               {grant.state === 'demoted'
                 ? grant.demoted_reason || 'the evidence no longer supports it'
                 : grant.is_override
@@ -372,7 +372,7 @@ function EarnedAutonomy({ grants }: { grants: AutonomyGrant[] }) {
 function TrackRecord({ record }: { record: TrackRecordSummary | null }) {
   if (record === null || !record.measured) {
     return (
-      <p className="mt-4 border-t border-gray-800 pt-3 text-xs text-gray-500">
+      <p className="mt-4 border-t border-surface-border pt-3 text-xs text-fg-muted">
         No measured track record yet. Enable shadow mode for an alert class and the agent&apos;s
         verdicts will be scored against your analysts&apos; own closures, here and in the source SIEM.
       </p>
@@ -380,8 +380,8 @@ function TrackRecord({ record }: { record: TrackRecordSummary | null }) {
   }
 
   return (
-    <div className="mt-4 border-t border-gray-800 pt-3">
-      <p className="text-[11px] uppercase tracking-wide text-gray-500">
+    <div className="mt-4 border-t border-surface-border pt-3">
+      <p className="text-[11px] uppercase tracking-wide text-fg-muted">
         Measured track record, last {record.windowDays} days
       </p>
       <dl className="mt-2 flex flex-wrap gap-x-6 gap-y-2">
@@ -404,7 +404,7 @@ function TrackRecord({ record }: { record: TrackRecordSummary | null }) {
           hint={`${record.maliciousSupport} / ${record.maliciousNeeded} malicious`}
         />
       </dl>
-      <p className="mt-2 text-[11px] text-gray-500">
+      <p className="mt-2 text-[11px] text-fg-muted">
         Most recent {record.recentAnswered} answered: {formatRate(record.recentAgreement)} agreement.
         Shown apart from the window because a decline that began this week is still
         absorbed by a month of earlier agreement.
@@ -424,11 +424,11 @@ function Stat({
 }) {
   return (
     <div>
-      <dt className="text-[11px] uppercase tracking-wide text-gray-500">{label}</dt>
-      <dd className="font-mono text-lg tabular-nums text-gray-100">{value}</dd>
+      <dt className="text-[11px] uppercase tracking-wide text-fg-muted">{label}</dt>
+      <dd className="font-mono text-lg tabular-nums text-fg-primary">{value}</dd>
       {/* Every rate on this card travels with the count it was computed over.
           100% over four answers is not the claim 100% over four hundred is. */}
-      {hint ? <p className="text-[11px] text-gray-500">{hint}</p> : null}
+      {hint ? <p className="text-[11px] text-fg-muted">{hint}</p> : null}
     </div>
   );
 }

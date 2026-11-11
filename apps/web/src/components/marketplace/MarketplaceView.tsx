@@ -140,7 +140,7 @@ const SEVERITY_COLORS: Record<string, string> = {
   high:     'bg-orange-900/40 text-orange-300 border-orange-700/60',
   medium:   'bg-yellow-900/40 text-yellow-300 border-yellow-700/60',
   low:      'bg-blue-900/40 text-blue-300 border-blue-700/60',
-  info:     'bg-slate-900/40 text-slate-300 border-slate-700/60',
+  info:     'bg-surface-card/40 text-fg-secondary border-surface-border/60',
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -168,7 +168,7 @@ function SeverityBadge({ severity }: { severity?: string }) {
     <span
       className={clsx(
         'inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide',
-        SEVERITY_COLORS[severity] ?? 'bg-zinc-700 text-zinc-300 border-zinc-600'
+        SEVERITY_COLORS[severity] ?? 'bg-surface-hover text-fg-secondary border-surface-border-strong'
       )}
     >
       {severity}
@@ -181,7 +181,7 @@ function TypeBadge({ type }: { type: string }) {
     <span
       className={clsx(
         'inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-xs font-medium',
-        TYPE_COLORS[type] ?? 'bg-zinc-700 text-zinc-300 border-zinc-600'
+        TYPE_COLORS[type] ?? 'bg-surface-hover text-fg-secondary border-surface-border-strong'
       )}
     >
       {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -235,13 +235,13 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
   const half = rating - full >= 0.5;
 
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
+    <span className="inline-flex items-center gap-1 text-xs text-fg-muted">
       <span className="text-yellow-400">
         {'★'.repeat(full)}
         {half ? '½' : ''}
         {'☆'.repeat(5 - full - (half ? 1 : 0))}
       </span>
-      <span className="text-zinc-500">
+      <span className="text-fg-subtle">
         {rating.toFixed(1)} ({count})
       </span>
     </span>
@@ -257,7 +257,7 @@ function MitreTechniquesRow({ ids }: { ids: string[] }) {
       className="flex flex-wrap items-center gap-1"
       title={`Maps to MITRE ATT&CK techniques: ${ids.join(', ')}`}
     >
-      <span className="text-[10px] uppercase tracking-wide text-zinc-500">
+      <span className="text-[10px] uppercase tracking-wide text-fg-subtle">
         ATT&amp;CK
       </span>
       {head.map((tid) => (
@@ -272,7 +272,7 @@ function MitreTechniquesRow({ ids }: { ids: string[] }) {
         </a>
       ))}
       {rest > 0 && (
-        <span className="rounded bg-zinc-700/60 px-1.5 py-0.5 text-[11px] text-zinc-400">
+        <span className="rounded bg-surface-hover/60 px-1.5 py-0.5 text-[11px] text-fg-muted">
           +{rest}
         </span>
       )}
@@ -296,7 +296,7 @@ function InstallButton({ item, installed, busy, onInstall, onUninstall }: Instal
     return (
       <span
         title={item.quarantine_reason || 'The engine does not load this rule, so installing it would enable nothing.'}
-        className="cursor-not-allowed rounded border border-zinc-700 px-2 py-1 text-xs font-medium text-zinc-500"
+        className="cursor-not-allowed rounded border border-surface-border px-2 py-1 text-xs font-medium text-fg-subtle"
       >
         Cannot install
       </span>
@@ -318,7 +318,7 @@ function InstallButton({ item, installed, busy, onInstall, onUninstall }: Instal
           onClick={() => onUninstall(item)}
           disabled={busy}
           title="Remove from this tenant"
-          className="rounded px-1.5 py-1 text-xs text-zinc-400 hover:text-rose-300 disabled:opacity-50"
+          className="rounded px-1.5 py-1 text-xs text-fg-muted hover:text-rose-300 disabled:opacity-50"
         >
           {busy ? '…' : '×'}
         </button>
@@ -330,7 +330,7 @@ function InstallButton({ item, installed, busy, onInstall, onUninstall }: Instal
     <button
       onClick={() => onInstall(item)}
       disabled={busy}
-      className="rounded bg-zinc-700 px-2 py-1 text-xs font-medium text-zinc-200 transition-colors hover:bg-zinc-600 disabled:opacity-60"
+      className="rounded bg-surface-hover px-2 py-1 text-xs font-medium text-fg-primary transition-colors hover:bg-zinc-600 disabled:opacity-60"
     >
       {busy ? '…' : 'Install'}
     </button>
@@ -393,10 +393,10 @@ function UpstreamAttribution({ provenance }: { provenance: NonNullable<Marketpla
   const licenceUrl = (provenance.license_url ?? '').trim();
 
   return (
-    <p className="text-xs leading-relaxed text-zinc-500">
+    <p className="text-xs leading-relaxed text-fg-subtle">
       {author ? (
         <>
-          Written by <span className="text-zinc-300">{author}</span>
+          Written by <span className="text-fg-secondary">{author}</span>
         </>
       ) : (
         <>No upstream author recorded</>
@@ -410,7 +410,7 @@ function UpstreamAttribution({ provenance }: { provenance: NonNullable<Marketpla
               href={ruleUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-zinc-400 underline decoration-dotted underline-offset-2 hover:text-zinc-200"
+              className="text-fg-muted underline decoration-dotted underline-offset-2 hover:text-fg-primary"
             >
               {source}
             </a>
@@ -427,7 +427,7 @@ function UpstreamAttribution({ provenance }: { provenance: NonNullable<Marketpla
               href={licenceUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-zinc-400 underline decoration-dotted underline-offset-2 hover:text-zinc-200"
+              className="text-fg-muted underline decoration-dotted underline-offset-2 hover:text-fg-primary"
             >
               {licence}
             </a>
@@ -443,10 +443,10 @@ function UpstreamAttribution({ provenance }: { provenance: NonNullable<Marketpla
 
 function ItemCard({ item, installed, busy, onInstall, onUninstall }: ItemCardProps) {
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-zinc-700/60 bg-zinc-800/60 p-4 hover:border-zinc-600 transition-colors">
+    <div className="flex flex-col gap-3 rounded-xl border border-surface-border/60 bg-surface-elevated/60 p-4 hover:border-surface-border-strong transition-colors">
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-sm font-semibold text-zinc-100 leading-snug line-clamp-2">
+        <h3 className="text-sm font-semibold text-fg-primary leading-snug line-clamp-2">
           {item.name}
         </h3>
         <div className="flex shrink-0 flex-wrap gap-1 justify-end">
@@ -467,7 +467,7 @@ function ItemCard({ item, installed, busy, onInstall, onUninstall }: ItemCardPro
       )}
 
       {/* Description */}
-      <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3">
+      <p className="text-xs text-fg-muted leading-relaxed line-clamp-3">
         {item.description}
       </p>
 
@@ -487,10 +487,10 @@ function ItemCard({ item, installed, busy, onInstall, onUninstall }: ItemCardPro
           {item.rating !== undefined && item.rating > 0 ? (
             <StarRating rating={item.rating} count={item.rating_count ?? 0} />
           ) : (
-            <span className="text-xs text-zinc-600">No ratings yet</span>
+            <span className="text-xs text-fg-secondary">No ratings yet</span>
           )}
           {item.install_count !== undefined && (
-            <span className="text-xs text-zinc-500">
+            <span className="text-xs text-fg-subtle">
               {item.install_count.toLocaleString()} installs
             </span>
           )}
@@ -498,29 +498,29 @@ function ItemCard({ item, installed, busy, onInstall, onUninstall }: ItemCardPro
       )}
 
       {/* Metadata row */}
-      <div className="flex flex-wrap items-center gap-2 mt-auto pt-2 border-t border-zinc-700/40">
+      <div className="flex flex-wrap items-center gap-2 mt-auto pt-2 border-t border-surface-border/40">
         {item.severity && <SeverityBadge severity={item.severity} />}
 
         {item.type === 'playbook' && item.trigger && (
-          <span className="text-xs text-zinc-500">
-            trigger: <span className="text-zinc-300">{item.trigger}</span>
+          <span className="text-xs text-fg-subtle">
+            trigger: <span className="text-fg-secondary">{item.trigger}</span>
           </span>
         )}
         {item.type === 'playbook' && item.steps !== undefined && (
-          <span className="text-xs text-zinc-500">{item.steps} steps</span>
+          <span className="text-xs text-fg-subtle">{item.steps} steps</span>
         )}
         {item.type === 'detection' && item.category && (
-          <span className="text-xs text-zinc-500">{item.category}</span>
+          <span className="text-xs text-fg-subtle">{item.category}</span>
         )}
         {item.type === 'detection' && item.log_source && (
-          <span className="text-xs text-zinc-500">via {item.log_source}</span>
+          <span className="text-xs text-fg-subtle">via {item.log_source}</span>
         )}
         {item.type === 'plugin' && item.plugin_type && (
-          <span className="text-xs text-zinc-500">{item.plugin_type}</span>
+          <span className="text-xs text-fg-subtle">{item.plugin_type}</span>
         )}
         {item.type === 'plugin' && <SdkChips sdks={item.sdks} />}
 
-        <span className="text-xs text-zinc-600">v{item.version}</span>
+        <span className="text-xs text-fg-secondary">v{item.version}</span>
         <div className="ml-auto">
           <InstallButton
             item={item}
@@ -543,14 +543,14 @@ function ItemCard({ item, installed, busy, onInstall, onUninstall }: ItemCardPro
               <span
                 key={tag}
                 title={title}
-                className="rounded bg-zinc-700/60 px-1.5 py-0.5 text-xs text-zinc-400"
+                className="rounded bg-surface-hover/60 px-1.5 py-0.5 text-xs text-fg-muted"
               >
                 {label}
               </span>
             );
           })}
           {item.tags.length > 4 && (
-            <span className="rounded bg-zinc-700/60 px-1.5 py-0.5 text-xs text-zinc-500">
+            <span className="rounded bg-surface-hover/60 px-1.5 py-0.5 text-xs text-fg-subtle">
               +{item.tags.length - 4}
             </span>
           )}
@@ -982,14 +982,14 @@ export function MarketplaceView() {
       {/* Page Header */}
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-[280px] flex-1">
-          <h1 className="text-2xl font-bold text-zinc-100">Marketplace</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-zinc-100 */>Marketplace</h1>
+          <p className="mt-1 text-sm text-fg-muted">
             Browse and install detection rules, response playbooks, and plugins shipped with AiSOC. Every entry is generated directly from the
-            repo&rsquo;s <code className="text-zinc-300">detections/</code>,{' '}
-            <code className="text-zinc-300">playbooks/</code> and{' '}
-            <code className="text-zinc-300">plugins/</code> trees, so what you see here is what your AiSOC instance has on disk.
+            repo&rsquo;s <code className="text-fg-secondary">detections/</code>,{' '}
+            <code className="text-fg-secondary">playbooks/</code> and{' '}
+            <code className="text-fg-secondary">plugins/</code> trees, so what you see here is what your AiSOC instance has on disk.
           </p>
-          <p className="mt-2 text-sm text-zinc-400">
+          <p className="mt-2 text-sm text-fg-muted">
             <span className="font-medium text-amber-300">On disk is not the same as running.</span>{' '}
             Much of this catalogue is imported upstream content the detection engine does not load —
             kept for provenance and for porting, marked{' '}
@@ -1057,7 +1057,7 @@ export function MarketplaceView() {
           {[
             { label: 'Installable',    value: installableCount,   color: 'text-emerald-400', title: 'Detection rules the engine loads, plus every playbook and plugin — everything here can be installed — these can fire.' },
             { label: 'Reference only', value: referenceOnlyCount, color: 'text-amber-400',   title: 'Present on disk and not loaded by the engine. They cannot fire; they are here for provenance and for porting.' },
-            { label: 'Total',          value: stats.total,        color: 'text-zinc-100',    title: 'Every entry in the catalogue, executable or not.' },
+            { label: 'Total',          value: stats.total,        color: 'text-fg-primary',    title: 'Every entry in the catalogue, executable or not.' },
             { label: 'Playbooks',      value: stats.playbooks,    color: 'text-purple-300' },
             { label: 'Detections',     value: stats.detections,   color: 'text-cyan-300' },
             { label: 'Plugins',        value: stats.plugins,      color: 'text-emerald-300' },
@@ -1065,10 +1065,10 @@ export function MarketplaceView() {
             <div
               key={label}
               title={title}
-              className="rounded-xl border border-zinc-700/60 bg-zinc-800/60 p-4 text-center"
+              className="rounded-xl border border-surface-border/60 bg-surface-elevated/60 p-4 text-center"
             >
               <p className={clsx('text-3xl font-bold tabular-nums', color)}>{value}</p>
-              <p className="mt-1 text-xs text-zinc-500">{label}</p>
+              <p className="mt-1 text-xs text-fg-subtle">{label}</p>
             </div>
           ))}
         </div>
@@ -1081,18 +1081,18 @@ export function MarketplaceView() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by name, description, tag, MITRE ID, or item ID…"
-          className="flex-1 min-w-[240px] rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+          className="flex-1 min-w-[240px] rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-fg-primary placeholder-zinc-500 focus:border-surface-border-strong focus:outline-none"
         />
 
         {/* Type filter */}
-        <div className="flex gap-1 rounded-lg border border-zinc-700 bg-zinc-800 p-1">
+        <div className="flex gap-1 rounded-lg border border-surface-border bg-surface-elevated p-1">
           {(['all', 'playbook', 'detection', 'plugin'] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTypeFilter(t)}
               className={clsx(
                 'rounded px-2.5 py-1.5 text-xs font-medium transition-colors capitalize',
-                typeFilter === t ? 'bg-zinc-600 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'
+                typeFilter === t ? 'bg-zinc-600 text-fg-primary' : 'text-fg-muted hover:text-fg-primary'
               )}
             >
               {t === 'all' ? 'All' : `${t.charAt(0).toUpperCase() + t.slice(1)}s`}
@@ -1101,14 +1101,14 @@ export function MarketplaceView() {
         </div>
 
         {/* Source filter (core vs community) */}
-        <div className="flex gap-1 rounded-lg border border-zinc-700 bg-zinc-800 p-1">
+        <div className="flex gap-1 rounded-lg border border-surface-border bg-surface-elevated p-1">
           {(['all', 'core', 'community'] as const).map((s) => (
             <button
               key={s}
               onClick={() => setSourceFilter(s)}
               className={clsx(
                 'rounded px-2.5 py-1.5 text-xs font-medium transition-colors capitalize',
-                sourceFilter === s ? 'bg-zinc-600 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'
+                sourceFilter === s ? 'bg-zinc-600 text-fg-primary' : 'text-fg-muted hover:text-fg-primary'
               )}
             >
               {s === 'all' ? 'All sources' : s}
@@ -1120,7 +1120,7 @@ export function MarketplaceView() {
             Separate from the tier chips below: tier is provenance, this is
             capability, and the two disagree in both directions. */}
         <div
-          className="flex gap-1 rounded-lg border border-zinc-700 bg-zinc-800 p-1"
+          className="flex gap-1 rounded-lg border border-surface-border bg-surface-elevated p-1"
           title="Installable = every entry you can install: the detection rules the engine loads, plus the playbooks and plugins, which are not rules. Reference only = present on disk and not loaded by the engine, so it cannot fire."
         >
           {([
@@ -1133,11 +1133,11 @@ export function MarketplaceView() {
               onClick={() => setRunsFilter(value)}
               className={clsx(
                 'rounded px-2.5 py-1.5 text-xs font-medium transition-colors',
-                runsFilter === value ? 'bg-zinc-600 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200',
+                runsFilter === value ? 'bg-zinc-600 text-fg-primary' : 'text-fg-muted hover:text-fg-primary',
               )}
             >
               {label}
-              {count !== undefined && <span className="ml-1 text-zinc-500">({count})</span>}
+              {count !== undefined && <span className="ml-1 text-fg-subtle">({count})</span>}
             </button>
           ))}
         </div>
@@ -1146,7 +1146,7 @@ export function MarketplaceView() {
             hand-authored detections don't get drowned in imported Sigma
             content. Users opt into imported/beta/community explicitly. */}
         <div
-          className="flex gap-1 rounded-lg border border-zinc-700 bg-zinc-800 p-1"
+          className="flex gap-1 rounded-lg border border-surface-border bg-surface-elevated p-1"
           title="Stable = native AiSOC content. Imported = upstream rules (SigmaHQ, Splunk, Chronicle, CAR), parseable but not fixture-tested. Beta = working but partial. Community = third-party."
         >
           {(['all', 'stable', 'beta', 'imported', 'community'] as const).map((t) => {
@@ -1158,11 +1158,11 @@ export function MarketplaceView() {
                 onClick={() => setTierFilter(t)}
                 className={clsx(
                   'rounded px-2.5 py-1.5 text-xs font-medium transition-colors',
-                  tierFilter === t ? 'bg-zinc-600 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'
+                  tierFilter === t ? 'bg-zinc-600 text-fg-primary' : 'text-fg-muted hover:text-fg-primary'
                 )}
               >
                 {label}
-                {count > 0 && <span className="ml-1 text-zinc-500">({count})</span>}
+                {count > 0 && <span className="ml-1 text-fg-subtle">({count})</span>}
               </button>
             );
           })}
@@ -1174,7 +1174,7 @@ export function MarketplaceView() {
         <select
           value={severityFilter}
           onChange={(e) => setSeverityFilter(e.target.value)}
-          className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-fg-secondary focus:border-surface-border-strong focus:outline-none"
         >
           <option value="all">All severities</option>
           <option value="critical">Critical</option>
@@ -1187,7 +1187,7 @@ export function MarketplaceView() {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+            className="rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-fg-secondary focus:border-surface-border-strong focus:outline-none"
           >
             <option value="all">All categories</option>
             {categoryOptions.map((c) => (
@@ -1219,7 +1219,7 @@ export function MarketplaceView() {
         <select
           value={sdkFilter}
           onChange={(e) => setSdkFilter(e.target.value as SdkFilter)}
-          className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-fg-secondary focus:border-surface-border-strong focus:outline-none"
           title="Filter plugins by SDK availability"
         >
           <option value="all">Any SDK</option>
@@ -1240,28 +1240,28 @@ export function MarketplaceView() {
 
       {/* Sort bar */}
       <div className="flex items-center gap-2 -mt-3">
-        <span className="text-xs text-zinc-500">Sort by:</span>
+        <span className="text-xs text-fg-subtle">Sort by:</span>
         {(['name', 'install_count', 'rating'] as SortOption[]).map((field) => (
           <button
             key={field}
             onClick={() => toggleSort(field)}
             className={clsx(
               'text-xs px-2 py-1 rounded transition-colors',
-              sortBy === field ? 'text-zinc-100 bg-zinc-700' : 'text-zinc-400 hover:text-zinc-200'
+              sortBy === field ? 'text-fg-primary bg-surface-hover' : 'text-fg-muted hover:text-fg-primary'
             )}
           >
             {field === 'install_count' ? 'Installs' : field === 'rating' ? 'Rating' : 'Name'}
             {sortBy === field && (sortOrder === 'desc' ? ' ↓' : ' ↑')}
           </button>
         ))}
-        <span className="ml-auto text-xs text-zinc-500">
+        <span className="ml-auto text-xs text-fg-subtle">
           Showing {items.length} of {catalogue.length}
         </span>
       </div>
 
       {/* Grid */}
       {isLoading && (
-        <div className="flex items-center justify-center py-20 text-zinc-500">
+        <div className="flex items-center justify-center py-20 text-fg-subtle">
           Loading marketplace…
         </div>
       )}

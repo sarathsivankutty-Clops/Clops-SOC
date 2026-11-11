@@ -85,8 +85,8 @@ export default function CoverageAdvisorView() {
   return (
     <div className="space-y-8 p-6 max-w-7xl mx-auto">
       <div>
-        <h1 className="text-2xl font-bold text-white">Coverage Gap Advisor</h1>
-        <p className="text-gray-400 mt-1">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-white */>Coverage Gap Advisor</h1>
+        <p className="text-fg-muted mt-1">
           MITRE ATT&amp;CK techniques your detection rules reference, ranked by how much enabled
           coverage each one has.
         </p>
@@ -121,7 +121,7 @@ export default function CoverageAdvisorView() {
             action={
               <Link
                 href="/detection"
-                className="rounded-lg bg-gray-800 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 transition-colors"
+                className="rounded-lg bg-surface-elevated px-4 py-2 text-sm text-fg-primary hover:bg-surface-hover transition-colors"
               >
                 Browse detection rules
               </Link>
@@ -148,16 +148,16 @@ export default function CoverageAdvisorView() {
             />
           </div>
 
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-fg-subtle">
             Scope: this endpoint reports one row per technique at least one of your rules
             references. Techniques with no rule at all do not appear, so the fraction above is
             coverage of your own corpus and not of ATT&amp;CK. Generated{' '}
             {data?.generatedAt ?? 'unknown'}.
           </p>
 
-          <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 overflow-hidden">
-            <div className="px-5 py-4 border-b border-gray-800/60 flex flex-wrap items-center gap-3">
-              <h2 className="text-lg font-semibold text-white flex-1 min-w-0">Gap analysis</h2>
+          <div className="rounded-xl border border-surface-border/60 bg-surface-card/40 overflow-hidden">
+            <div className="px-5 py-4 border-b border-surface-border/60 flex flex-wrap items-center gap-3">
+              <h2 className="text-lg font-semibold text-fg-primary flex-1 min-w-0">Gap analysis</h2>
               <div className="flex gap-2">
                 {FILTERS.map((f) => (
                   <button
@@ -167,7 +167,7 @@ export default function CoverageAdvisorView() {
                       'text-xs px-3 py-1 rounded-lg border transition-colors',
                       statusFilter === f.id
                         ? 'bg-blue-600/15 text-blue-300 border-blue-600/30'
-                        : 'text-gray-400 border-gray-800 hover:border-gray-700',
+                        : 'text-fg-muted border-surface-border hover:border-surface-border',
                     )}
                     aria-pressed={statusFilter === f.id}
                   >
@@ -180,7 +180,7 @@ export default function CoverageAdvisorView() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-800/60 text-left text-gray-400">
+                  <tr className="border-b border-surface-border/60 text-left text-fg-muted">
                     <th className="px-5 py-3 font-medium">Technique</th>
                     <th className="px-5 py-3 font-medium">Tactic</th>
                     <th className="px-5 py-3 font-medium text-center">Enabled rules</th>
@@ -201,7 +201,7 @@ export default function CoverageAdvisorView() {
                             <button
                               type="button"
                               onClick={() => setStatusFilter('all')}
-                              className="rounded-lg bg-gray-800 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 transition-colors"
+                              className="rounded-lg bg-surface-elevated px-4 py-2 text-sm text-fg-primary hover:bg-surface-hover transition-colors"
                             >
                               Show all techniques
                             </button>
@@ -235,10 +235,10 @@ function GapAnalysisSection({ children }: { children: React.ReactNode }) {
 
 function SummaryCard({ label, value, hint }: { label: string; value: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4">
-      <p className="text-xs text-gray-400 uppercase tracking-wider">{label}</p>
-      <p className="mt-1 text-2xl font-semibold text-white">{value}</p>
-      {hint && <p className="mt-0.5 text-[11px] text-gray-500">{hint}</p>}
+    <div className="rounded-xl border border-surface-border/60 bg-surface-card/40 p-4">
+      <p className="text-xs text-fg-muted uppercase tracking-wider">{label}</p>
+      <p className="mt-1 text-2xl font-semibold text-fg-primary">{value}</p>
+      {hint && <p className="mt-0.5 text-[11px] text-fg-subtle">{hint}</p>}
     </div>
   );
 }
@@ -248,7 +248,7 @@ function CoverageRow({ cell }: { cell: DetectionCoverageCell }) {
   const style = STATUS_STYLES[status];
 
   return (
-    <tr className="border-b border-gray-800/40 hover:bg-gray-800/30 transition-colors">
+    <tr className="border-b border-surface-border/40 hover:bg-surface-elevated/30 transition-colors">
       <td className="px-5 py-3 font-mono text-xs">
         <a
           href={`https://attack.mitre.org/techniques/${cell.techniqueId.replace('.', '/')}/`}
@@ -258,11 +258,11 @@ function CoverageRow({ cell }: { cell: DetectionCoverageCell }) {
         >
           {cell.techniqueId}
         </a>
-        {cell.techniqueName && <span className="ml-2 text-gray-300">{cell.techniqueName}</span>}
+        {cell.techniqueName && <span className="ml-2 text-fg-secondary">{cell.techniqueName}</span>}
       </td>
-      <td className="px-5 py-3 text-gray-300">{cell.tactic ?? 'unmapped'}</td>
-      <td className="px-5 py-3 text-center text-gray-200">{cell.activeRules}</td>
-      <td className="px-5 py-3 text-center text-gray-200">{cell.inactiveRules}</td>
+      <td className="px-5 py-3 text-fg-secondary">{cell.tactic ?? 'unmapped'}</td>
+      <td className="px-5 py-3 text-center text-fg-primary">{cell.activeRules}</td>
+      <td className="px-5 py-3 text-center text-fg-primary">{cell.inactiveRules}</td>
       <td className="px-5 py-3 text-center">
         <span
           className={clsx(
@@ -274,7 +274,7 @@ function CoverageRow({ cell }: { cell: DetectionCoverageCell }) {
           {style.label}
         </span>
       </td>
-      <td className="px-5 py-3 text-gray-400">
+      <td className="px-5 py-3 text-fg-muted">
         {status === 'unenforced' ? (
           // A real navigation to the rules that exist and are switched off,
           // rather than the success toast that used to claim a draft rule had
@@ -286,7 +286,7 @@ function CoverageRow({ cell }: { cell: DetectionCoverageCell }) {
             {`Enable one of ${cell.inactiveRules} rule${cell.inactiveRules === 1 ? '' : 's'} disabled`}
           </Link>
         ) : (
-          <span className="text-xs text-gray-500">Nothing to do</span>
+          <span className="text-xs text-fg-subtle">Nothing to do</span>
         )}
       </td>
     </tr>

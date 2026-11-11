@@ -42,9 +42,9 @@ const VARIANT_STYLES: Record<EmptyStateVariant, {
 }> = {
   default: {
     container:
-      'border-gray-800 bg-gray-900/30',
+      'border-surface-border bg-surface-sunken/40',
     iconWrap:
-      'bg-gray-800/60 text-blue-400',
+      'bg-surface-sunken text-brand-400',
     badge: '',
     badgeLabel: '',
   },
@@ -101,9 +101,9 @@ export function EmptyState({
         </div>
       )}
       {showBadge && <span className={clsx('mb-3', styles.badge)}>{badgeText}</span>}
-      <Heading className="text-base font-semibold text-gray-100">{title}</Heading>
+      <Heading className="text-base font-semibold text-fg-primary">{title}</Heading>
       {description && (
-        <p className="mt-1 max-w-md text-sm text-gray-500">{description}</p>
+        <p className="mt-1 max-w-md text-sm text-fg-muted">{description}</p>
       )}
       {action && variant === 'default' && <div className="mt-5">{action}</div>}
     </div>

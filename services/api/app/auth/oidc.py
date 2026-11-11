@@ -39,6 +39,8 @@ from fastapi.responses import JSONResponse, RedirectResponse, Response
 
 from app.api.v1.deps import DBSession
 from app.auth.sso_provisioning import SsoProvisioningError, complete_sso_login
+from app.core.logging import safe_log_value
+from app.core.security import record_auth_metric
 
 logger = logging.getLogger(__name__)
 
@@ -215,6 +217,20 @@ async def _pop_state(state: str) -> dict[str, str] | None:
 _SAFE_REDIRECT_RE = re.compile(r"^/[\w\-./]*$")
 # Characters allowed in a safe relative redirect path.
 _SAFE_PATH_CHARS_RE = re.compile(r"[^\w\-./]")
+# Characters allowed in an optional upstream IdP broker hint (e.g. kc_idp_hint=google).
+_SAFE_IDP_HINT_RE = re.compile(r"^[a-zA-Z0-9_\-]{1,64}$")
+
+
+def _sanitize_idp_hint(hint: str | None) -> str | None:
+    """Validate and return a clean IdP hint token, or None if invalid/absent."""
+    if not hint:
+        return None
+    cleaned = hint.strip()
+    if _SAFE_IDP_HINT_RE.match(cleaned):
+        return cleaned
+    logger.warning("oidc.invalid_idp_hint_rejected hint=%s", safe_log_value(hint, 64))
+    record_auth_metric("oidc", "idp_hint_validation", "rejected")
+    return None
 
 
 def _sso_feature_enabled() -> bool:
@@ -244,6 +260,9 @@ def _safe_redirect(url: str) -> str:
         # is not considered tainted by static analysis tools.
         safe_path = "/" + _SAFE_PATH_CHARS_RE.sub("", url.lstrip("/"))
         return safe_path
+    if url and url != "/":
+        logger.warning("oidc.invalid_redirect_rejected target=%s", safe_log_value(url, 120))
+        record_auth_metric("oidc", "redirect_validation", "rejected")
     return "/"
 
 
@@ -251,7 +270,11 @@ def _safe_redirect(url: str) -> str:
 
 
 @router.get("/login")
-async def oidc_login(request: Request, redirect: str = "/") -> Response:
+async def oidc_login(
+    request: Request,
+    redirect: str = "/",
+    kc_idp_hint: str | None = Query(default=None, max_length=64),
+) -> Response:
     """Initiate OIDC authorization code flow."""
     _require_sso_enabled()
     issuer = os.getenv("OIDC_ISSUER")
@@ -276,6 +299,12 @@ async def oidc_login(request: Request, redirect: str = "/") -> Response:
     try:
         provider = await _discover(issuer)
     except Exception as exc:
+        logger.error(
+            "oidc.discovery_failed issuer=%s error=%s",
+            safe_log_value(issuer, 120),
+            safe_log_value(type(exc).__name__, 64),
+        )
+        record_auth_metric("oidc", "login_started", "discovery_error")
         raise HTTPException(status_code=502, detail=f"OIDC discovery failed: {exc}") from exc
 
     state = secrets.token_urlsafe(32)
@@ -291,6 +320,10 @@ async def oidc_login(request: Request, redirect: str = "/") -> Response:
         "nonce": nonce,
     }
 
+    safe_hint = _sanitize_idp_hint(kc_idp_hint)
+    if safe_hint:
+        params["kc_idp_hint"] = safe_hint
+
     if use_pkce:
         verifier = secrets.token_urlsafe(64)
         challenge = hashlib.sha256(verifier.encode()).digest()
@@ -302,6 +335,14 @@ async def oidc_login(request: Request, redirect: str = "/") -> Response:
         state_data["verifier"] = verifier
 
     await _store_state(state, state_data)
+
+    logger.info(
+        "oidc.login_started redirect=%s idp_hint=%s pkce=%s",
+        safe_log_value(safe_redirect, 120),
+        safe_log_value(safe_hint or "none", 64),
+        use_pkce,
+    )
+    record_auth_metric("oidc", "login_started", "initiated")
 
     auth_url = provider["authorization_endpoint"] + "?" + urlencode(params)
     response = RedirectResponse(url=auth_url)
@@ -319,10 +360,14 @@ async def oidc_callback(
 ) -> Response:
     """Handle OIDC authorization code callback and issue JWT."""
     if error:
+        logger.warning("oidc.callback_error error=%s", safe_log_value(error, 120))
+        record_auth_metric("oidc", "callback", "idp_error")
         raise HTTPException(status_code=400, detail=f"OIDC error: {error}")
 
     state_data = await _pop_state(state)
     if state_data is None:
+        logger.warning("oidc.state_invalid")
+        record_auth_metric("oidc", "callback", "invalid_state")
         raise HTTPException(status_code=400, detail="Invalid or expired OIDC state")
 
     issuer = os.getenv("OIDC_ISSUER", "")
@@ -333,6 +378,12 @@ async def oidc_callback(
     try:
         provider = await _discover(issuer)
     except Exception as exc:
+        logger.error(
+            "oidc.discovery_failed issuer=%s error=%s",
+            safe_log_value(issuer, 120),
+            safe_log_value(type(exc).__name__, 64),
+        )
+        record_auth_metric("oidc", "callback", "discovery_error")
         raise HTTPException(status_code=502, detail=f"OIDC discovery failed: {exc}") from exc
 
     # Exchange code for tokens
@@ -353,6 +404,8 @@ async def oidc_callback(
             headers={"Accept": "application/json"},
         )
         if not token_resp.is_success:
+            logger.warning("oidc.token_exchange_failed status=%d", token_resp.status_code)
+            record_auth_metric("oidc", "callback", "token_exchange_error")
             raise HTTPException(status_code=502, detail=f"Token exchange failed: {token_resp.text}")
         tokens = token_resp.json()
 
@@ -380,6 +433,7 @@ async def oidc_callback(
                 str(issuer).replace("\r", "").replace("\n", " ")[:200],
                 str(exc).replace("\r", "").replace("\n", " ")[:200],
             )
+            record_auth_metric("oidc", "callback", "id_token_rejected")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="The identity provider's id_token could not be verified.",
@@ -394,6 +448,7 @@ async def oidc_callback(
                 "oidc.nonce_mismatch issuer=%s",
                 str(issuer).replace("\r", "").replace("\n", " ")[:200],
             )
+            record_auth_metric("oidc", "callback", "nonce_mismatch")
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="The identity provider's response did not match this sign-in attempt.",
@@ -451,7 +506,23 @@ async def oidc_callback(
         # A specific reason, not a generic failure. "No SSO connection is
         # configured for this issuer" is an administrator's next action;
         # "login failed" is a support ticket.
+        logger.warning(
+            "oidc.provisioning_failed issuer=%s reason=%s",
+            safe_log_value(issuer, 120),
+            safe_log_value(exc, 160),
+        )
+        record_auth_metric("oidc", "login_completed", "provisioning_denied")
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(exc)) from exc
+
+    logger.info(
+        "oidc.login_succeeded user_id=%s tenant_id=%s role=%s mfa_challenged=%s provisioned=%s",
+        safe_log_value(session.get("user_id"), 64),
+        safe_log_value(session.get("tenant_id"), 64),
+        safe_log_value(session.get("role"), 40),
+        bool(session.get("mfa_required") or session.get("mfa_enrollment_required")),
+        bool(session.get("provisioned")),
+    )
+    record_auth_metric("oidc", "login_completed", "succeeded")
 
     # Land on the login page with the session in the fragment, NOT directly
     # on the requested page: the fragment consumer lives on /login, and any
@@ -541,6 +612,8 @@ async def oidc_logout(request: Request, post_logout_redirect_uri: str = "/") -> 
     """RP-initiated logout — clear cookie and redirect to provider end_session."""
     issuer = os.getenv("OIDC_ISSUER")
     safe_uri = _safe_redirect(post_logout_redirect_uri)
+    logger.info("oidc.logout redirect=%s", safe_log_value(safe_uri, 120))
+    record_auth_metric("oidc", "logout", "succeeded")
     response = RedirectResponse(url=safe_uri, status_code=302)
     response.delete_cookie("aisoc_token")
 

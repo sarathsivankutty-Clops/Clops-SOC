@@ -64,7 +64,7 @@ function windowLabel(run: ReplayEvaluationSummary): string {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  queued: 'bg-slate-500/15 text-slate-300 border-slate-500/30',
+  queued: 'bg-slate-500/15 text-fg-secondary border-surface-border-strong/30',
   running: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
   completed: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
   failed: 'bg-rose-500/15 text-rose-300 border-rose-500/30',
@@ -96,10 +96,10 @@ function Figure({
   over: string;
 }) {
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-900/40 p-4">
-      <div className="text-xs uppercase tracking-wide text-slate-400">{label}</div>
-      <div className="mt-1 text-2xl font-semibold text-slate-100">{value}</div>
-      <div className="mt-1 text-xs text-slate-400">{over}</div>
+    <div className="rounded-lg border border-surface-border bg-surface-card/40 p-4">
+      <div className="text-xs uppercase tracking-wide text-fg-muted">{label}</div>
+      <div className="mt-1 text-2xl font-semibold text-fg-primary">{value}</div>
+      <div className="mt-1 text-xs text-fg-muted">{over}</div>
     </div>
   );
 }
@@ -176,19 +176,19 @@ function StartPanel({
   }
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5">
-      <h2 className="text-sm font-semibold text-slate-200">Run an evaluation</h2>
-      <p className="mt-1 max-w-3xl text-sm text-slate-400">
+    <div className="rounded-xl border border-surface-border bg-surface-card/40 p-5">
+      <h2 className="text-sm font-semibold text-fg-primary">Run an evaluation</h2>
+      <p className="mt-1 max-w-3xl text-sm text-fg-muted">
         AiSOC reads the findings your analysts closed in this window, replays them through the
         same triage path production runs, and grades the result against the labels they chose.
         Nothing is written back to your SIEM and no alert, memory or action is created.
       </p>
 
       <div className="mt-4 flex flex-wrap items-end gap-4">
-        <label className="flex flex-col gap-1 text-xs text-slate-400">
+        <label className="flex flex-col gap-1 text-xs text-fg-muted">
           Source
           <select
-            className="min-w-[16rem] rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+            className="min-w-[16rem] rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-fg-primary"
             value={connectorId}
             onChange={(event) => setChosen(event.target.value)}
           >
@@ -200,10 +200,10 @@ function StartPanel({
           </select>
         </label>
 
-        <label className="flex flex-col gap-1 text-xs text-slate-400">
+        <label className="flex flex-col gap-1 text-xs text-fg-muted">
           Window
           <select
-            className="rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-100"
+            className="rounded-md border border-surface-border bg-surface-base px-3 py-2 text-sm text-fg-primary"
             value={days}
             onChange={(event) => setDays(Number(event.target.value))}
           >
@@ -226,7 +226,7 @@ function StartPanel({
       </div>
 
       {capabilities ? (
-        <p className="mt-3 text-xs text-slate-500">
+        <p className="mt-3 text-xs text-fg-subtle">
           The earlier {Math.round(capabilities.default_train_fraction * 100)}% of the window fixes
           what the agent is allowed to know; only the later period is graded. A headline accuracy
           is printed only when that period holds at least {capabilities.min_malicious_for_headline}{' '}
@@ -246,7 +246,7 @@ function StartPanel({
 function Headline({ run }: { run: ReplayEvaluationDetail }) {
   const withheld = run.headline_accuracy === null;
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5">
+    <div className="rounded-xl border border-surface-border bg-surface-card/40 p-5">
       <div className="grid gap-4 sm:grid-cols-3">
         <Figure
           label="Recall on malicious"
@@ -291,43 +291,43 @@ function MethodPanel({ run }: { run: ReplayEvaluationDetail }) {
   const attempted = Object.values(writes).reduce((total, count) => total + (count || 0), 0);
 
   return (
-    <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5">
-      <h3 className="text-sm font-semibold text-slate-200">Method and sample sizes</h3>
+    <div className="rounded-xl border border-surface-border bg-surface-card/40 p-5">
+      <h3 className="text-sm font-semibold text-fg-primary">Method and sample sizes</h3>
 
       <dl className="mt-3 grid gap-x-8 gap-y-2 text-sm sm:grid-cols-2">
-        <div className="flex justify-between gap-4 border-b border-slate-800 py-1">
-          <dt className="text-slate-400">Source</dt>
-          <dd className="text-slate-200">{run.vendor}</dd>
+        <div className="flex justify-between gap-4 border-b border-surface-border py-1">
+          <dt className="text-fg-muted">Source</dt>
+          <dd className="text-fg-primary">{run.vendor}</dd>
         </div>
-        <div className="flex justify-between gap-4 border-b border-slate-800 py-1">
-          <dt className="text-slate-400">Window</dt>
-          <dd className="text-slate-200">{windowLabel(run)}</dd>
+        <div className="flex justify-between gap-4 border-b border-surface-border py-1">
+          <dt className="text-fg-muted">Window</dt>
+          <dd className="text-fg-primary">{windowLabel(run)}</dd>
         </div>
-        <div className="flex justify-between gap-4 border-b border-slate-800 py-1">
-          <dt className="text-slate-400">Split</dt>
-          <dd className="text-slate-200">
+        <div className="flex justify-between gap-4 border-b border-surface-border py-1">
+          <dt className="text-fg-muted">Split</dt>
+          <dd className="text-fg-primary">
             {split.train_findings ?? 0} train / {split.test_findings ?? 0} graded, cut at{' '}
             {when(split.split_at ?? null)}
           </dd>
         </div>
-        <div className="flex justify-between gap-4 border-b border-slate-800 py-1">
-          <dt className="text-slate-400">Confidence intervals</dt>
-          <dd className="text-slate-200">
+        <div className="flex justify-between gap-4 border-b border-surface-border py-1">
+          <dt className="text-fg-muted">Confidence intervals</dt>
+          <dd className="text-fg-primary">
             bootstrap, {run.bootstrap_resamples} resamples, seed {run.bootstrap_seed}
           </dd>
         </div>
-        <div className="flex justify-between gap-4 border-b border-slate-800 py-1">
-          <dt className="text-slate-400">Frozen context</dt>
-          <dd className="text-slate-200">
+        <div className="flex justify-between gap-4 border-b border-surface-border py-1">
+          <dt className="text-fg-muted">Frozen context</dt>
+          <dd className="text-fg-primary">
             {frozen.statements_frozen ?? 0} statements, {frozen.priors_frozen ?? 0} priors
             {frozen.statements_dropped_after_split
               ? `, ${frozen.statements_dropped_after_split} dropped as later than the split`
               : ''}
           </dd>
         </div>
-        <div className="flex justify-between gap-4 border-b border-slate-800 py-1">
-          <dt className="text-slate-400">Writes suppressed</dt>
-          <dd className="text-slate-200">
+        <div className="flex justify-between gap-4 border-b border-surface-border py-1">
+          <dt className="text-fg-muted">Writes suppressed</dt>
+          <dd className="text-fg-primary">
             {attempted} attempted, 0 performed
           </dd>
         </div>
@@ -335,10 +335,10 @@ function MethodPanel({ run }: { run: ReplayEvaluationDetail }) {
 
       {limits.length > 0 ? (
         <div className="mt-4">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
             What a replayed finding does not carry
           </h4>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-400">
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-fg-muted">
             {limits.map((limit) => (
               <li key={limit}>{limit}</li>
             ))}
@@ -359,17 +359,17 @@ function ExportBar({ id }: { id: string }) {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <span className="text-xs uppercase tracking-wide text-slate-400">Export</span>
+      <span className="text-xs uppercase tracking-wide text-fg-muted">Export</span>
       {formats.map(({ format, label }) => (
         <a
           key={format}
           href={evaluationsApi.exportUrl(id, format, excludeLatency)}
-          className="rounded-md border border-slate-700 px-3 py-1.5 text-sm text-slate-200 hover:border-slate-500"
+          className="rounded-md border border-surface-border px-3 py-1.5 text-sm text-fg-primary hover:border-surface-border-strong"
         >
           {label}
         </a>
       ))}
-      <label className="flex items-center gap-2 text-xs text-slate-400">
+      <label className="flex items-center gap-2 text-xs text-fg-muted">
         <input
           type="checkbox"
           checked={excludeLatency}
@@ -395,7 +395,7 @@ function ReportPanel({ run }: { run: ReplayEvaluationDetail }) {
   }
   if (run.status !== 'completed') {
     return (
-      <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5 text-sm text-slate-400">
+      <div className="rounded-xl border border-surface-border bg-surface-card/40 p-5 text-sm text-fg-muted">
         This evaluation is {run.status}. Replaying a window of findings through triage takes a
         few minutes; the report appears here when it finishes.
       </div>
@@ -407,8 +407,8 @@ function ReportPanel({ run }: { run: ReplayEvaluationDetail }) {
       <Headline run={run} />
       <MethodPanel run={run} />
       <ExportBar id={run.id} />
-      <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5">
-        <h3 className="text-sm font-semibold text-slate-200">Full report</h3>
+      <div className="rounded-xl border border-surface-border bg-surface-card/40 p-5">
+        <h3 className="text-sm font-semibold text-fg-primary">Full report</h3>
         {/*
           Rendered as preformatted text rather than through a Markdown
           renderer. The report embeds connector-supplied values and model
@@ -416,7 +416,7 @@ function ReportPanel({ run }: { run: ReplayEvaluationDetail }) {
           and this is the one presentation that cannot turn any of it into
           markup. The same bytes are what the Markdown export downloads.
         */}
-        <pre className="mt-3 max-h-[36rem] overflow-auto whitespace-pre-wrap break-words rounded-lg bg-slate-950 p-4 font-mono text-xs leading-relaxed text-slate-300">
+        <pre className="mt-3 max-h-[36rem] overflow-auto whitespace-pre-wrap break-words rounded-lg bg-surface-base p-4 font-mono text-xs leading-relaxed text-fg-secondary">
           {run.report_markdown}
         </pre>
       </div>
@@ -473,8 +473,8 @@ export function ReplayEvaluationView() {
   return (
     <div className="space-y-6 p-6">
       <header>
-        <h1 className="text-xl font-semibold text-slate-100">Evaluate on your history</h1>
-        <p className="mt-1 max-w-3xl text-sm text-slate-400">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-xl font-semibold text-slate-100 */>Evaluate on your history</h1>
+        <p className="mt-1 max-w-3xl text-sm text-fg-muted">
           Measure AiSOC triage against your own analysts&apos; past decisions, on your own data,
           before trusting it. Every rate below travels with the number of cases it was computed
           over.
@@ -497,7 +497,7 @@ export function ReplayEvaluationView() {
       {(runs?.length ?? 0) > 0 ? (
         <div className="grid gap-6 lg:grid-cols-[18rem_1fr]">
           <aside className="space-y-2">
-            <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            <h2 className="text-xs font-semibold uppercase tracking-wide text-fg-muted">
               Evaluations
             </h2>
             {runs?.map((run) => (
@@ -509,15 +509,15 @@ export function ReplayEvaluationView() {
                   'w-full rounded-lg border p-3 text-left',
                   run.id === activeId
                     ? 'border-sky-500/50 bg-sky-500/10'
-                    : 'border-slate-800 bg-slate-900/40 hover:border-slate-700',
+                    : 'border-surface-border bg-surface-card/40 hover:border-surface-border',
                 )}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-sm text-slate-200">{run.vendor}</span>
+                  <span className="text-sm text-fg-primary">{run.vendor}</span>
                   <StatusPill status={run.status} />
                 </div>
-                <div className="mt-1 text-xs text-slate-400">{windowLabel(run)}</div>
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-xs text-fg-muted">{windowLabel(run)}</div>
+                <div className="mt-1 text-xs text-fg-subtle">
                   {run.status === 'completed'
                     ? `${run.graded} graded, ${run.malicious_support} malicious`
                     : when(run.created_at)}

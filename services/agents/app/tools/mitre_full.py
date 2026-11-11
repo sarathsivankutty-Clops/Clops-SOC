@@ -16,6 +16,7 @@ AiSOC — open-source AI Security Operations Center (MIT License)
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import json
 import os
 import pathlib
@@ -33,22 +34,92 @@ ATTCK_CDN_URL = "https://raw.githubusercontent.com/mitre/cti/master/enterprise-a
 ATTCK_DATA_PATH = os.getenv("ATTCK_DATA_PATH", "/data/enterprise-attack.json")
 _CACHE_TTL_HOURS = 24
 _EMBED_BATCH_SIZE = 50
-
-#: Embeddings deliberately do NOT follow chat traffic to the bundled LiteLLM
-#: gateway. ``infra/litellm/config.yaml`` declares seven *chat* aliases and no
-#: embedding model, so routing here would 400 on every batch — and a gateway
-#: master key sent to api.openai.com 401s just as surely. This path therefore
-#: keeps its own pair of variables, defaulting to the provider.
-#: ``scripts/check_llm_model_routing.py`` records embeddings as out of the
-#: gateway's scope, so the exclusion is checked rather than assumed.
-_DEFAULT_EMBEDDING_MODEL = "text-embedding-3-large"
+_DEFAULT_EMBEDDING_MODEL = "nomic-embed-text"
+_DEFAULT_OLLAMA_URL = "http://ollama:11434"
+_EMBEDDING_TIMEOUT = 120.0
 
 
-def _embedding_client(openai_module: Any, api_key: str) -> tuple[Any, str]:
-    """Return ``(client, model)`` for the embedding endpoint."""
-    base_url = os.getenv("AISOC_EMBEDDING_BASE_URL", "").strip() or None
+def _embedding_config() -> tuple[str, str]:
+    """Return the local Ollama URL and embedding model."""
+    base_url = os.getenv("AISOC_OLLAMA_URL", "").strip() or _DEFAULT_OLLAMA_URL
     model = os.getenv("AISOC_EMBEDDING_MODEL", "").strip() or _DEFAULT_EMBEDDING_MODEL
-    return openai_module.AsyncOpenAI(api_key=api_key, base_url=base_url), model
+    return base_url.rstrip("/"), model
+
+
+async def _embed_texts(
+    texts: list[str],
+    *,
+    client: httpx.AsyncClient | None = None,
+    base_url: str | None = None,
+    model: str | None = None,
+) -> list[list[float]]:
+    """Embed text locally with Ollama and reject malformed or mixed vectors."""
+    if not texts:
+        return []
+
+    configured_url, configured_model = _embedding_config()
+    url = (base_url or configured_url).rstrip("/")
+    model_name = model or configured_model
+    owns_client = client is None
+    http = client or httpx.AsyncClient(timeout=_EMBEDDING_TIMEOUT)
+    try:
+        response = await http.post(
+            f"{url}/api/embed",
+            json={"model": model_name, "input": texts},
+        )
+        response.raise_for_status()
+        vectors = response.json().get("embeddings")
+        if not isinstance(vectors, list) or len(vectors) != len(texts):
+            raise ValueError(f"Ollama returned an unexpected embedding count for {len(texts)} input(s).")
+        normalized = [[float(value) for value in vector] for vector in vectors]
+        dimensions = {len(vector) for vector in normalized}
+        if not normalized or len(dimensions) != 1 or 0 in dimensions:
+            raise ValueError("Ollama returned empty or inconsistent embedding vectors.")
+        return normalized
+    finally:
+        if owns_client:
+            await http.aclose()
+
+
+async def _ensure_attck_collection(qdrant: Any, collection: str, dimensions: int) -> None:
+    """Create the derived ATT&CK vector collection, rebuilding on dimension changes."""
+    from qdrant_client.models import Distance, VectorParams
+    from qdrant_client.http.exceptions import UnexpectedResponse
+
+    try:
+        info = await qdrant.get_collection(collection)
+    except UnexpectedResponse as exc:
+        if exc.status_code != 404:
+            raise
+        info = None
+
+    if info is not None:
+        vectors = info.config.params.vectors
+        if isinstance(vectors, dict):
+            if len(vectors) != 1:
+                raise ValueError(f"ATT&CK collection {collection!r} must use one unnamed vector.")
+            vectors = next(iter(vectors.values()))
+        current_dimensions = getattr(vectors, "size", None)
+        if current_dimensions == dimensions:
+            return
+        logger.warning(
+            "Rebuilding ATT&CK vector collection for embedding dimension change",
+            collection=collection,
+            previous_dimensions=current_dimensions,
+            dimensions=dimensions,
+        )
+        await qdrant.delete_collection(collection)
+
+    await qdrant.create_collection(
+        collection_name=collection,
+        vectors_config=VectorParams(size=dimensions, distance=Distance.COSINE),
+        on_disk_payload=True,
+    )
+
+
+def _technique_point_id(technique_id: str) -> int:
+    """Return a stable Qdrant point ID across agent process restarts."""
+    return int.from_bytes(hashlib.sha256(technique_id.encode("utf-8")).digest()[:8], "big") & ((1 << 63) - 1)
 
 
 # ─── Data Model ───────────────────────────────────────────────────────────────
@@ -387,130 +458,116 @@ def _load_stub_corpus() -> None:
 
 async def embed_techniques_into_qdrant(
     qdrant_url: str,
-    openai_api_key: str,
     collection: str = "attck_techniques",
 ) -> None:
     """
-    Embed ATT&CK technique descriptions into Qdrant for semantic RAG.
-    Only embeds techniques that are not already present in the collection.
+    Embed ATT&CK technique descriptions locally with Ollama and store them in Qdrant.
     """
     if not _loaded:
         await load_attck_corpus()
 
     try:
-        import openai
         from qdrant_client import AsyncQdrantClient
-        from qdrant_client.models import Distance, PointStruct, VectorParams
+        from qdrant_client.models import PointStruct
     except ImportError as exc:
-        logger.warning("Qdrant/OpenAI client not available for ATT&CK embedding", error=str(exc))
+        logger.warning("Qdrant client not available for ATT&CK embedding", error=str(exc))
         return
 
-    oai, embed_model = _embedding_client(openai, openai_api_key)
+    ollama_url, embed_model = _embedding_config()
     qdrant = AsyncQdrantClient(url=qdrant_url)
     logger.info(
         "ATT&CK embedding target",
-        base_url=os.getenv("AISOC_EMBEDDING_BASE_URL", "").strip() or "provider default",
+        base_url=ollama_url,
         model=embed_model,
     )
-
-    # Ensure collection exists
-    try:
-        await qdrant.create_collection(
-            collection_name=collection,
-            vectors_config=VectorParams(size=3072, distance=Distance.COSINE),
-            on_disk_payload=True,
-        )
-        logger.info("Created Qdrant collection for ATT&CK", collection=collection)
-    except Exception:
-        pass  # Collection already exists
 
     techniques_list = list(_techniques.values())
     total = len(techniques_list)
     embedded = 0
+    embedding_dimensions: int | None = None
 
-    for i in range(0, total, _EMBED_BATCH_SIZE):
-        batch = techniques_list[i : i + _EMBED_BATCH_SIZE]
-        texts = [f"{t.id} {t.name}: {t.description or ''} Tactics: {', '.join(t.tactic_names or [])}" for t in batch]
-        try:
-            resp = await oai.embeddings.create(
-                model=embed_model,
-                input=texts,
-                dimensions=3072,
-            )
-            vectors = [e.embedding for e in resp.data]
-            points = [
-                PointStruct(
-                    id=abs(hash(t.id)) % (2**63),
-                    vector=vec,
-                    payload={
-                        "technique_id": t.id,
-                        "name": t.name,
-                        "tactic_names": t.tactic_names,
-                        "platforms": t.platforms,
-                        "url": t.url,
-                    },
-                )
-                for t, vec in zip(batch, vectors, strict=False)
+    try:
+        for i in range(0, total, _EMBED_BATCH_SIZE):
+            batch = techniques_list[i : i + _EMBED_BATCH_SIZE]
+            texts = [
+                f"{t.id} {t.name}: {t.description or ''} Tactics: {', '.join(t.tactic_names or [])}"
+                for t in batch
             ]
-            await qdrant.upsert(collection_name=collection, points=points)
-            embedded += len(batch)
-            logger.info(
-                "ATT&CK embedding progress",
-                embedded=embedded,
-                total=total,
-            )
-        except Exception as exc:
-            logger.warning("Batch embedding error", batch_start=i, error=str(exc))
+            try:
+                vectors = await _embed_texts(texts, base_url=ollama_url, model=embed_model)
+                dimensions = len(vectors[0])
+                if embedding_dimensions is None:
+                    await _ensure_attck_collection(qdrant, collection, dimensions)
+                    embedding_dimensions = dimensions
+                elif dimensions != embedding_dimensions:
+                    raise ValueError(
+                        f"Ollama returned {dimensions}-dimension vectors after the first batch "
+                        f"established {embedding_dimensions} dimensions."
+                    )
+                points = [
+                    PointStruct(
+                        id=_technique_point_id(technique.id),
+                        vector=vector,
+                        payload={
+                            "technique_id": technique.id,
+                            "name": technique.name,
+                            "tactic_names": technique.tactic_names,
+                            "platforms": technique.platforms,
+                            "url": technique.url,
+                        },
+                    )
+                    for technique, vector in zip(batch, vectors, strict=True)
+                ]
+                await qdrant.upsert(collection_name=collection, points=points)
+                embedded += len(batch)
+                logger.info(
+                    "ATT&CK embedding progress",
+                    embedded=embedded,
+                    total=total,
+                )
+            except Exception as exc:
+                logger.warning("ATT&CK embedding batch failed", batch_start=i, error=str(exc))
+                if embedded == 0:
+                    break
 
-    logger.info("ATT&CK embedding complete", total_embedded=embedded)
-    await qdrant.close()
+        logger.info("ATT&CK embedding complete", total_embedded=embedded)
+    finally:
+        await qdrant.close()
 
 
 async def semantic_technique_search(
     query: str,
     qdrant_url: str,
-    openai_api_key: str,
     collection: str = "attck_techniques",
     top_k: int = 5,
+    client: httpx.AsyncClient | None = None,
 ) -> list[dict[str, Any]]:
     """
-    Perform semantic search over ATT&CK techniques using Qdrant.
+    Embed a query locally with Ollama and perform semantic search over ATT&CK in Qdrant.
     Returns the top_k most relevant techniques.
     """
-    try:
-        import openai
-        from qdrant_client import AsyncQdrantClient
-    except ImportError:
-        return []
-
-    oai, embed_model = _embedding_client(openai, openai_api_key)
-    qdrant = AsyncQdrantClient(url=qdrant_url)
+    ollama_url, embed_model = _embedding_config()
+    owns_client = client is None
+    http = client or httpx.AsyncClient(timeout=_EMBEDDING_TIMEOUT)
 
     try:
-        emb_resp = await oai.embeddings.create(
-            model=embed_model,
-            input=[query],
-            dimensions=3072,
+        query_vector = (await _embed_texts([query], base_url=ollama_url, model=embed_model))[0]
+        response = await http.post(
+            f"{qdrant_url.rstrip('/')}/collections/{collection}/points/search",
+            json={"vector": query_vector, "limit": top_k, "with_payload": True},
         )
-        query_vector = emb_resp.data[0].embedding
-
-        hits = await qdrant.search(
-            collection_name=collection,
-            query_vector=query_vector,
-            limit=top_k,
-            with_payload=True,
-        )
+        response.raise_for_status()
 
         results = []
-        for hit in hits:
-            payload = hit.payload or {}
+        for hit in response.json().get("result", []):
+            payload = hit.get("payload") or {}
             tid = payload.get("technique_id", "")
             tech = _techniques.get(tid)
             result = {
                 "technique_id": tid,
                 "name": payload.get("name", ""),
                 "tactic_names": payload.get("tactic_names", []),
-                "score": hit.score,
+                "score": hit.get("score", 0.0),
                 "description": tech.description if tech else "",
                 "mitigations": tech.mitigations if tech else [],
                 "url": payload.get("url", ""),
@@ -521,7 +578,8 @@ async def semantic_technique_search(
         logger.warning("Semantic ATT&CK search failed", error=str(exc))
         return []
     finally:
-        await qdrant.close()
+        if owns_client:
+            await http.aclose()
 
 
 # ─── Public Lookup API ────────────────────────────────────────────────────────

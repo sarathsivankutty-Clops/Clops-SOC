@@ -35,7 +35,7 @@ import { msspApi, rulePacksApi, type ChildTenant, type RulePack } from '@/lib/ap
 import { EmptyState } from '@/components/ui/EmptyState';
 
 function inputClass() {
-  return 'w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none';
+  return 'w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary placeholder-fg-muted focus:border-brand-500 focus:outline-none';
 }
 
 function describeError(err: unknown, fallback: string): string {
@@ -135,18 +135,18 @@ export function RulePacksPanel() {
 
   return (
     <div data-testid="rule-packs-panel">
-      <div className="border-b border-gray-800 px-6 py-4">
-        <h2 className="text-base font-semibold text-gray-100">Rule packs</h2>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="border-b border-surface-border px-6 py-4">
+        <h2 className="text-base font-semibold text-fg-primary">Rule packs</h2>
+        <p className="mt-1 text-sm text-fg-muted">
           Curated detection content you own and push to the tenants you manage.
           A pack takes effect when it is assigned.
         </p>
       </div>
 
       <div className="space-y-5 px-6 py-5">
-        <div className="flex flex-col gap-3 rounded-lg border border-gray-800 bg-gray-950/40 p-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col gap-3 rounded-lg border border-surface-border bg-surface-sunken/50 p-4 sm:flex-row sm:items-end">
           <label className="flex-1 text-sm">
-            <span className="mb-1 block text-gray-400">Name</span>
+            <span className="mb-1 block text-fg-secondary">Name</span>
             <input
               className={inputClass()}
               value={draftName}
@@ -156,7 +156,7 @@ export function RulePacksPanel() {
             />
           </label>
           <label className="text-sm sm:w-56">
-            <span className="mb-1 block text-gray-400">Category</span>
+            <span className="mb-1 block text-fg-secondary">Category</span>
             <input
               className={inputClass()}
               value={draftCategory}
@@ -169,7 +169,7 @@ export function RulePacksPanel() {
             type="button"
             onClick={() => void create()}
             disabled={busy}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 disabled:opacity-50"
           >
             {busy ? 'Working…' : 'Create pack'}
           </button>
@@ -181,7 +181,7 @@ export function RulePacksPanel() {
             on this page load. The packs below are unaffected.
           </p>
         ) : children.length === 0 ? (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-fg-muted">
             You manage no child tenants, so there is nothing to assign a pack
             to yet.
           </p>
@@ -197,9 +197,9 @@ export function RulePacksPanel() {
             description="Create one above to group detection content you want to push to the tenants you manage."
           />
         ) : (
-          <div className="overflow-hidden rounded-lg border border-gray-800">
+          <div className="overflow-hidden rounded-lg border border-surface-border">
             <table className="w-full text-sm">
-              <thead className="bg-gray-900/60 text-xs uppercase tracking-wide text-gray-500">
+              <thead className="bg-surface-card text-xs uppercase tracking-wide text-fg-muted">
                 <tr>
                   <th className="px-4 py-2 text-left">Name</th>
                   <th className="px-4 py-2 text-left">Category</th>
@@ -208,27 +208,27 @@ export function RulePacksPanel() {
                   <th className="px-4 py-2 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800 bg-gray-950/40">
+              <tbody className="divide-y divide-surface-border bg-surface-sunken/50">
                 {packs.map((pack) => (
                   <tr key={pack.id}>
                     <td className="px-4 py-3">
-                      <span className="font-medium text-gray-100">{pack.name}</span>
+                      <span className="font-medium text-fg-primary">{pack.name}</span>
                       {pack.is_default ? (
-                        <span className="ml-2 rounded bg-blue-500/10 px-1.5 py-0.5 text-xs text-blue-300 ring-1 ring-blue-500/30">
+                        <span className="ml-2 rounded bg-brand-500/10 px-1.5 py-0.5 text-xs text-brand-300 ring-1 ring-blue-500/30">
                           Default
                         </span>
                       ) : null}
                       {pack.description ? (
-                        <span className="mt-0.5 block text-xs text-gray-500">{pack.description}</span>
+                        <span className="mt-0.5 block text-xs text-fg-muted">{pack.description}</span>
                       ) : null}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400">{pack.category ?? 'Uncategorised'}</td>
-                    <td className="px-4 py-3 text-xs text-gray-400" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-xs text-fg-secondary">{pack.category ?? 'Uncategorised'}</td>
+                    <td className="px-4 py-3 text-xs text-fg-secondary" suppressHydrationWarning>
                       {format(new Date(pack.created_at), 'PPP')}
                     </td>
                     <td className="px-4 py-3">
                       <select
-                        className="rounded border border-gray-700 bg-gray-950 px-2 py-1 text-xs text-gray-200 disabled:opacity-40"
+                        className="rounded border border-surface-border-strong bg-surface-base px-2 py-1 text-xs text-fg-primary disabled:opacity-40"
                         value={assignTarget[pack.id] ?? ''}
                         disabled={children.length === 0 || busy}
                         aria-label={`Assign ${pack.name} to tenant`}
@@ -248,7 +248,7 @@ export function RulePacksPanel() {
                           type="button"
                           onClick={() => void assign(pack)}
                           disabled={busy || children.length === 0}
-                          className="rounded border border-gray-700 bg-gray-900 px-2 py-1 text-xs text-gray-200 hover:bg-gray-800 disabled:opacity-40"
+                          className="rounded border border-surface-border-strong bg-surface-card px-2 py-1 text-xs text-fg-primary hover:bg-surface-elevated disabled:opacity-40"
                         >
                           Assign
                         </button>

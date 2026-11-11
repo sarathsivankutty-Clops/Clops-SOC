@@ -78,7 +78,7 @@ const SEVERITY_BADGE: Record<string, string> = {
   high: 'bg-orange-500/10 text-orange-300 ring-orange-500/40',
   medium: 'bg-yellow-500/10 text-yellow-300 ring-yellow-500/40',
   low: 'bg-blue-500/10 text-blue-300 ring-blue-500/40',
-  info: 'bg-slate-500/10 text-slate-300 ring-slate-500/40',
+  info: 'bg-slate-500/10 text-fg-secondary ring-surface-border-strong/40',
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -154,19 +154,19 @@ export function ConfidenceTrends() {
         <SummaryCard
           label="Median"
           value={`${summary.medianConfidence}/100`}
-          tone="text-gray-100"
+          tone="text-fg-primary"
           hint={`${summary.totalRules} rule${summary.totalRules === 1 ? '' : 's'}`}
         />
         <SummaryCard
           label="Active rules"
           value={String(summary.activeRules)}
-          tone="text-gray-100"
+          tone="text-fg-primary"
           hint={`${summary.totalRules - summary.activeRules} disabled`}
         />
         <SummaryCard
           label="Below trust gate"
           value={String(summary.lowConfidence)}
-          tone={summary.lowConfidence > 0 ? 'text-amber-300' : 'text-gray-100'}
+          tone={summary.lowConfidence > 0 ? 'text-amber-300' : 'text-fg-primary'}
           hint="< 60/100 confidence"
         />
       </div>
@@ -174,17 +174,17 @@ export function ConfidenceTrends() {
       {/* Histogram */}
       <section
         aria-label="Confidence distribution"
-        className="rounded-lg border border-gray-800 bg-gray-900/40 p-4"
+        className="rounded-lg border border-surface-border bg-surface-card/40 p-4"
       >
         <header className="flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold text-gray-100">
+          <h2 className="text-sm font-semibold text-fg-primary">
             Confidence distribution
           </h2>
-          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+          <span className="text-[11px] uppercase tracking-wide text-fg-muted">
             Active rules shown stacked on enabled rules
           </span>
         </header>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-fg-muted">
           Where the rule library sits today on the 0–100 confidence scale.
           Bars fill more darkly with their <em>active</em> share so a tall
           but pale bar means many disabled rules in that band.
@@ -203,17 +203,17 @@ export function ConfidenceTrends() {
       {/* Per-tactic averages */}
       <section
         aria-label="Average confidence by MITRE tactic"
-        className="rounded-lg border border-gray-800 bg-gray-900/40 p-4"
+        className="rounded-lg border border-surface-border bg-surface-card/40 p-4"
       >
         <header className="flex items-baseline justify-between">
-          <h2 className="text-sm font-semibold text-gray-100">
+          <h2 className="text-sm font-semibold text-fg-primary">
             Confidence by MITRE tactic
           </h2>
-          <span className="text-[11px] uppercase tracking-wide text-gray-500">
+          <span className="text-[11px] uppercase tracking-wide text-fg-muted">
             Lower bars = tuning priority
           </span>
         </header>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-fg-muted">
           Each row averages the confidence of every rule whose primary
           MITRE tactic falls in that column. Faded portion of each bar
           shows the gap between all rules and the *active* rules — wide
@@ -222,7 +222,7 @@ export function ConfidenceTrends() {
         </p>
         <ul className="mt-4 space-y-2.5">
           {tactics.length === 0 ? (
-            <li className="text-xs text-gray-500">
+            <li className="text-xs text-fg-muted">
               No rules tagged with a MITRE tactic yet.
             </li>
           ) : (
@@ -271,7 +271,7 @@ function HistogramBar({ bucket, maxCount }: HistogramBarProps) {
     <div className="flex flex-col items-center gap-1.5">
       <div className="flex h-32 w-full items-end justify-center">
         <div
-          className="relative w-full max-w-[3.5rem] overflow-hidden rounded-t-md bg-gray-800/60"
+          className="relative w-full max-w-[3.5rem] overflow-hidden rounded-t-md bg-surface-elevated/60"
           style={{ height: `${Math.max(totalPct, bucket.count > 0 ? 4 : 0)}%` }}
           aria-label={`${bucket.count} rules between ${bucket.label} confidence, ${bucket.activeCount} active`}
         >
@@ -285,11 +285,11 @@ function HistogramBar({ bucket, maxCount }: HistogramBarProps) {
         <div className={clsx('font-mono text-sm font-semibold', tone.text)}>
           {bucket.count}
         </div>
-        <div className="text-[10px] uppercase tracking-wide text-gray-500">
+        <div className="text-[10px] uppercase tracking-wide text-fg-muted">
           {bucket.label}
         </div>
         {bucket.activeCount !== bucket.count && (
-          <div className="text-[10px] text-gray-500">
+          <div className="text-[10px] text-fg-muted">
             {bucket.activeCount} active
           </div>
         )}
@@ -308,10 +308,10 @@ function TacticBar({ tactic }: TacticBarProps) {
   const active = Math.max(0, Math.min(100, tactic.avgConfidenceActive));
   return (
     <li className="grid grid-cols-[10rem_1fr_5rem] items-center gap-3">
-      <div className="truncate text-xs font-medium text-gray-300">
+      <div className="truncate text-xs font-medium text-fg-secondary">
         {humanizeTactic(tactic.tactic)}
       </div>
-      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-gray-800/70">
+      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-surface-elevated/70">
         <div
           className={clsx('absolute inset-y-0 left-0 opacity-40', tone.bar)}
           style={{ width: `${total}%` }}
@@ -327,8 +327,8 @@ function TacticBar({ tactic }: TacticBarProps) {
         <span className={clsx('font-mono font-semibold', tone.text)}>
           {tactic.avgConfidenceActive}
         </span>
-        <span className="text-gray-600">/100</span>
-        <div className="text-[10px] text-gray-500">
+        <span className="text-fg-faint">/100</span>
+        <div className="text-[10px] text-fg-muted">
           {tactic.activeRules}/{tactic.rules} active
         </div>
       </div>
@@ -349,16 +349,16 @@ function RuleList({ title, subtitle, tone, entries }: RuleListProps) {
   return (
     <section
       aria-label={title}
-      className="rounded-lg border border-gray-800 bg-gray-900/40 p-4"
+      className="rounded-lg border border-surface-border bg-surface-card/40 p-4"
     >
       <header>
         <h2 className={clsx('text-sm font-semibold', headerTone)}>{title}</h2>
-        <p className="mt-1 text-xs text-gray-500">{subtitle}</p>
+        <p className="mt-1 text-xs text-fg-muted">{subtitle}</p>
       </header>
       {entries.length === 0 ? (
-        <p className="mt-4 text-xs text-gray-500">No rules to show.</p>
+        <p className="mt-4 text-xs text-fg-muted">No rules to show.</p>
       ) : (
-        <ul className="mt-3 divide-y divide-gray-800/80">
+        <ul className="mt-3 divide-y divide-surface-border/80">
           {entries.map((entry) => (
             <li key={entry.ruleId}>
               <RuleListRow entry={entry} />
@@ -379,7 +379,7 @@ function RuleListRow({ entry }: RuleListRowProps) {
   return (
     <Link
       href={`/detection/${entry.ruleId}`}
-      className="group flex items-center gap-3 py-2.5 transition-colors hover:bg-gray-900/60"
+      className="group flex items-center gap-3 py-2.5 transition-colors hover:bg-surface-card/60"
     >
       <span
         className={clsx(
@@ -390,7 +390,7 @@ function RuleListRow({ entry }: RuleListRowProps) {
       />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h3 className="truncate text-sm text-gray-100 group-hover:text-blue-300">
+          <h3 className="truncate text-sm text-fg-primary group-hover:text-blue-300">
             {entry.name}
           </h3>
           {entry.severity && (
@@ -398,20 +398,20 @@ function RuleListRow({ entry }: RuleListRowProps) {
               className={clsx(
                 'rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ring-1',
                 SEVERITY_BADGE[entry.severity] ??
-                  'bg-gray-800 text-gray-300 ring-gray-700',
+                  'bg-surface-elevated text-fg-secondary ring-surface-border',
               )}
             >
               {entry.severity}
             </span>
           )}
         </div>
-        <div className="mt-0.5 flex items-center gap-3 text-[11px] text-gray-500">
+        <div className="mt-0.5 flex items-center gap-3 text-[11px] text-fg-muted">
           {entry.primaryTactic && (
             <span>{humanizeTactic(entry.primaryTactic)}</span>
           )}
           <span>
             FP rate{' '}
-            <span className="font-mono text-gray-400">
+            <span className="font-mono text-fg-muted">
               {(entry.fpRate * 100).toFixed(1)}%
             </span>
           </span>
@@ -421,7 +421,7 @@ function RuleListRow({ entry }: RuleListRowProps) {
         <div className={clsx('font-mono text-sm font-semibold', tone.text)}>
           {entry.confidence}
         </div>
-        <div className="text-[10px] uppercase tracking-wide text-gray-500">
+        <div className="text-[10px] uppercase tracking-wide text-fg-muted">
           /100
         </div>
       </div>
@@ -438,15 +438,15 @@ interface SummaryCardProps {
 
 function SummaryCard({ label, value, hint, tone }: SummaryCardProps) {
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900/40 px-3 py-2.5">
-      <div className="text-[11px] uppercase tracking-wide text-gray-500">
+    <div className="rounded-lg border border-surface-border bg-surface-card/40 px-3 py-2.5">
+      <div className="text-[11px] uppercase tracking-wide text-fg-muted">
         {label}
       </div>
       <div className={clsx('mt-1 font-mono text-xl font-semibold', tone)}>
         {value}
       </div>
       {hint && (
-        <div className="mt-0.5 text-[11px] text-gray-500">{hint}</div>
+        <div className="mt-0.5 text-[11px] text-fg-muted">{hint}</div>
       )}
     </div>
   );

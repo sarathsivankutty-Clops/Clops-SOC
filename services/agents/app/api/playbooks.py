@@ -137,6 +137,11 @@ class RunRequest(BaseModel):
     dry_run: bool = False
 
 
+class InvestigateStoryRequest(BaseModel):
+    alert_summary: str
+    raw_alert: dict[str, Any] = {}
+
+
 class DraftFromNLRequest(BaseModel):
     """T3.7 — analyst prompt to draft a playbook from."""
 
@@ -145,6 +150,44 @@ class DraftFromNLRequest(BaseModel):
     # to ``False`` so tests are hermetic; the production default is
     # ``True`` so the LLM is consulted when configured.
     allow_llm: bool = True
+
+
+# ---------------------------------------------------------------------------
+# Story & Blueprint Endpoints (declared BEFORE /{playbook_id})
+# ---------------------------------------------------------------------------
+
+
+@router.get("/blueprints", summary="List runbook blueprints with 3-category view")
+async def list_blueprints(principal: ScopedPrincipal) -> list[dict]:
+    """List curated Runbook Blueprints with 3-category (Investigation, Response, Governance) views."""
+    _ = scoped_tenant_or_403(principal)
+    from app.runbook import get_builtin_blueprints
+
+    return get_builtin_blueprints()
+
+
+@router.get("/packs-catalog", summary="List composable packs organized by the 3 visible studio categories")
+async def list_packs_catalog(principal: ScopedPrincipal) -> dict:
+    """List 9 modular packs organized under Investigation, Response, and Governance."""
+    _ = scoped_tenant_or_403(principal)
+    from app.runbook import get_builtin_packs_catalog
+
+    return get_builtin_packs_catalog()
+
+
+@router.post("/investigate-story", summary="Context-first investigation emitting Dual-Projection story")
+async def investigate_story(req: InvestigateStoryRequest, principal: ScopedPrincipal) -> dict:
+    """Execute pre-reasoning 24-dimension context sweep & information-gain inquiry."""
+    tenant_id = str(scoped_tenant_or_403(principal))
+    from app.runbook import InformationGainRunbookEngine
+
+    engine = InformationGainRunbookEngine()
+    result = engine.investigate(
+        tenant_id=tenant_id,
+        alert_summary=req.alert_summary,
+        raw_alert=req.raw_alert,
+    )
+    return result.model_dump()
 
 
 # ---------------------------------------------------------------------------
@@ -181,7 +224,14 @@ async def draft_playbook_from_nl(req: DraftFromNLRequest) -> dict:
 async def list_playbooks(principal: ScopedPrincipal, enabled_only: bool = False) -> list[dict]:
     store = PlaybookStore.default()
     tenant_id = str(scoped_tenant_or_403(principal))
-    return [pb.model_dump() for pb in store.list(tenant_id=tenant_id, enabled_only=enabled_only)]
+    from app.runbook import project_legacy_playbook_categories
+
+    results: list[dict] = []
+    for pb in store.list(tenant_id=tenant_id, enabled_only=enabled_only):
+        d = pb.model_dump()
+        d["categories_view"] = project_legacy_playbook_categories(d)
+        results.append(d)
+    return results
 
 
 @router.post("", summary="Create a playbook", status_code=201)
@@ -227,7 +277,11 @@ async def get_playbook(playbook_id: str, principal: ScopedPrincipal) -> dict:
     pb = store.get(playbook_id, tenant_id=tenant_id)
     if not pb:
         raise HTTPException(status_code=404, detail="Playbook not found")
-    return pb.model_dump()
+    d = pb.model_dump()
+    from app.runbook import project_legacy_playbook_categories
+
+    d["categories_view"] = project_legacy_playbook_categories(d)
+    return d
 
 
 @router.put("/{playbook_id}", summary="Update a playbook")

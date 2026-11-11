@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import useSWR from 'swr';
 import toast from 'react-hot-toast';
+import { DialogBehavior } from '@/components/ui/Dialog';
 import {
   adminUsersApi,
   authApi,
@@ -123,12 +124,13 @@ function EditRolesModal({ user, roles, isSelf, onClose, onSaved }: EditRolesModa
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+      <DialogBehavior onClose={onClose} /> {/* [P6 overlay-dialog] role=dialog, focus trap, Escape */}
       <div
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl"
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-surface-border bg-surface-card p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-base font-semibold text-gray-100">Edit roles</h3>
-        <p className="mt-1 text-sm text-gray-400">
+        <h3 className="text-base font-semibold text-fg-primary">Edit roles</h3>
+        <p className="mt-1 text-sm text-fg-secondary">
           {user.username || user.email} · {user.email}
           {!user.is_active && (
             <span className="ml-2 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] uppercase text-amber-300">
@@ -143,26 +145,26 @@ function EditRolesModal({ user, roles, isSelf, onClose, onSaved }: EditRolesModa
           </p>
         )}
 
-        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Roles (multi-select — permissions merge)
         </p>
         <div className="mt-1 space-y-1.5">
           {roles.map((r) => (
             <label
               key={r.id}
-              className="flex cursor-pointer items-start gap-2 rounded-lg border border-gray-800 bg-gray-950/60 px-3 py-2 hover:border-gray-700"
+              className="flex cursor-pointer items-start gap-2 rounded-lg border border-surface-border bg-surface-sunken px-3 py-2 hover:border-surface-border-strong"
             >
               <input
                 type="checkbox"
                 checked={selected.has(r.name)}
                 onChange={() => toggle(r.name)}
                 disabled={!user.is_active}
-                className="mt-0.5 rounded border-gray-600 text-indigo-600"
+                className="mt-0.5 rounded border-surface-border-strong text-indigo-600"
               />
               <span className="min-w-0">
-                <span className="block text-sm text-gray-100">
+                <span className="block text-sm text-fg-primary">
                   {r.label || r.name}
-                  <span className="ml-2 font-mono text-[11px] text-gray-500">{r.name}</span>
+                  <span className="ml-2 font-mono text-[11px] text-fg-muted">{r.name}</span>
                   {r.is_system && (
                     <span className="ml-2 rounded bg-indigo-100/10 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-indigo-300">system</span>
                   )}
@@ -170,28 +172,28 @@ function EditRolesModal({ user, roles, isSelf, onClose, onSaved }: EditRolesModa
                     <span className="ml-2 rounded bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-sky-300">SSO default</span>
                   )}
                 </span>
-                {r.description && <span className="block text-xs text-gray-500">{r.description}</span>}
+                {r.description && <span className="block text-xs text-fg-muted">{r.description}</span>}
               </span>
             </label>
           ))}
         </div>
 
-        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <p className="mt-4 text-xs font-semibold uppercase tracking-wide text-fg-muted">
           Effective permissions — {effective.length} (read-only preview)
         </p>
-        <div className="mt-1 max-h-32 overflow-y-auto rounded-lg border border-gray-800 bg-gray-950/80 p-2">
+        <div className="mt-1 max-h-32 overflow-y-auto rounded-lg border border-surface-border bg-surface-sunken/80 p-2">
           {effective.length === 0 ? (
-            <p className="text-xs italic text-gray-600">Select at least one role.</p>
+            <p className="text-xs italic text-fg-subtle">Select at least one role.</p>
           ) : (
             <div className="flex flex-wrap gap-1">
               {effective.map((p) => (
-                <span key={p} className="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-[10px] text-gray-300">{p}</span>
+                <span key={p} className="rounded bg-surface-elevated px-1.5 py-0.5 font-mono text-[10px] text-fg-secondary">{p}</span>
               ))}
             </div>
           )}
         </div>
 
-        <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-gray-500" htmlFor="users-role-reason">
+        <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-fg-muted" htmlFor="users-role-reason">
           Reason (required, audited)
         </label>
         <textarea
@@ -201,7 +203,7 @@ function EditRolesModal({ user, roles, isSelf, onClose, onSaved }: EditRolesModa
           rows={2}
           maxLength={500}
           placeholder="Why are these roles changing? Stored in the audit log with actor, target, old and new roles."
-          className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500 focus:outline-none"
+          className="mt-1 w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary placeholder-fg-muted focus:border-indigo-500 focus:outline-none"
         />
 
         {grantingAdmin && (
@@ -221,7 +223,7 @@ function EditRolesModal({ user, roles, isSelf, onClose, onSaved }: EditRolesModa
         )}
 
         <div className="mt-5 flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-gray-400 hover:bg-gray-800">
+          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-fg-secondary hover:bg-surface-elevated">
             Cancel
           </button>
           <button
@@ -334,7 +336,7 @@ export function UsersView() {
   const headerSort = (col: 'name' | 'email' | 'status' | 'created' | 'last_login', label: string) => (
     <button
       type="button"
-      className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-gray-500 hover:text-gray-300"
+      className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-fg-muted hover:text-fg-secondary"
       onClick={() => {
         if (sort === col) setOrder(order === 'asc' ? 'desc' : 'asc');
         else { setSort(col); setOrder('asc'); }
@@ -361,12 +363,12 @@ export function UsersView() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search name or email…"
-            className="w-56 rounded-lg border border-gray-700 bg-gray-950 px-3 py-1.5 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500 focus:outline-none"
+            className="w-56 rounded-lg border border-surface-border-strong bg-surface-base px-3 py-1.5 text-sm text-fg-primary placeholder-fg-muted focus:border-indigo-500 focus:outline-none"
           />
           <select
             value={roleFilter}
             onChange={(e) => { setRoleFilter(e.target.value); setOffset(0); }}
-            className="rounded-lg border border-gray-700 bg-gray-950 px-2 py-1.5 text-sm text-gray-200"
+            className="rounded-lg border border-surface-border-strong bg-surface-base px-2 py-1.5 text-sm text-fg-primary"
           >
             <option value="">All roles</option>
             {(roles ?? []).map((r) => (
@@ -376,23 +378,23 @@ export function UsersView() {
           <select
             value={statusFilter}
             onChange={(e) => { setStatusFilter(e.target.value); setOffset(0); }}
-            className="rounded-lg border border-gray-700 bg-gray-950 px-2 py-1.5 text-sm text-gray-200"
+            className="rounded-lg border border-surface-border-strong bg-surface-base px-2 py-1.5 text-sm text-fg-primary"
           >
             <option value="">Any status</option>
             <option value="active">Active</option>
             <option value="disabled">Disabled</option>
           </select>
-          <button type="submit" className="rounded-lg border border-gray-700 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-800">
+          <button type="submit" className="rounded-lg border border-surface-border-strong px-3 py-1.5 text-sm text-fg-primary hover:bg-surface-elevated">
             Search
           </button>
         </form>
-        <span className="ml-auto text-xs text-gray-500">{failed ? '' : `${total} member${total === 1 ? '' : 's'}`}</span>
+        <span className="ml-auto text-xs text-fg-muted">{failed ? '' : `${total} member${total === 1 ? '' : 's'}`}</span>
       </div>
 
       {failed && (
         <div className="rounded-xl border border-red-900/60 bg-red-950/30 px-4 py-6 text-center">
           <p className="text-sm text-red-300">The user list could not be loaded.</p>
-          <p className="mt-1 text-[11px] text-gray-500">{(error as Error).message || 'Unknown error'}</p>
+          <p className="mt-1 text-[11px] text-fg-muted">{(error as Error).message || 'Unknown error'}</p>
           <button type="button" onClick={refresh} className="mt-3 rounded-lg border border-red-800 px-3 py-1.5 text-xs text-red-200 hover:bg-red-900/40">
             Retry
           </button>
@@ -400,58 +402,58 @@ export function UsersView() {
       )}
 
       {empty && (
-        <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 px-4 py-12 text-center">
-          <p className="text-sm text-gray-300">No users match these filters.</p>
-          <p className="mt-1 text-[11px] text-gray-600">
+        <div className="rounded-xl border border-surface-border/70 bg-surface-sunken/60 px-4 py-12 text-center">
+          <p className="text-sm text-fg-secondary">No users match these filters.</p>
+          <p className="mt-1 text-[11px] text-fg-subtle">
             This is an empty result set, not a load failure — the server answered successfully.
           </p>
         </div>
       )}
 
       {!failed && (
-        <div className="overflow-x-auto rounded-xl border border-gray-800/60">
+        <div className="overflow-x-auto rounded-xl border border-surface-border/70">
           <table className="w-full text-left text-sm">
-            <thead className="border-b border-gray-800 bg-gray-900/70">
+            <thead className="border-b border-surface-border bg-surface-card">
               <tr>
                 <th className="px-4 py-2.5">{headerSort('name', 'Name')}</th>
                 <th className="px-4 py-2.5">{headerSort('email', 'Email')}</th>
                 <th className="px-4 py-2.5">{headerSort('status', 'Status')}</th>
-                <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Role(s)</th>
-                <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Provider</th>
+                <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-fg-muted">Role(s)</th>
+                <th className="px-4 py-2.5 text-xs font-semibold uppercase tracking-wide text-fg-muted">Provider</th>
                 <th className="px-4 py-2.5">{headerSort('last_login', 'Last login')}</th>
                 <th className="px-4 py-2.5">{headerSort('created', 'Created')}</th>
-                <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Actions</th>
+                <th className="px-4 py-2.5 text-right text-xs font-semibold uppercase tracking-wide text-fg-muted">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800/60">
+            <tbody className="divide-y divide-surface-border/60">
               {isLoading && rows.length === 0 && (
                 Array.from({ length: 4 }).map((_, i) => (
                   <tr key={i}>
                     {Array.from({ length: 8 }).map((__, j) => (
-                      <td key={j} className="px-4 py-3"><div className="h-4 w-full max-w-28 animate-pulse rounded bg-gray-800/70" /></td>
+                      <td key={j} className="px-4 py-3"><div className="h-4 w-full max-w-28 animate-pulse rounded bg-surface-hover" /></td>
                     ))}
                   </tr>
                 ))
               )}
               {rows.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-900/50">
-                  <td className="px-4 py-3 text-gray-100">{u.username || '—'}</td>
-                  <td className="px-4 py-3 text-gray-300">{u.email}</td>
+                <tr key={u.id} className="hover:bg-surface-card">
+                  <td className="px-4 py-3 text-fg-primary">{u.username || '—'}</td>
+                  <td className="px-4 py-3 text-fg-secondary">{u.email}</td>
                   <td className="px-4 py-3"><StatusBadge active={u.is_active} /></td>
                   <td className="px-4 py-3">
                     <div className="flex flex-wrap gap-1">
                       {(u.roles.length ? u.roles : [u.role]).map((r) => <RoleBadge key={r} name={r} />)}
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-xs uppercase tracking-wide text-gray-400">{u.provider}</td>
-                  <td className="px-4 py-3 text-xs text-gray-400">{formatDate(u.last_login)}</td>
-                  <td className="px-4 py-3 text-xs text-gray-400">{formatDate(u.created_at)}</td>
+                  <td className="px-4 py-3 text-xs uppercase tracking-wide text-fg-secondary">{u.provider}</td>
+                  <td className="px-4 py-3 text-xs text-fg-secondary">{formatDate(u.last_login)}</td>
+                  <td className="px-4 py-3 text-xs text-fg-secondary">{formatDate(u.created_at)}</td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                       <button
                         type="button"
                         onClick={() => setEditing(u)}
-                        className="rounded-lg border border-gray-700 px-2.5 py-1 text-xs text-gray-200 hover:bg-gray-800"
+                        className="rounded-lg border border-surface-border-strong px-2.5 py-1 text-xs text-fg-primary hover:bg-surface-elevated"
                       >
                         Edit role
                       </button>
@@ -493,12 +495,12 @@ export function UsersView() {
       )}
 
       {!failed && total > PAGE_SIZE && (
-        <div className="flex items-center justify-end gap-3 text-sm text-gray-400">
+        <div className="flex items-center justify-end gap-3 text-sm text-fg-secondary">
           <button
             type="button"
             disabled={offset === 0}
             onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-            className="rounded-lg border border-gray-700 px-3 py-1.5 hover:bg-gray-800 disabled:opacity-40"
+            className="rounded-lg border border-surface-border-strong px-3 py-1.5 hover:bg-surface-elevated disabled:opacity-40"
           >
             ← Prev
           </button>
@@ -509,7 +511,7 @@ export function UsersView() {
             type="button"
             disabled={offset + PAGE_SIZE >= total}
             onClick={() => setOffset(offset + PAGE_SIZE)}
-            className="rounded-lg border border-gray-700 px-3 py-1.5 hover:bg-gray-800 disabled:opacity-40"
+            className="rounded-lg border border-surface-border-strong px-3 py-1.5 hover:bg-surface-elevated disabled:opacity-40"
           >
             Next →
           </button>

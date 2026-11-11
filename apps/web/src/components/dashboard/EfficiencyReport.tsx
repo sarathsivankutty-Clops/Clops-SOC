@@ -80,14 +80,14 @@ function BarRow({
     <div>
       <div className="flex items-baseline justify-between gap-3 mb-1">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-gray-200 truncate">{label}</p>
-          <p className="text-[11px] text-gray-500 truncate">{description}</p>
+          <p className="text-sm font-medium text-fg-secondary truncate">{label}</p>
+          <p className="text-[11px] text-fg-subtle truncate">{description}</p>
         </div>
-        <p className="text-sm font-semibold text-gray-100 tabular-nums shrink-0">
+        <p className="text-sm font-semibold text-fg-primary tabular-nums shrink-0">
           {display}
         </p>
       </div>
-      <div className="h-1.5 w-full rounded-full bg-gray-800/80 overflow-hidden">
+      <div className="h-1.5 w-full rounded-full bg-surface-hover overflow-hidden">
         <div
           className={clsx('h-full rounded-full transition-[width]', barColor)}
           style={{ width: `${(v * 100).toFixed(1)}%` }}
@@ -101,10 +101,10 @@ function LoadingBar({ label }: { label: string }) {
   return (
     <div>
       <div className="flex items-baseline justify-between gap-3 mb-1">
-        <p className="text-sm font-medium text-gray-200 truncate">{label}</p>
-        <div className="h-4 w-12 rounded bg-gray-800/60 animate-pulse" />
+        <p className="text-sm font-medium text-fg-secondary truncate">{label}</p>
+        <div className="h-4 w-12 rounded bg-surface-hover animate-pulse" />
       </div>
-      <div className="h-1.5 w-full rounded-full bg-gray-800/40 animate-pulse" />
+      <div className="h-1.5 w-full rounded-full bg-surface-hover animate-pulse" />
     </div>
   );
 }
@@ -125,21 +125,21 @@ export function EfficiencyReport({
   );
 
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-5">
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-xl p-5">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-base font-semibold text-gray-100">
+          <h2 className="text-base font-semibold text-fg-primary">
             Efficiency Report
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-fg-subtle mt-0.5">
             How well raw signal converts to actionable alerts
           </p>
         </div>
-        <span className="text-xs text-gray-500">Last {period}</span>
+        <span className="text-xs text-fg-subtle">Last {period}</span>
       </div>
 
       {error ? (
-        <p className="text-sm text-gray-400">Efficiency metrics unavailable.</p>
+        <p className="text-sm text-fg-muted">Efficiency metrics unavailable.</p>
       ) : isLoading || !data ? (
         <div className="space-y-4">
           <LoadingBar label="Correlation efficiency" />

@@ -490,18 +490,18 @@ export function EffectivePermissionsView() {
   }, [elements, showGraph]);
 
   return (
-    <div className="flex h-screen flex-col bg-gray-950 text-gray-200">
-      <header className="flex flex-wrap items-center gap-4 border-b border-gray-800 px-6 py-3">
-        <h1 className="text-lg font-semibold">Effective Permissions</h1>
+    <div className="flex h-screen flex-col bg-surface-base text-fg-primary">
+      <header className="flex flex-wrap items-center gap-4 border-b border-surface-border px-6 py-3">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-lg font-semibold */>Effective Permissions</h1>
         <div className="flex items-center gap-2">
-          <label htmlFor="provider" className="text-sm text-gray-400">
+          <label htmlFor="provider" className="text-sm text-fg-muted">
             Provider
           </label>
           <select
             id="provider"
             value={provider}
             onChange={(e) => setProvider(e.target.value as SupportedProvider)}
-            className="rounded border border-gray-700 bg-gray-900 px-2 py-1 text-sm"
+            className="rounded border border-surface-border bg-surface-card px-2 py-1 text-sm"
           >
             {providers.map((p) => (
               <option key={p.name} value={p.name}>
@@ -512,18 +512,18 @@ export function EffectivePermissionsView() {
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <label htmlFor="principal" className="text-sm text-gray-400">
+          <label htmlFor="principal" className="text-sm text-fg-muted">
             Principal
           </label>
           <input
             id="principal"
             value={principalId}
             onChange={(e) => setPrincipalId(e.target.value)}
-            className="w-96 rounded border border-gray-700 bg-gray-900 px-2 py-1 text-sm"
+            className="w-96 rounded border border-surface-border bg-surface-card px-2 py-1 text-sm"
             placeholder="arn:aws:iam::…"
           />
         </div>
-        <label className="ml-auto flex items-center gap-2 text-sm text-gray-400">
+        <label className="ml-auto flex items-center gap-2 text-sm text-fg-muted">
           <input
             type="checkbox"
             checked={denyOnly}
@@ -555,10 +555,10 @@ export function EffectivePermissionsView() {
 
       <div className="grid flex-1 grid-cols-[1fr_320px]">
         {/* Graph pane: Cytoscape canvas, empty state, or scaffold placeholder. */}
-        <div className="relative h-full w-full bg-gray-950">
+        <div className="relative h-full w-full bg-surface-base">
           {isScaffoldProvider ? (
-            <div className="flex h-full flex-col items-center justify-center px-8 text-center text-gray-400">
-              <p className="text-base font-semibold text-gray-200">
+            <div className="flex h-full flex-col items-center justify-center px-8 text-center text-fg-muted">
+              <p className="text-base font-semibold text-fg-primary">
                 {PROVIDER_LABEL[provider]} resolver is scaffolded
               </p>
               <p className="mt-2 max-w-md text-sm">
@@ -570,8 +570,8 @@ export function EffectivePermissionsView() {
               </p>
             </div>
           ) : resolveFailed ? (
-            <div className="flex h-full flex-col items-center justify-center px-8 text-center text-gray-400">
-              <p className="text-base font-semibold text-gray-200">
+            <div className="flex h-full flex-col items-center justify-center px-8 text-center text-fg-muted">
+              <p className="text-base font-semibold text-fg-primary">
                 Effective permissions could not be resolved
               </p>
               <p className="mt-2 max-w-md text-sm">
@@ -583,14 +583,14 @@ export function EffectivePermissionsView() {
               <button
                 type="button"
                 onClick={() => void mutate()}
-                className="mt-4 rounded border border-gray-700 px-3 py-1.5 text-sm text-gray-200 transition-colors hover:bg-gray-800"
+                className="mt-4 rounded border border-surface-border px-3 py-1.5 text-sm text-fg-primary transition-colors hover:bg-surface-elevated"
               >
                 Retry
               </button>
             </div>
           ) : showEmptyState ? (
-            <div className="flex h-full flex-col items-center justify-center px-8 text-center text-gray-400">
-              <p className="text-base font-semibold text-gray-200">
+            <div className="flex h-full flex-col items-center justify-center px-8 text-center text-fg-muted">
+              <p className="text-base font-semibold text-fg-primary">
                 No {denyOnly ? 'deny paths' : 'decisions'} for this principal
               </p>
               <p className="mt-2 max-w-md text-sm">
@@ -604,10 +604,10 @@ export function EffectivePermissionsView() {
           )}
         </div>
 
-        <aside className="border-l border-gray-800 bg-gray-900 p-4 text-sm">
+        <aside className="border-l border-surface-border bg-surface-card p-4 text-sm">
           <h2 className="mb-2 font-semibold">Resolver envelope</h2>
           {isLoading ? (
-            <p className="text-gray-500">Resolving…</p>
+            <p className="text-fg-subtle">Resolving…</p>
           ) : isScaffold501(error) ? (
             <p className="text-amber-300">
               {PROVIDER_LABEL[provider]} resolver is scaffolded — no live data yet.
@@ -620,13 +620,13 @@ export function EffectivePermissionsView() {
               })}
             </p>
           ) : result ? (
-            <dl className="space-y-1 text-gray-300">
+            <dl className="space-y-1 text-fg-secondary">
               <div>
-                <dt className="inline text-gray-500">Provider:</dt>{' '}
+                <dt className="inline text-fg-subtle">Provider:</dt>{' '}
                 <dd className="inline">{result.provider}</dd>
               </div>
               <div>
-                <dt className="inline text-gray-500">Coverage:</dt>{' '}
+                <dt className="inline text-fg-subtle">Coverage:</dt>{' '}
                 <dd
                   className={clsx(
                     'inline',
@@ -637,19 +637,19 @@ export function EffectivePermissionsView() {
                 </dd>
               </div>
               <div>
-                <dt className="inline text-gray-500">Resolver:</dt>{' '}
+                <dt className="inline text-fg-subtle">Resolver:</dt>{' '}
                 <dd className="inline">{result.resolver_version}</dd>
               </div>
               <div>
-                <dt className="inline text-gray-500">Last resolved:</dt>{' '}
+                <dt className="inline text-fg-subtle">Last resolved:</dt>{' '}
                 <dd className="inline">{result.last_resolved}</dd>
               </div>
               <div>
-                <dt className="inline text-gray-500">Decisions:</dt>{' '}
+                <dt className="inline text-fg-subtle">Decisions:</dt>{' '}
                 <dd className="inline">
                   {visibleDecisionCount}
                   {denyOnly && visibleDecisionCount !== result.decisions.length && (
-                    <span className="text-gray-500">
+                    <span className="text-fg-subtle">
                       {' '}
                       / {result.decisions.length} total
                     </span>
@@ -657,14 +657,14 @@ export function EffectivePermissionsView() {
                 </dd>
               </div>
               <div>
-                <dt className="inline text-gray-500">Total actions:</dt>{' '}
+                <dt className="inline text-fg-subtle">Total actions:</dt>{' '}
                 <dd className="inline">
                   {result.decisions.reduce((n, d) => n + d.actions.length, 0)}
                 </dd>
               </div>
               {denyCount > 0 && (
                 <div>
-                  <dt className="inline text-gray-500">Deny actions:</dt>{' '}
+                  <dt className="inline text-fg-subtle">Deny actions:</dt>{' '}
                   <dd className="inline text-red-400">{denyCount}</dd>
                 </div>
               )}

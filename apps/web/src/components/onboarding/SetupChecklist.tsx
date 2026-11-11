@@ -75,7 +75,7 @@ export function SetupChecklist({ compact = false }: { compact?: boolean }) {
     return (
       <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-4 text-sm">
         <p className="font-medium text-amber-200">Setup status unavailable</p>
-        <p className="mt-1 text-slate-400">
+        <p className="mt-1 text-fg-muted">
           The console could not read what is set up. Treat this as unknown rather than as a
           tenant with nothing configured.
         </p>
@@ -84,7 +84,7 @@ export function SetupChecklist({ compact = false }: { compact?: boolean }) {
   }
 
   if (isLoading || !data) {
-    return <div className="h-32 animate-pulse rounded-lg bg-slate-800/40" />;
+    return <div className="h-32 animate-pulse rounded-lg bg-surface-elevated/40" />;
   }
 
   // `try` and `model` are both optional: sample data is an alternative to a real
@@ -98,14 +98,14 @@ export function SetupChecklist({ compact = false }: { compact?: boolean }) {
   return (
     <section
       aria-labelledby="setup-checklist-heading"
-      className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-5"
+      className="rounded-xl border border-surface-border/60 bg-surface-card/40 p-5"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 id="setup-checklist-heading" className="text-lg font-semibold text-slate-100">
+          <h2 id="setup-checklist-heading" className="text-lg font-semibold text-fg-primary">
             {remaining === 0 ? 'Setup complete' : 'Finish setting up'}
           </h2>
-          <p className="mt-1 text-sm text-slate-400">
+          <p className="mt-1 text-sm text-fg-muted">
             {remaining === 0
               ? 'A source is connected and alerts are arriving from it.'
               : `${remaining} step${remaining === 1 ? '' : 's'} left before AiSOC is working on your own data.`}
@@ -121,27 +121,27 @@ export function SetupChecklist({ compact = false }: { compact?: boolean }) {
               'flex gap-3 rounded-lg border p-3',
               step.done
                 ? 'border-emerald-500/25 bg-emerald-500/5'
-                : 'border-slate-700/60 bg-slate-800/30',
+                : 'border-surface-border/60 bg-surface-elevated/30',
             )}
           >
             <span
               aria-hidden
               className={clsx(
                 'mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-                step.done ? 'bg-emerald-500/20 text-emerald-300' : 'bg-slate-700 text-slate-400',
+                step.done ? 'bg-emerald-500/20 text-emerald-300' : 'bg-surface-hover text-fg-muted',
               )}
             >
               {step.done ? '✓' : '·'}
             </span>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-medium text-slate-100">{step.label}</span>
+                <span className="font-medium text-fg-primary">{step.label}</span>
                 <span className="sr-only">{step.done ? 'done' : 'not done yet'}</span>
                 {step.detail && (
-                  <span className="text-xs text-slate-500">{step.detail}</span>
+                  <span className="text-xs text-fg-subtle">{step.detail}</span>
                 )}
               </div>
-              {!compact && <p className="mt-1 text-sm text-slate-400">{step.why}</p>}
+              {!compact && <p className="mt-1 text-sm text-fg-muted">{step.why}</p>}
 
               {step.key === 'model' && <ModelPlacement />}
 
@@ -150,7 +150,7 @@ export function SetupChecklist({ compact = false }: { compact?: boolean }) {
                   type="button"
                   onClick={loadSamples}
                   disabled={loading}
-                  className="mt-2 rounded-md border border-slate-600 px-3 py-1.5 text-sm text-slate-200 transition hover:border-slate-400 hover:bg-slate-800 disabled:opacity-50"
+                  className="mt-2 rounded-md border border-surface-border-strong px-3 py-1.5 text-sm text-fg-primary transition hover:border-surface-border-strong hover:bg-surface-elevated disabled:opacity-50"
                 >
                   {loading ? 'Pushing events through the pipeline…' : 'Load sample data'}
                 </button>
@@ -170,16 +170,16 @@ export function SetupChecklist({ compact = false }: { compact?: boolean }) {
       </ol>
 
       {result && (
-        <div className="mt-4 rounded-lg border border-slate-700/60 bg-slate-800/30 p-4">
-          <p className="text-sm text-slate-300">{result.note}</p>
+        <div className="mt-4 rounded-lg border border-surface-border/60 bg-surface-elevated/30 p-4">
+          <p className="text-sm text-fg-secondary">{result.note}</p>
           <ul className="mt-3 space-y-1.5">
             {result.scenarios.map((scenario) => (
               <li key={scenario.key} className="text-sm">
-                <span className="text-slate-200">{scenario.title}</span>
-                <span className="ml-2 text-xs uppercase tracking-wide text-slate-500">
+                <span className="text-fg-primary">{scenario.title}</span>
+                <span className="ml-2 text-xs uppercase tracking-wide text-fg-subtle">
                   {scenario.severity}
                 </span>
-                <p className="text-xs text-slate-500">{scenario.why}</p>
+                <p className="text-xs text-fg-subtle">{scenario.why}</p>
               </li>
             ))}
           </ul>
@@ -193,7 +193,7 @@ export function SetupChecklist({ compact = false }: { compact?: boolean }) {
       )}
 
       {data.sample_data_loaded && (
-        <p className="mt-4 text-xs text-slate-500">
+        <p className="mt-4 text-xs text-fg-subtle">
           Sample alerts are attributed to &quot;AiSOC&quot; in the source column, so you can tell
           them from real telemetry anywhere in the console. Connecting a real source is still
           the next step.

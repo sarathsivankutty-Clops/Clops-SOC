@@ -19,52 +19,52 @@ type MdxComponentsMap = Readonly<Record<string, ComponentType<any>>>;
 export const mdxBodyComponents: MdxComponentsMap = {
   h1: (props: ComponentPropsWithoutRef<'h1'>) => (
     <h1
-      className="mt-12 text-3xl font-semibold tracking-tight text-white first:mt-0 md:text-4xl"
+      className="mt-12 text-3xl font-semibold tracking-tight text-fg-primary first:mt-0 md:text-4xl"
       {...props}
     />
   ),
   h2: (props: ComponentPropsWithoutRef<'h2'>) => (
     <h2
-      className="mt-12 text-2xl font-semibold tracking-tight text-white first:mt-0"
+      className="mt-12 text-2xl font-semibold tracking-tight text-fg-primary first:mt-0"
       {...props}
     />
   ),
   h3: (props: ComponentPropsWithoutRef<'h3'>) => (
     <h3
-      className="mt-8 text-lg font-semibold tracking-tight text-white"
+      className="mt-8 text-lg font-semibold tracking-tight text-fg-primary"
       {...props}
     />
   ),
   p: (props: ComponentPropsWithoutRef<'p'>) => (
-    <p className="mt-5 text-base leading-relaxed text-gray-300" {...props} />
+    <p className="mt-5 text-base leading-relaxed text-fg-secondary" {...props} />
   ),
   ul: (props: ComponentPropsWithoutRef<'ul'>) => (
     <ul
-      className="mt-5 space-y-2.5 pl-6 text-base leading-relaxed text-gray-300 [&>li]:list-disc [&>li]:marker:text-gray-500"
+      className="mt-5 space-y-2.5 pl-6 text-base leading-relaxed text-fg-secondary [&>li]:list-disc [&>li]:marker:text-fg-subtle"
       {...props}
     />
   ),
   ol: (props: ComponentPropsWithoutRef<'ol'>) => (
     <ol
-      className="mt-5 space-y-2.5 pl-6 text-base leading-relaxed text-gray-300 [&>li]:list-decimal [&>li]:marker:text-gray-500"
+      className="mt-5 space-y-2.5 pl-6 text-base leading-relaxed text-fg-secondary [&>li]:list-decimal [&>li]:marker:text-fg-subtle"
       {...props}
     />
   ),
   blockquote: (props: ComponentPropsWithoutRef<'blockquote'>) => (
     <blockquote
-      className="mt-6 border-l-2 border-brand-500/50 bg-white/[0.02] p-5 text-base italic leading-relaxed text-gray-300"
+      className="mt-6 border-l-2 border-brand-500/50 bg-white/[0.02] p-5 text-base italic leading-relaxed text-fg-secondary"
       {...props}
     />
   ),
   code: (props: ComponentPropsWithoutRef<'code'>) => (
     <code
-      className="rounded bg-white/10 px-1.5 py-0.5 font-mono text-[0.85em] text-gray-100"
+      className="rounded bg-surface-hover px-1.5 py-0.5 font-mono text-[0.85em] text-fg-primary"
       {...props}
     />
   ),
   pre: (props: ComponentPropsWithoutRef<'pre'>) => (
     <pre
-      className="mt-5 overflow-x-auto rounded-xl border border-white/10 bg-black/40 p-5 font-mono text-sm leading-relaxed text-gray-200"
+      className="mt-5 overflow-x-auto rounded-xl border border-surface-border bg-black/40 p-5 font-mono text-sm leading-relaxed text-fg-primary"
       {...props}
     />
   ),
@@ -89,11 +89,11 @@ export const mdxBodyComponents: MdxComponentsMap = {
       />
     );
   },
-  hr: () => <hr className="my-10 border-white/5" />,
+  hr: () => <hr className="my-10 border-surface-border" />,
   strong: (props: ComponentPropsWithoutRef<'strong'>) => (
-    <strong className="font-semibold text-white" {...props} />
+    <strong className="font-semibold text-fg-primary" {...props} />
   ),
   em: (props: ComponentPropsWithoutRef<'em'>) => (
-    <em className="text-gray-200" {...props} />
+    <em className="text-fg-primary" {...props} />
   ),
 };

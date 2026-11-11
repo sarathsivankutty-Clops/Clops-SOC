@@ -31,15 +31,15 @@ export type ButtonSize = 'xs' | 'sm' | 'md' | 'lg';
 
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
   primary:
-    'bg-blue-600 text-white hover:bg-blue-500 active:bg-blue-700 disabled:bg-blue-600/40',
+    'bg-brand-600 text-white hover:bg-brand-500 active:bg-blue-700 disabled:bg-brand-600/40',
   secondary:
-    'bg-gray-800 text-gray-200 hover:bg-gray-700 active:bg-gray-700 disabled:bg-gray-800/40 disabled:text-gray-500',
+    'bg-surface-elevated text-fg-primary hover:bg-surface-hover active:bg-surface-hover disabled:bg-surface-sunken/50 disabled:text-fg-muted',
   destructive:
     'bg-red-600 text-white hover:bg-red-500 active:bg-red-700 disabled:bg-red-600/40',
   ghost:
-    'bg-transparent text-gray-300 hover:bg-gray-800/60 hover:text-gray-100 disabled:text-gray-600',
+    'bg-transparent text-fg-secondary hover:bg-surface-sunken hover:text-fg-primary disabled:text-fg-subtle',
   outline:
-    'bg-transparent text-gray-300 border border-gray-700 hover:border-gray-600 hover:bg-gray-800/40 disabled:opacity-50',
+    'bg-transparent text-fg-secondary border border-surface-border-strong hover:border-surface-border-strong hover:bg-surface-sunken/50 disabled:opacity-50',
 };
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {

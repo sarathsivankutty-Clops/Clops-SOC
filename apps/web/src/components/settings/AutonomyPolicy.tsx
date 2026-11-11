@@ -49,8 +49,8 @@ const BLAST_TONE: Record<AutonomyBlastRadius, string> = {
   medium: 'bg-amber-500/10 text-amber-300 ring-amber-500/30',
   high: 'bg-orange-500/10 text-orange-300 ring-orange-500/30',
   critical: 'bg-red-500/10 text-red-300 ring-red-500/30',
-  custom: 'bg-blue-500/10 text-blue-300 ring-blue-500/30',
-  unknown: 'bg-gray-500/10 text-gray-300 ring-gray-500/30',
+  custom: 'bg-brand-500/10 text-brand-300 ring-blue-500/30',
+  unknown: 'bg-gray-500/10 text-fg-secondary ring-surface-border-strong/30',
 };
 
 function clamp(n: number, lo = 0, hi = 1): number {
@@ -142,8 +142,8 @@ export function AutonomyPolicyPanel() {
         ) : null}
 
         {/* Legend */}
-        <div className="rounded-lg border border-gray-800 bg-gray-950/40 p-4 text-xs text-gray-400">
-          <p className="font-medium text-gray-300">How tiers map</p>
+        <div className="rounded-lg border border-surface-border bg-surface-sunken/50 p-4 text-xs text-fg-secondary">
+          <p className="font-medium text-fg-secondary">How tiers map</p>
           <ul className="mt-2 space-y-1">
             <li>
               <Pill tone="emerald">≥ auto</Pill> agent executes the action
@@ -171,13 +171,13 @@ export function AutonomyPolicyPanel() {
             today — whether a verb reaches a vendor unattended is decided by the
             autonomy tier above and by the action&apos;s own capability contract.
           </p>
-          <p className="mt-2 text-[11px] text-gray-500">
+          <p className="mt-2 text-[11px] text-fg-muted">
             Defaults are loaded from{' '}
-            <code className="font-mono text-gray-400">
+            <code className="font-mono text-fg-secondary">
               services/agents/config/autonomy_policy.yaml
             </code>
             . Tenant overrides written here are stored in{' '}
-            <code className="font-mono text-gray-400">
+            <code className="font-mono text-fg-secondary">
               aisoc_autonomy_thresholds
             </code>
             .
@@ -290,11 +290,11 @@ function ActionRow({
   };
 
   const overrideTag = action.overridden ? (
-    <span className="rounded-full bg-blue-500/10 px-2 py-0.5 text-[11px] font-medium text-blue-300 ring-1 ring-blue-500/30">
+    <span className="rounded-full bg-brand-500/10 px-2 py-0.5 text-[11px] font-medium text-brand-300 ring-1 ring-blue-500/30">
       tenant override
     </span>
   ) : (
-    <span className="rounded-full bg-gray-500/10 px-2 py-0.5 text-[11px] text-gray-400 ring-1 ring-gray-500/30">
+    <span className="rounded-full bg-gray-500/10 px-2 py-0.5 text-[11px] text-fg-secondary ring-1 ring-surface-border-strong/30">
       default
     </span>
   );
@@ -304,7 +304,7 @@ function ActionRow({
   // platform can do it and is choosing not to; nothing in the tree can.
   const runtimeTag =
     action.executable === false ? (
-      <span className="rounded-full bg-gray-500/10 px-2 py-0.5 text-[11px] font-medium text-gray-400 ring-1 ring-gray-500/30">
+      <span className="rounded-full bg-gray-500/10 px-2 py-0.5 text-[11px] font-medium text-fg-secondary ring-1 ring-surface-border-strong/30">
         no executor
       </span>
     ) : action.effective_auto_execute ? (
@@ -318,11 +318,11 @@ function ActionRow({
     ) : null;
 
   return (
-    <li className="rounded-lg border border-gray-800 bg-gray-950/40 p-4 transition-colors hover:border-gray-700">
-      <div className="flex flex-col gap-1 border-b border-gray-800 pb-3 sm:flex-row sm:items-start sm:justify-between">
+    <li className="rounded-lg border border-surface-border bg-surface-sunken/50 p-4 transition-colors hover:border-surface-border-strong">
+      <div className="flex flex-col gap-1 border-b border-surface-border pb-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-mono text-sm font-semibold text-gray-100">
+            <h3 className="font-mono text-sm font-semibold text-fg-primary">
               {action.action}
             </h3>
             <span
@@ -337,10 +337,10 @@ function ActionRow({
             {runtimeTag}
           </div>
           {action.effective_reason ? (
-            <p className="mt-1 text-[11px] text-gray-500">{action.effective_reason}</p>
+            <p className="mt-1 text-[11px] text-fg-muted">{action.effective_reason}</p>
           ) : null}
           {action.last_updated_at ? (
-            <p className="mt-1 text-[11px] text-gray-500">
+            <p className="mt-1 text-[11px] text-fg-muted">
               Last updated{' '}
               {new Date(action.last_updated_at).toLocaleString(undefined, {
                 dateStyle: 'medium',
@@ -358,10 +358,10 @@ function ActionRow({
               onClick={onResetClick}
               disabled={resetting}
               className={clsx(
-                'rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-gray-200',
+                'rounded-lg border border-surface-border-strong bg-surface-card px-3 py-1.5 text-xs text-fg-primary',
                 resetting
                   ? 'cursor-not-allowed opacity-60'
-                  : 'hover:bg-gray-800',
+                  : 'hover:bg-surface-elevated',
               )}
             >
               {resetting ? 'Resetting…' : 'Reset to default'}
@@ -410,12 +410,12 @@ function ActionRow({
             initial={{ opacity: 0, y: 4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            className="mt-3 flex flex-col gap-2 rounded-lg border border-gray-800 bg-gray-950/40 p-3 sm:flex-row sm:items-end"
+            className="mt-3 flex flex-col gap-2 rounded-lg border border-surface-border bg-surface-sunken/50 p-3 sm:flex-row sm:items-end"
           >
             <label className="flex flex-1 flex-col gap-1.5">
-              <span className="text-xs font-medium text-gray-300">
+              <span className="text-xs font-medium text-fg-secondary">
                 Reason{' '}
-                <span className="text-gray-500">
+                <span className="text-fg-muted">
                   (optional — appears in audit log)
                 </span>
               </span>
@@ -424,8 +424,8 @@ function ActionRow({
                 onChange={(e) => setReason(e.target.value)}
                 placeholder='e.g. "Lower auto threshold during incident response window"'
                 className={clsx(
-                  'w-full rounded-lg border border-gray-700 bg-gray-950/60 px-3 py-2 text-sm text-gray-100',
-                  'placeholder:text-gray-600 focus:border-blue-500/60 focus:outline-none focus:ring-1 focus:ring-blue-500/40',
+                  'w-full rounded-lg border border-surface-border-strong bg-surface-sunken px-3 py-2 text-sm text-fg-primary',
+                  'placeholder:text-fg-subtle focus:border-brand-500/60 focus:outline-none focus:ring-1 focus:ring-brand-500/40',
                 )}
                 maxLength={500}
               />
@@ -437,7 +437,7 @@ function ActionRow({
                   setDraft(action.thresholds);
                   setReason('');
                 }}
-                className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-200 hover:bg-gray-800"
+                className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-2 text-sm text-fg-primary hover:bg-surface-elevated"
               >
                 Discard
               </button>
@@ -448,8 +448,8 @@ function ActionRow({
                 className={clsx(
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   canSave
-                    ? 'bg-blue-600 text-white hover:bg-blue-500'
-                    : 'cursor-not-allowed bg-gray-800 text-gray-500',
+                    ? 'bg-brand-600 text-white hover:bg-brand-500'
+                    : 'cursor-not-allowed bg-surface-elevated text-fg-muted',
                 )}
               >
                 {saving ? 'Saving…' : 'Save thresholds'}
@@ -493,7 +493,7 @@ function ThresholdInput({
   const dirty = Math.abs(value - remote) > 1e-9;
 
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-950/60 p-3">
+    <div className="rounded-lg border border-surface-border bg-surface-sunken p-3">
       <div className="flex items-center justify-between">
         <span className={clsx('text-xs font-semibold', tones[tone])}>
           {label}
@@ -501,7 +501,7 @@ function ThresholdInput({
         <span
           className={clsx(
             'font-mono text-sm tabular-nums',
-            dirty ? 'text-blue-300' : 'text-gray-200',
+            dirty ? 'text-brand-300' : 'text-fg-primary',
           )}
         >
           {formatPct(value)}
@@ -517,8 +517,8 @@ function ThresholdInput({
         className="mt-2 w-full accent-blue-500"
         aria-label={`${label} threshold`}
       />
-      <p className="mt-1 text-[11px] text-gray-500">{help}</p>
-      <p className="mt-1 text-[10px] text-gray-600">
+      <p className="mt-1 text-[11px] text-fg-muted">{help}</p>
+      <p className="mt-1 text-[10px] text-fg-subtle">
         default {formatPct(defaultValue)}
       </p>
     </div>
@@ -534,7 +534,7 @@ function ThresholdBand({ draft }: { draft: AutonomyThresholdTriple }) {
 
   return (
     <div className="mt-3" aria-hidden>
-      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-gray-900 ring-1 ring-gray-800">
+      <div className="relative h-2.5 w-full overflow-hidden rounded-full bg-surface-card ring-1 ring-surface-border">
         {/* refuse */}
         <div
           className="absolute inset-y-0 bg-red-500/30"
@@ -562,7 +562,7 @@ function ThresholdBand({ draft }: { draft: AutonomyThresholdTriple }) {
           style={{ left: `${autoPct}%`, right: 0 }}
         />
       </div>
-      <div className="mt-1 flex justify-between font-mono text-[10px] text-gray-500">
+      <div className="mt-1 flex justify-between font-mono text-[10px] text-fg-muted">
         <span>0%</span>
         <span>50%</span>
         <span>100%</span>
@@ -606,10 +606,10 @@ function PanelHeader({
   description: string;
 }) {
   return (
-    <div className="flex flex-col gap-3 border-b border-gray-800 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 border-b border-surface-border px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-lg font-semibold text-gray-100">{title}</h2>
-        <p className="mt-1 max-w-xl text-sm text-gray-500">{description}</p>
+        <h2 className="text-lg font-semibold text-fg-primary">{title}</h2>
+        <p className="mt-1 max-w-xl text-sm text-fg-muted">{description}</p>
       </div>
     </div>
   );

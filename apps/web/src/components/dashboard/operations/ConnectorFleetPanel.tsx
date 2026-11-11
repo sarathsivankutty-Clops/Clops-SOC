@@ -28,7 +28,7 @@ const STATE_STYLE: Record<FleetHealthState, { dot: string; text: string; label: 
   degraded: { dot: 'bg-yellow-500', text: 'text-yellow-300', label: 'Degraded' },
   failed: { dot: 'bg-red-500', text: 'text-red-300', label: 'Failed' },
   unproven: { dot: 'bg-blue-500', text: 'text-blue-300', label: 'Never synced' },
-  disabled: { dot: 'bg-gray-600', text: 'text-gray-400', label: 'Disabled' },
+  disabled: { dot: 'bg-gray-600', text: 'text-fg-muted', label: 'Disabled' },
 };
 
 /** Order worst-first so the answer is the first thing read. */
@@ -57,21 +57,21 @@ function ConnectorRow({ row }: { row: FleetConnectorHealth }) {
   const style = STATE_STYLE[row.state] ?? STATE_STYLE.unproven;
   return (
     <li
-      className="flex items-start gap-3 border-t border-gray-800/40 px-4 py-2.5 first:border-t-0"
+      className="flex items-start gap-3 border-t border-surface-border/40 px-4 py-2.5 first:border-t-0"
       data-testid={`fleet-row-${row.connector_id}`}
     >
       <span className={clsx('mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full', style.dot)} aria-hidden="true" />
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-baseline gap-x-2">
-          <span className="truncate text-sm text-gray-200">{row.name}</span>
-          <span className="text-[11px] text-gray-500">{row.connector_type}</span>
+          <span className="truncate text-sm text-fg-primary">{row.name}</span>
+          <span className="text-[11px] text-fg-subtle">{row.connector_type}</span>
           <span className={clsx('text-[11px]', style.text)}>{style.label}</span>
         </div>
         {/* The server writes operator-actionable wording; render it verbatim
             rather than re-deriving a status string from the same fields. */}
-        <p className="mt-0.5 text-[11px] text-gray-500">{row.reason}</p>
+        <p className="mt-0.5 text-[11px] text-fg-subtle">{row.reason}</p>
       </div>
-      <div className="shrink-0 text-right text-[11px] text-gray-500">
+      <div className="shrink-0 text-right text-[11px] text-fg-subtle">
         <div>{formatStaleness(row)}</div>
         <div className="mt-0.5">
           {row.events_ingested.toLocaleString()} events
@@ -99,14 +99,14 @@ export function ConnectorFleetPanel() {
   return (
     <section
       aria-labelledby="ops-fleet-heading"
-      className="rounded-xl border border-gray-800/60 bg-gray-900/40"
+      className="rounded-xl border border-surface-border/60 bg-surface-card/40"
     >
       <div className="flex items-baseline justify-between px-4 py-3">
         <div>
-          <h2 id="ops-fleet-heading" className="text-sm font-medium text-gray-300">
+          <h2 id="ops-fleet-heading" className="text-sm font-medium text-fg-secondary">
             Connector fleet
           </h2>
-          <p className="mt-0.5 text-[11px] text-gray-500">
+          <p className="mt-0.5 text-[11px] text-fg-subtle">
             Staleness measured against each connector&apos;s own poll cadence.
           </p>
         </div>
@@ -132,7 +132,7 @@ export function ConnectorFleetPanel() {
       </div>
 
       {isLoading && !data ? (
-        <div className="m-4 h-24 animate-pulse rounded bg-gray-800/40" />
+        <div className="m-4 h-24 animate-pulse rounded bg-surface-elevated/40" />
       ) : error ? (
         <ErrorState
           title="Fleet health unavailable"

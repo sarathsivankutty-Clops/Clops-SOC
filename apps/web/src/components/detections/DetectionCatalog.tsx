@@ -37,7 +37,7 @@ const LEVEL_COLORS: Record<string, string> = {
   high:          'bg-orange-900/40 text-orange-300 border-orange-700/60',
   medium:        'bg-yellow-900/40 text-yellow-300 border-yellow-700/60',
   low:           'bg-blue-900/40 text-blue-300 border-blue-700/60',
-  informational: 'bg-zinc-700/60 text-zinc-400 border-zinc-600',
+  informational: 'bg-surface-elevated/60 text-fg-muted border-surface-border',
 };
 
 const PAGE_SIZE = 24;
@@ -61,7 +61,7 @@ function LevelBadge({ level }: { level?: string }) {
     <span
       className={clsx(
         'inline-flex items-center rounded border px-1.5 py-0.5 text-xs font-semibold uppercase tracking-wide',
-        LEVEL_COLORS[level] ?? 'bg-zinc-700 text-zinc-300 border-zinc-600'
+        LEVEL_COLORS[level] ?? 'bg-surface-elevated text-fg-secondary border-surface-border'
       )}
     >
       {level}
@@ -73,13 +73,13 @@ function StarRating({ rating, count }: { rating: number; count: number }) {
   const full = Math.floor(rating);
   const half = rating - full >= 0.5;
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-zinc-400">
+    <span className="inline-flex items-center gap-1 text-xs text-fg-muted">
       <span className="text-yellow-400">
         {'★'.repeat(full)}
         {half ? '½' : ''}
         {'☆'.repeat(5 - full - (half ? 1 : 0))}
       </span>
-      <span className="text-zinc-500">
+      <span className="text-fg-muted">
         {rating.toFixed(1)} ({count})
       </span>
     </span>
@@ -125,31 +125,31 @@ function DetectionCard({ rule }: { rule: DetectionRule }) {
 
   return (
     <div
-      className="flex flex-col gap-3 rounded-xl border border-zinc-700/60 bg-zinc-800/60 p-4 hover:border-zinc-600 transition-colors cursor-pointer"
+      className="flex flex-col gap-3 rounded-xl border border-surface-border/60 bg-surface-card/60 p-4 hover:border-surface-border transition-colors cursor-pointer"
       onClick={toggleDetail}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
-        <h3 className="text-sm font-semibold text-zinc-100 leading-snug line-clamp-2 flex-1">
+        <h3 className="text-sm font-semibold text-fg-primary leading-snug line-clamp-2 flex-1">
           {rule.name}
         </h3>
         <LevelBadge level={rule.level} />
       </div>
 
       {/* Description */}
-      <p className="text-xs text-zinc-400 leading-relaxed line-clamp-3">
+      <p className="text-xs text-fg-muted leading-relaxed line-clamp-3">
         {rule.description || 'No description provided.'}
       </p>
 
       {/* Metadata */}
-      <div className="flex items-center gap-3 text-xs text-zinc-500">
+      <div className="flex items-center gap-3 text-xs text-fg-muted">
         {rule.logsource_product && (
-          <span className="rounded bg-zinc-700/60 px-1.5 py-0.5 text-zinc-300">
+          <span className="rounded bg-surface-elevated/60 px-1.5 py-0.5 text-fg-secondary">
             {rule.logsource_product}
           </span>
         )}
         {rule.logsource_category && (
-          <span className="rounded bg-zinc-700/60 px-1.5 py-0.5 text-zinc-400">
+          <span className="rounded bg-surface-elevated/60 px-1.5 py-0.5 text-fg-muted">
             {rule.logsource_category}
           </span>
         )}
@@ -160,28 +160,28 @@ function DetectionCard({ rule }: { rule: DetectionRule }) {
         {rule.rating > 0 ? (
           <StarRating rating={rule.rating} count={rule.rating_count} />
         ) : (
-          <span className="text-xs text-zinc-600">No ratings</span>
+          <span className="text-xs text-fg-faint">No ratings</span>
         )}
-        <span className="text-xs text-zinc-500">{rule.install_count.toLocaleString()} installs</span>
+        <span className="text-xs text-fg-muted">{rule.install_count.toLocaleString()} installs</span>
       </div>
 
       {/* Tags */}
       {rule.tags && rule.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">
           {rule.tags.slice(0, 5).map((t) => (
-            <span key={t} className="rounded bg-zinc-700/50 px-1.5 py-0.5 text-xs text-zinc-400">
+            <span key={t} className="rounded bg-surface-elevated/50 px-1.5 py-0.5 text-xs text-fg-muted">
               {t}
             </span>
           ))}
           {rule.tags.length > 5 && (
-            <span className="text-xs text-zinc-600">+{rule.tags.length - 5}</span>
+            <span className="text-xs text-fg-faint">+{rule.tags.length - 5}</span>
           )}
         </div>
       )}
 
       {/* Install button */}
-      <div className="flex items-center justify-between pt-2 border-t border-zinc-700/40">
-        <span className="text-xs text-zinc-600">by {rule.author}</span>
+      <div className="flex items-center justify-between pt-2 border-t border-surface-border/40">
+        <span className="text-xs text-fg-faint">by {rule.author}</span>
         <button
           onClick={handleInstall}
           disabled={installing || installed}
@@ -189,7 +189,7 @@ function DetectionCard({ rule }: { rule: DetectionRule }) {
             'rounded px-2.5 py-1 text-xs font-medium transition-colors',
             installed
               ? 'bg-emerald-900/40 text-emerald-300 cursor-default'
-              : 'bg-zinc-700 text-zinc-200 hover:bg-zinc-600'
+              : 'bg-surface-elevated text-fg-primary hover:bg-surface-elevated'
           )}
         >
           {installed ? '✓ Installed' : installing ? '…' : 'Install Rule'}
@@ -199,7 +199,7 @@ function DetectionCard({ rule }: { rule: DetectionRule }) {
       {/* Expandable YAML */}
       {(loadingDetail || detail !== null) && (
         <div
-          className="mt-1 rounded-lg bg-zinc-900 p-3 text-xs font-mono text-zinc-300 overflow-auto max-h-64 whitespace-pre"
+          className="mt-1 rounded-lg bg-surface-sunken p-3 text-xs font-mono text-fg-secondary overflow-auto max-h-64 whitespace-pre"
           onClick={(e) => e.stopPropagation()}
         >
           {loadingDetail ? 'Loading…' : detail}
@@ -293,12 +293,12 @@ export function DetectionCatalog() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-zinc-100">Detection Catalog</h1>
-          <p className="mt-1 text-sm text-zinc-400">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-fg-primary */>Detection Catalog</h1>
+          <p className="mt-1 text-sm text-fg-muted">
             Browse and install community Sigma detection rules for your SOC.
           </p>
         </div>
-        <div className="text-sm text-zinc-500">
+        <div className="text-sm text-fg-muted">
           {total > 0 && <span>{total.toLocaleString()} rules</span>}
         </div>
       </div>
@@ -312,11 +312,11 @@ export function DetectionCatalog() {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
             placeholder="Search rules…"
-            className="flex-1 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-zinc-500 focus:outline-none"
+            className="flex-1 rounded-lg border border-surface-border bg-surface-card px-3 py-2 text-sm text-fg-primary placeholder-fg-faint focus:border-brand-500 focus:outline-none"
           />
           <button
             onClick={handleSearch}
-            className="rounded-lg bg-zinc-700 px-3 py-2 text-sm text-zinc-200 hover:bg-zinc-600 transition-colors"
+            className="rounded-lg bg-surface-elevated px-3 py-2 text-sm text-fg-primary hover:bg-surface-elevated transition-colors"
           >
             Search
           </button>
@@ -325,7 +325,7 @@ export function DetectionCatalog() {
         <select
           value={productFilter}
           onChange={(e) => handleFilterChange(e.target.value, levelFilter, sortBy)}
-          className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-surface-border bg-surface-card px-3 py-2 text-sm text-fg-secondary focus:border-brand-500 focus:outline-none"
         >
           <option value="all">All Products</option>
           {PRODUCTS.map((p) => (
@@ -336,7 +336,7 @@ export function DetectionCatalog() {
         <select
           value={levelFilter}
           onChange={(e) => handleFilterChange(productFilter, e.target.value, sortBy)}
-          className="rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-2 text-sm text-zinc-300 focus:border-zinc-500 focus:outline-none"
+          className="rounded-lg border border-surface-border bg-surface-card px-3 py-2 text-sm text-fg-secondary focus:border-brand-500 focus:outline-none"
         >
           <option value="all">All Levels</option>
           <option value="critical">Critical</option>
@@ -346,14 +346,14 @@ export function DetectionCatalog() {
           <option value="informational">Informational</option>
         </select>
 
-        <div className="flex gap-1 rounded-lg border border-zinc-700 bg-zinc-800 p-1">
+        <div className="flex gap-1 rounded-lg border border-surface-border bg-surface-card p-1">
           {(['install_count', 'rating', 'name'] as const).map((s) => (
             <button
               key={s}
               onClick={() => handleFilterChange(productFilter, levelFilter, s)}
               className={clsx(
                 'rounded px-2.5 py-1.5 text-xs font-medium transition-colors',
-                sortBy === s ? 'bg-zinc-600 text-zinc-100' : 'text-zinc-400 hover:text-zinc-200'
+                sortBy === s ? 'bg-zinc-600 text-fg-primary' : 'text-fg-muted hover:text-fg-primary'
               )}
             >
               {s === 'install_count' ? 'Popular' : s === 'rating' ? 'Top Rated' : 'Name'}
@@ -364,7 +364,7 @@ export function DetectionCatalog() {
 
       {/* Content */}
       {loading && (
-        <div className="flex items-center justify-center py-20 text-zinc-500">
+        <div className="flex items-center justify-center py-20 text-fg-muted">
           Loading detection catalog…
         </div>
       )}
@@ -374,7 +374,7 @@ export function DetectionCatalog() {
           <span>{error}</span>
           <button
             onClick={() => loadRules(search, productFilter, levelFilter, sortBy, page)}
-            className="ml-4 rounded bg-zinc-700 px-3 py-1 text-xs text-zinc-200 hover:bg-zinc-600 transition-colors"
+            className="ml-4 rounded bg-surface-elevated px-3 py-1 text-xs text-fg-primary hover:bg-surface-elevated transition-colors"
           >
             Retry
           </button>
@@ -382,11 +382,11 @@ export function DetectionCatalog() {
       )}
 
       {!loading && !error && fetched && rules.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-20 text-zinc-500">
+        <div className="flex flex-col items-center justify-center py-20 text-fg-muted">
           <p className="text-sm">No detection rules found.</p>
           <p className="text-xs mt-1">
             Publish rules with{' '}
-            <code className="text-zinc-400">aisoc detection validate &amp;&amp; aisoc detection publish</code>
+            <code className="text-fg-muted">aisoc detection validate &amp;&amp; aisoc detection publish</code>
           </p>
         </div>
       )}
@@ -409,11 +409,11 @@ export function DetectionCatalog() {
                   loadRules(search, productFilter, levelFilter, sortBy, newPage);
                 }}
                 disabled={page <= 1}
-                className="rounded px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-200 disabled:opacity-30"
+                className="rounded px-3 py-1.5 text-sm text-fg-muted hover:text-fg-primary disabled:opacity-30"
               >
                 ← Prev
               </button>
-              <span className="text-sm text-zinc-500">
+              <span className="text-sm text-fg-muted">
                 Page {page} of {totalPages}
               </span>
               <button
@@ -423,7 +423,7 @@ export function DetectionCatalog() {
                   loadRules(search, productFilter, levelFilter, sortBy, newPage);
                 }}
                 disabled={page >= totalPages}
-                className="rounded px-3 py-1.5 text-sm text-zinc-400 hover:text-zinc-200 disabled:opacity-30"
+                className="rounded px-3 py-1.5 text-sm text-fg-muted hover:text-fg-primary disabled:opacity-30"
               >
                 Next →
               </button>

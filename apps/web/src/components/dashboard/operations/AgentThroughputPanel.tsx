@@ -61,19 +61,19 @@ export function AgentThroughputPanel() {
   return (
     <section
       aria-labelledby="ops-agent-heading"
-      className="rounded-xl border border-gray-800/60 bg-gray-900/40"
+      className="rounded-xl border border-surface-border/60 bg-surface-card/40"
     >
       <div className="px-4 py-3">
-        <h2 id="ops-agent-heading" className="text-sm font-medium text-gray-300">
+        <h2 id="ops-agent-heading" className="text-sm font-medium text-fg-secondary">
           Agent throughput and spend
         </h2>
-        <p className="mt-0.5 text-[11px] text-gray-500">
+        <p className="mt-0.5 text-[11px] text-fg-subtle">
           Recorded token usage from the last {WINDOW_DAYS} days of investigation runs.
         </p>
       </div>
 
       {isLoading && !data ? (
-        <div className="m-4 h-28 animate-pulse rounded bg-gray-800/40" />
+        <div className="m-4 h-28 animate-pulse rounded bg-surface-elevated/40" />
       ) : error ? (
         <ErrorState
           title="Agent telemetry unavailable"
@@ -105,11 +105,11 @@ export function AgentThroughputPanel() {
               it is null the server had no basis for it, and dividing here
               would invent one. */}
           {anyMeasured && headline.avg_cost_per_run_usd != null ? (
-            <p className="text-[11px] text-gray-500">
+            <p className="text-[11px] text-fg-subtle">
               {`${formatUsd(headline.avg_cost_per_run_usd)} per run on average, measured over ${measuredCalls.toLocaleString()} calls.`}
             </p>
           ) : (
-            <p className="text-[11px] text-gray-500">
+            <p className="text-[11px] text-fg-subtle">
               {estimatedCalls > 0
                 ? `Spend not measured — the gateway reported no cost. List price for the models involved is ~${formatUsd(headline.estimated_cost_usd)}.`
                 : 'Spend not measured: no call in this window reported a cost.'}
@@ -118,17 +118,17 @@ export function AgentThroughputPanel() {
 
           {byModel.length > 0 && (
             <div>
-              <p className="mb-2 text-[11px] uppercase tracking-wider text-gray-500">
+              <p className="mb-2 text-[11px] uppercase tracking-wider text-fg-subtle">
                 By model
               </p>
               <ul className="space-y-2">
                 {byModel.map((m) => (
                   <li key={m.model}>
                     <div className="mb-1 flex items-baseline justify-between gap-3">
-                      <span className="truncate font-mono text-[11px] text-gray-300">
+                      <span className="truncate font-mono text-[11px] text-fg-secondary">
                         {m.model}
                       </span>
-                      <span className="shrink-0 text-[11px] text-gray-500">
+                      <span className="shrink-0 text-[11px] text-fg-subtle">
                         {`${m.runs} runs · ${
                           (m.measured_call_count ?? 0) > 0
                             ? formatUsd(m.total_cost_usd)
@@ -139,7 +139,7 @@ export function AgentThroughputPanel() {
                       </span>
                     </div>
                     {anyMeasured && (
-                      <div className="h-1 rounded-full bg-gray-800">
+                      <div className="h-1 rounded-full bg-surface-elevated">
                         <div
                           className="h-1 rounded-full bg-indigo-500/60"
                           style={{
@@ -162,8 +162,8 @@ export function AgentThroughputPanel() {
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[11px] uppercase tracking-wider text-gray-500">{label}</p>
-      <p className="text-xl font-semibold text-gray-100">{value}</p>
+      <p className="text-[11px] uppercase tracking-wider text-fg-subtle">{label}</p>
+      <p className="text-xl font-semibold text-fg-primary">{value}</p>
     </div>
   );
 }

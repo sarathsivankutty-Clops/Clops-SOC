@@ -35,7 +35,7 @@ import { ApiError, brandingApi, type Branding, type BrandingUpdate } from '@/lib
 import { EmptyState } from '@/components/ui/EmptyState';
 
 function inputClass() {
-  return 'w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none';
+  return 'w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary placeholder-fg-muted focus:border-brand-500 focus:outline-none';
 }
 
 function describeError(err: unknown, fallback: string): string {
@@ -187,9 +187,9 @@ export function BrandingPanel() {
 
   return (
     <div data-testid="branding-panel">
-      <div className="border-b border-gray-800 px-6 py-4">
-        <h2 className="text-base font-semibold text-gray-100">Branding</h2>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="border-b border-surface-border px-6 py-4">
+        <h2 className="text-base font-semibold text-fg-primary">Branding</h2>
+        <p className="mt-1 text-sm text-fg-muted">
           The product name, colours and support details this organisation&apos;s
           tenants see — and that appear in approval emails and exported
           reports.
@@ -218,7 +218,7 @@ export function BrandingPanel() {
 
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm">
-                <span className="mb-1 block text-gray-400">Product name</span>
+                <span className="mb-1 block text-fg-secondary">Product name</span>
                 <input
                   className={inputClass()}
                   value={draft.product_name}
@@ -228,7 +228,7 @@ export function BrandingPanel() {
                 />
               </label>
               <label className="text-sm">
-                <span className="mb-1 block text-gray-400">Email sender name</span>
+                <span className="mb-1 block text-fg-secondary">Email sender name</span>
                 <input
                   className={inputClass()}
                   value={draft.sender_name}
@@ -238,7 +238,7 @@ export function BrandingPanel() {
                 />
               </label>
               <label className="text-sm">
-                <span className="mb-1 block text-gray-400">Primary colour</span>
+                <span className="mb-1 block text-fg-secondary">Primary colour</span>
                 <input
                   className={inputClass()}
                   value={draft.primary_color}
@@ -248,7 +248,7 @@ export function BrandingPanel() {
                 />
               </label>
               <label className="text-sm">
-                <span className="mb-1 block text-gray-400">Accent colour</span>
+                <span className="mb-1 block text-fg-secondary">Accent colour</span>
                 <input
                   className={inputClass()}
                   value={draft.accent_color}
@@ -258,7 +258,7 @@ export function BrandingPanel() {
                 />
               </label>
               <label className="text-sm">
-                <span className="mb-1 block text-gray-400">Support email</span>
+                <span className="mb-1 block text-fg-secondary">Support email</span>
                 <input
                   className={inputClass()}
                   value={draft.support_email}
@@ -268,7 +268,7 @@ export function BrandingPanel() {
                 />
               </label>
               <label className="text-sm">
-                <span className="mb-1 block text-gray-400">Support URL</span>
+                <span className="mb-1 block text-fg-secondary">Support URL</span>
                 <input
                   className={inputClass()}
                   value={draft.support_url}
@@ -280,7 +280,7 @@ export function BrandingPanel() {
             </div>
 
             <label className="block text-sm">
-              <span className="mb-1 block text-gray-400">Footer text</span>
+              <span className="mb-1 block text-fg-secondary">Footer text</span>
               <textarea
                 className={`${inputClass()} min-h-[72px]`}
                 value={draft.footer_text}
@@ -295,40 +295,40 @@ export function BrandingPanel() {
                 type="button"
                 onClick={() => void save()}
                 disabled={busy}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+                className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 disabled:opacity-50"
               >
                 {busy ? 'Working…' : 'Save branding'}
               </button>
               {branding?.is_white_labelled ? (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-fg-muted">
                   This organisation is white-labelled.
                 </span>
               ) : null}
             </div>
 
-            <div className="space-y-3 rounded-lg border border-gray-800 bg-gray-950/40 p-4">
-              <h3 className="text-sm font-medium text-gray-200">Logo and favicon</h3>
-              <p className="text-xs text-gray-500">
+            <div className="space-y-3 rounded-lg border border-surface-border bg-surface-sunken/50 p-4">
+              <h3 className="text-sm font-medium text-fg-primary">Logo and favicon</h3>
+              <p className="text-xs text-fg-muted">
                 SVG, PNG, JPEG or WebP. An SVG is sanitised on upload and what is
                 stored is the sanitised output — nothing re-sanitises when it is
                 rendered.
               </p>
               {(['logo', 'favicon'] as const).map((kind) => (
                 <div key={kind} className="flex flex-wrap items-center gap-3">
-                  <span className="w-20 text-sm capitalize text-gray-300">{kind}</span>
+                  <span className="w-20 text-sm capitalize text-fg-secondary">{kind}</span>
                   <input
                     type="file"
                     accept="image/svg+xml,image/png,image/jpeg,image/webp"
                     aria-label={`Upload ${kind}`}
                     disabled={busy}
                     onChange={(e) => void upload(kind, e.target.files?.[0] ?? null)}
-                    className="text-xs text-gray-400 file:mr-3 file:rounded file:border file:border-gray-700 file:bg-gray-900 file:px-3 file:py-1.5 file:text-xs file:text-gray-200"
+                    className="text-xs text-fg-secondary file:mr-3 file:rounded file:border file:border-surface-border-strong file:bg-surface-card file:px-3 file:py-1.5 file:text-xs file:text-fg-primary"
                   />
                   <button
                     type="button"
                     onClick={() => void removeAsset(kind)}
                     disabled={busy}
-                    className="rounded border border-gray-700 bg-gray-900 px-2 py-1 text-xs text-gray-200 hover:bg-gray-800 disabled:opacity-40"
+                    className="rounded border border-surface-border-strong bg-surface-card px-2 py-1 text-xs text-fg-primary hover:bg-surface-elevated disabled:opacity-40"
                   >
                     Remove
                   </button>

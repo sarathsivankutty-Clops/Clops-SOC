@@ -136,10 +136,10 @@ export function AiChatCompliancePanel() {
   const data = config.data;
 
   return (
-    <section className="space-y-4 rounded border border-neutral-700 p-4">
+    <section className="space-y-4 rounded border border-surface-border p-4">
       <header>
         <h2 className="font-semibold">Enterprise AI chat compliance</h2>
-        <p className="mt-1 text-sm text-neutral-400">
+        <p className="mt-1 text-sm text-fg-muted">
           Reads your AI provider&apos;s compliance API for the directory, projects and activity feed. Off
           until you add a key here. AiSOC stores classification labels and one 280-character masked
           snippet per conversation, never the conversation.
@@ -148,9 +148,9 @@ export function AiChatCompliancePanel() {
 
       <div className="space-y-3">
         <label className="block text-sm">
-          <span className="text-neutral-300">Provider</span>
+          <span className="text-fg-secondary">Provider</span>
           <select
-            className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2"
+            className="mt-1 w-full rounded border border-surface-border bg-surface-card p-2"
             value={provider}
             onChange={(e) => setProvider(e.target.value)}
           >
@@ -159,18 +159,18 @@ export function AiChatCompliancePanel() {
         </label>
 
         <label className="block text-sm">
-          <span className="text-neutral-300">
+          <span className="text-fg-secondary">
             Compliance Access Key{data?.hasKey ? " (one is stored; type a new one to replace it)" : ""}
           </span>
           <input
             type="password"
             autoComplete="off"
-            className="mt-1 w-full rounded border border-neutral-700 bg-neutral-900 p-2 font-mono"
+            className="mt-1 w-full rounded border border-surface-border bg-surface-card p-2 font-mono"
             placeholder="sk-ant-api01-…"
             value={accessKey}
             onChange={(e) => setAccessKey(e.target.value)}
           />
-          <span className="mt-1 block text-xs text-neutral-500">
+          <span className="mt-1 block text-xs text-fg-subtle">
             Encrypted by the credential vault before it is written, and never returned by the API. An
             Admin API key reaches the activity feed only.
           </span>
@@ -179,8 +179,8 @@ export function AiChatCompliancePanel() {
         <label className="flex items-start gap-2 text-sm">
           <input type="checkbox" checked={enabled} onChange={(e) => setEnabled(e.target.checked)} />
           <span>
-            <span className="text-neutral-200">Collect the directory, projects and activity feed</span>
-            <span className="mt-0.5 block text-xs text-neutral-500">
+            <span className="text-fg-primary">Collect the directory, projects and activity feed</span>
+            <span className="mt-0.5 block text-xs text-fg-subtle">
               Users, roles, projects, and who did what and when. No message content is read.
             </span>
           </span>
@@ -194,8 +194,8 @@ export function AiChatCompliancePanel() {
             onChange={(e) => setContentLabels(e.target.checked)}
           />
           <span>
-            <span className="text-neutral-200">Also classify message content</span>
-            <span className="mt-0.5 block text-xs text-neutral-500">
+            <span className="text-fg-primary">Also classify message content</span>
+            <span className="mt-0.5 block text-xs text-fg-subtle">
               Reads messages in memory to label a conversation as containing credentials, personal data,
               regulated identifiers or financial data. Stores the labels, the shape names and one masked
               snippet of at most 280 characters. The conversation is not stored and is not sent anywhere.
@@ -215,7 +215,7 @@ export function AiChatCompliancePanel() {
       </div>
 
       {data ? (
-        <p className="text-xs text-neutral-500">
+        <p className="text-xs text-fg-subtle">
           {!data.configured
             ? "Not configured. Nothing is collected for this tenant."
             : data.lastError
@@ -234,35 +234,35 @@ export function AiChatCompliancePanel() {
             an empty result.
           </p>
         ) : !labels.data ? (
-          <p className="mt-1 text-sm text-neutral-500">Loading…</p>
+          <p className="mt-1 text-sm text-fg-subtle">Loading…</p>
         ) : !labels.data.contentLabelsEnabled ? (
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-fg-subtle">
             Content classification is off, so there is nothing to show. That is a setting, not a result.
           </p>
         ) : labels.data.items.length === 0 ? (
-          <p className="mt-1 text-sm text-neutral-500">
+          <p className="mt-1 text-sm text-fg-subtle">
             No conversation has matched a classifier yet.
           </p>
         ) : (
           <ul className="mt-2 space-y-2">
             {labels.data.items.map((row) => (
-              <li key={row.id} className="rounded border border-neutral-800 p-2 text-sm">
+              <li key={row.id} className="rounded border border-surface-border p-2 text-sm">
                 <div className="flex flex-wrap items-center gap-2">
                   {row.labels.map((label) => (
                     <span key={label} className="rounded bg-amber-900/60 px-1.5 py-0.5 text-xs">
                       {LABEL_COPY[label] ?? label}
                     </span>
                   ))}
-                  <span className="text-neutral-400">{row.actorEmail ?? "actor not learned"}</span>
-                  <span className="text-neutral-600">{new Date(row.occurredAt).toLocaleString()}</span>
+                  <span className="text-fg-muted">{row.actorEmail ?? "actor not learned"}</span>
+                  <span className="text-fg-secondary">{new Date(row.occurredAt).toLocaleString()}</span>
                 </div>
                 {row.snippet ? (
-                  <pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-all rounded bg-neutral-900 p-2 font-mono text-xs text-neutral-300">
+                  <pre className="mt-1 overflow-x-auto whitespace-pre-wrap break-all rounded bg-surface-card p-2 font-mono text-xs text-fg-secondary">
                     {row.snippet}
                     {row.snippetTruncated ? "…" : ""}
                   </pre>
                 ) : null}
-                <p className="mt-1 text-xs text-neutral-500">
+                <p className="mt-1 text-xs text-fg-subtle">
                   {row.messagesMatched} of {row.messagesExamined} messages matched
                   {row.secretKinds.length > 0 ? ` · ${row.secretKinds.join(", ")}` : ""}
                 </p>

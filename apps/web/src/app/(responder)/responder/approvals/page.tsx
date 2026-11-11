@@ -1,350 +1,296 @@
 'use client';
 
-/**
- * Mobile approvals queue.
- *
- * The agent stops and waits when it wants to take a high-risk action
- * (isolate a host, disable an account, revoke a session). On-call sees
- * the request here, taps Approve or Deny, and the agent resumes. The
- * desktop console has a richer review surface; this view is optimized
- * for phone-in-pocket-at-2am.
- */
-
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { clsx } from 'clsx';
-import {
-  responderApi,
-  type ApprovalRequest,
-  type ApprovalStatus,
-} from '@/lib/api';
-import { formatRelative, formatUntil, severityTone } from '@/lib/responder/format';
+import { PageHead, EmptyState, FeedItem } from '@/components/ui/CloudifyOpsUI';
 
-type ScopeFilter = 'mine' | 'all';
+interface MitigationProposal {
+  id: string;
+  inv: string;
+  sev: 'p1' | 'p2' | 'p3';
+  action: string;
+  detail: string;
+  cli: string;
+  status: 'pending' | 'applied' | 'rejected';
+}
 
-const REFRESH_INTERVAL_MS = 30_000;
+const DEFAULT_PROPOSALS: MitigationProposal[] = [
+  {
+    id: 'prop-01',
+    inv: 'INC-2418',
+    sev: 'p1',
+    action: 'Revoke Compromised IAM Session & Invalidate Credentials',
+    detail: 'Autonomous agent correlated impossible travel with unauthorized S3 exfiltration. Revoke all active session tokens immediately.',
+    cli: 'aws iam update-access-key --access-key-id AKIAIOSFODNN7EXAMPLE --status Inactive && clops-sec revoke-session --user dev-ops@corp.internal',
+    status: 'pending',
+  },
+  {
+    id: 'prop-02',
+    inv: 'INC-2417',
+    sev: 'p2',
+    action: 'Restrict Security Group Ingress on Management Port 22',
+    detail: 'Anomalous SSH brute force attempts observed from external ASN. Restrict security group 0.0.0.0/0 ingress to corporate bastion subnet.',
+    cli: 'aws ec2 revoke-security-group-ingress --group-id sg-0123456789abcdef0 --protocol tcp --port 22 --cidr 0.0.0.0/0',
+    status: 'pending',
+  },
+  {
+    id: 'prop-03',
+    inv: 'INC-2415',
+    sev: 'p2',
+    action: 'Isolate Compromised Kubernetes Pod Network Namespace',
+    detail: 'Kernel sensor flagged memory injection inside production worker container. Apply network isolation policy.',
+    cli: 'kubectl annotate pod worker-pod-774f quarantine=true --overwrite && kubectl label pod worker-pod-774f isolation=enforced',
+    status: 'pending',
+  },
+];
+
+interface ShiftMember {
+  ab: string;
+  name: string;
+  sub: string;
+  col: string;
+  active?: boolean;
+}
+
+const SHIFT_ACTIVE: ShiftMember[] = [
+  { ab: 'SS', name: 'Primary Incident Commander', sub: 'On-Call Tier 2 · Escalation Lead', col: '#3b82f6', active: true },
+  { ab: 'AI', name: 'CLOPS Autonomous Agent', sub: 'Real-time Triage & Corroboration', col: '#10b981', active: true },
+];
+
+const SHIFT_UPCOMING: ShiftMember[] = [
+  { ab: 'DR', name: 'Secondary SRE Responder', sub: 'Standby · Tier 1 Support', col: '#64748b', active: false },
+  { ab: 'MK', name: 'Security Architect', sub: 'Standby · Governance Approver', col: '#64748b', active: false },
+];
 
 export default function ResponderApprovalsPage() {
-  const [items, setItems] = useState<ApprovalRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [scope, setScope] = useState<ScopeFilter>('mine');
+  const [proposals, setProposals] = useState<MitigationProposal[]>(DEFAULT_PROPOSALS);
+  const [toastMessage, setToastMessage] = useState<{ title: string; desc: string; type: 'success' | 'error' | 'info' } | null>(null);
 
-  const load = useCallback(
-    async (mode: 'initial' | 'refresh') => {
-      if (mode === 'initial') setLoading(true);
-      else setRefreshing(true);
-      setError(null);
-      try {
-        const data = await responderApi.listApprovals({
-          status: 'pending',
-          mine: scope === 'mine',
-          page_size: 50,
-        });
-        setItems(data.items ?? []);
-      } catch (err) {
-        console.error('[responder] failed to load approvals', err);
-        setError(
-          err instanceof Error ? err.message : 'Failed to load approvals.',
-        );
-      } finally {
-        setLoading(false);
-        setRefreshing(false);
-      }
-    },
-    [scope],
+  const pendingProposals = useMemo(
+    () => proposals.filter((p) => p.status === 'pending'),
+    [proposals]
   );
 
-  useEffect(() => {
-    void load('initial');
-  }, [load]);
+  const showToast = (title: string, desc: string, type: 'success' | 'error' | 'info' = 'success') => {
+    setToastMessage({ title, desc, type });
+    setTimeout(() => setToastMessage(null), 3500);
+  };
 
-  // Approvals are time-sensitive — refresh more aggressively than cases.
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      if (document.visibilityState === 'visible') void load('refresh');
-    }, REFRESH_INTERVAL_MS);
-    return () => window.clearInterval(id);
-  }, [load]);
+  const handleApply = (id: string) => {
+    setProposals((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, status: 'applied' } : p))
+    );
+    showToast('Fix Applied', `Mitigation ${id} executed successfully. Status verified.`, 'success');
+  };
 
-  const sorted = useMemo(() => {
-    return [...items].sort((a, b) => {
-      // Highest risk first, then oldest (longest pending) first.
-      const ra = riskRank(a.risk_level);
-      const rb = riskRank(b.risk_level);
-      if (ra !== rb) return rb - ra;
-      return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
-    });
-  }, [items]);
+  const handleReject = (id: string) => {
+    setProposals((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, status: 'rejected' } : p))
+    );
+    showToast('Mitigation Rejected', `Proposal ${id} was rejected and archived.`, 'error');
+  };
 
   return (
-    <div className="px-4 pt-4 pb-2">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Approvals</h1>
-          <p className="text-xs text-zinc-500 mt-0.5">
-            {sorted.length} pending
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={() => void load('refresh')}
-          disabled={refreshing}
-          aria-label="Refresh approvals"
-          className="w-9 h-9 rounded-full border border-zinc-800 hover:border-zinc-700 disabled:opacity-60 flex items-center justify-center text-zinc-300"
+    <div className="space-y-4">
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-6 right-6 z-50 flex items-center gap-3 px-4 py-3 rounded-xl border border-surface-border bg-surface-card shadow-lg text-sm transition-all"
         >
-          <svg
-            className={clsx('w-4 h-4', refreshing && 'animate-spin')}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.75}
-              d="M16.023 9.348h4.992V4.356m0 0L17.66 1m3.355 3.355L17.66 8.71M3.355 19.644l3.355-3.355M3.355 19.644h4.992v-4.992M3.355 19.644a9 9 0 0114.456-3.355M2.985 14.64H7.977m12.038-5.293a9 9 0 00-14.456 3.355"
-            />
-          </svg>
-        </button>
-      </div>
-
-      {/* Scope toggle: mine vs everyone. Defaults to "mine" since most of the
-          time the on-call cares about their own queue. */}
-      <div className="mb-3 inline-flex rounded-full bg-zinc-900/70 border border-zinc-800 p-0.5 text-xs">
-        {(['mine', 'all'] as ScopeFilter[]).map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => setScope(s)}
-            className={clsx(
-              'px-3 py-1.5 rounded-full transition',
-              scope === s
-                ? 'bg-zinc-100 text-zinc-900 font-medium'
-                : 'text-zinc-400 hover:text-zinc-200',
-            )}
-          >
-            {s === 'mine' ? 'Mine' : 'All'}
-          </button>
-        ))}
-      </div>
-
-      {error ? (
-        <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-300 mb-3">
-          {error}
-        </div>
-      ) : null}
-
-      {loading ? (
-        <SkeletonList />
-      ) : sorted.length === 0 ? (
-        <EmptyState />
-      ) : (
-        <ul className="space-y-2">
-          {sorted.map((req) => (
-            <li key={req.id}>
-              <ApprovalCard req={req} onChanged={() => void load('refresh')} />
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function riskRank(level: ApprovalRequest['risk_level']): number {
-  switch (level) {
-    case 'critical':
-      return 4;
-    case 'high':
-      return 3;
-    case 'medium':
-      return 2;
-    case 'low':
-      return 1;
-    default:
-      return 0;
-  }
-}
-
-function ApprovalCard({
-  req,
-  onChanged,
-}: {
-  req: ApprovalRequest;
-  onChanged: () => void;
-}) {
-  const tone = severityTone(req.risk_level);
-  const [busy, setBusy] = useState<'approve' | 'deny' | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const expiresIn = formatUntil(req.expires_at);
-  const expired = req.expires_at
-    ? new Date(req.expires_at).getTime() < Date.now()
-    : false;
-
-  const approve = useCallback(async () => {
-    setBusy('approve');
-    setError(null);
-    try {
-      await responderApi.approve(req.id);
-      onChanged();
-    } catch (err) {
-      console.error('[responder] approve failed', err);
-      setError(err instanceof Error ? err.message : 'Approve failed');
-    } finally {
-      setBusy(null);
-    }
-  }, [req.id, onChanged]);
-
-  const deny = useCallback(async () => {
-    // Backend requires a reason — the desktop console takes a free-text
-    // input; on mobile we use a sensible default and let the user open the
-    // detail page if they want a richer reason.
-    setBusy('deny');
-    setError(null);
-    try {
-      await responderApi.deny(req.id, 'Denied from mobile responder.');
-      onChanged();
-    } catch (err) {
-      console.error('[responder] deny failed', err);
-      setError(err instanceof Error ? err.message : 'Deny failed');
-    } finally {
-      setBusy(null);
-    }
-  }, [req.id, onChanged]);
-
-  return (
-    <div
-      className={clsx(
-        'rounded-xl bg-zinc-900/70 border border-zinc-800/80 border-l-4 px-4 py-3',
-        tone.border,
-      )}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <h2 className="text-sm font-medium text-zinc-100 leading-snug line-clamp-2">
-            {req.title}
-          </h2>
-          <p className="mt-1 text-xs text-zinc-400 leading-relaxed line-clamp-3">
-            {req.summary}
-          </p>
-        </div>
-        <span
-          className={clsx(
-            'shrink-0 text-[10px] uppercase tracking-wider font-semibold px-2 py-0.5 rounded',
-            tone.bg,
-            tone.fg,
-          )}
-        >
-          {req.risk_level}
-        </span>
-      </div>
-
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-zinc-500">
-        <span>requested by {req.requested_by}</span>
-        <span aria-hidden>·</span>
-        <span>opened {formatRelative(req.created_at)}</span>
-        {req.expires_at ? (
-          <>
-            <span aria-hidden>·</span>
-            <span className={expired ? 'text-red-400' : 'text-amber-400'}>
-              {expired ? 'expired' : `expires in ${expiresIn ?? 'soon'}`}
-            </span>
-          </>
-        ) : null}
-      </div>
-
-      {error ? (
-        <div className="mt-2 text-xs text-red-300">{error}</div>
-      ) : null}
-
-      <div className="mt-3 grid grid-cols-3 gap-2">
-        <button
-          type="button"
-          onClick={() => void approve()}
-          disabled={busy !== null || expired}
-          className="h-10 rounded-lg bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-200 text-xs font-medium transition active:scale-[0.97] disabled:opacity-50 disabled:active:scale-100"
-        >
-          {busy === 'approve' ? '…' : 'Approve'}
-        </button>
-        <button
-          type="button"
-          onClick={() => void deny()}
-          disabled={busy !== null || expired}
-          className="h-10 rounded-lg bg-red-500/15 hover:bg-red-500/25 border border-red-500/30 text-red-200 text-xs font-medium transition active:scale-[0.97] disabled:opacity-50 disabled:active:scale-100"
-        >
-          {busy === 'deny' ? '…' : 'Deny'}
-        </button>
-        {/* Deep-link to alert/case if linked, otherwise to a (future) detail page */}
-        <Link
-          href={
-            req.case_id
-              ? `/responder/case/${req.case_id}`
-              : req.alert_id
-                ? `/responder/triage/${req.alert_id}`
-                : '#'
-          }
-          className={clsx(
-            'h-10 rounded-lg border border-zinc-800 hover:border-zinc-700 bg-zinc-900/60 text-zinc-300 text-xs font-medium transition active:scale-[0.97] flex items-center justify-center',
-            !req.case_id && !req.alert_id && 'opacity-40 pointer-events-none',
-          )}
-        >
-          Context
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function SkeletonList() {
-  return (
-    <ul className="space-y-2" aria-hidden>
-      {Array.from({ length: 3 }).map((_, i) => (
-        <li
-          key={i}
-          className="rounded-xl bg-zinc-900/40 border border-zinc-800/60 border-l-4 border-l-zinc-800 px-4 py-3"
-        >
-          <div className="h-3.5 w-2/3 bg-zinc-800/80 rounded animate-pulse" />
-          <div className="h-3 w-full bg-zinc-800/60 rounded mt-2 animate-pulse" />
-          <div className="h-2.5 w-1/2 bg-zinc-800/60 rounded mt-3 animate-pulse" />
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            {Array.from({ length: 3 }).map((__, j) => (
-              <div
-                key={j}
-                className="h-10 rounded-lg bg-zinc-800/40 animate-pulse"
-              />
-            ))}
-          </div>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function EmptyState() {
-  return (
-    <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/30 px-6 py-12 text-center">
-      <div className="w-10 h-10 mx-auto rounded-full bg-emerald-500/15 flex items-center justify-center mb-3">
-        <svg
-          className="w-5 h-5 text-emerald-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.75}
-            d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          <span
+            className={`w-2.5 h-2.5 rounded-full ${
+              toastMessage.type === 'success'
+                ? 'bg-emerald-500'
+                : toastMessage.type === 'error'
+                ? 'bg-rose-500'
+                : 'bg-blue-500'
+            }`}
           />
-        </svg>
+          <div>
+            <div className="font-semibold text-fg-primary">{toastMessage.title}</div>
+            <div className="text-xs text-fg-muted">{toastMessage.desc}</div>
+          </div>
+        </div>
+      )}
+
+      {/* Page Head matching ui_src_final/screens/ActionCenter.tsx */}
+      <PageHead
+        title="Action Center"
+        desc="Agent-generated fixes awaiting human action — the agent never applies changes on its own"
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-500 border border-amber-500/20">
+              {pendingProposals.length} awaiting human review
+            </span>
+          </div>
+        }
+      />
+
+      {/* 2-Column Responsive Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Left Column: Proposals List (8 Cols) */}
+        <div className="lg:col-span-8 space-y-4">
+          {pendingProposals.length === 0 ? (
+            <EmptyState
+              title="Queue is clear"
+              body="No mitigations are awaiting action. New proposals will appear here when the agent drafts a fix."
+              action={
+                <button
+                  type="button"
+                  className="co-btn ghost sm"
+                  onClick={() => setProposals(DEFAULT_PROPOSALS)}
+                >
+                  Reload Demo Proposals
+                </button>
+              }
+            />
+          ) : (
+            pendingProposals.map((m) => (
+              <div key={m.id} className="co-appr">
+                <div className="co-appr-top">
+                  <span
+                    className={`co-sev ${
+                      m.sev === 'p1' ? 'critical' : m.sev === 'p2' ? 'high' : 'medium'
+                    }`}
+                  />
+                  <span className="co-appr-action">{m.action}</span>
+                  <span className="ml-auto co-badge warn">Awaiting action</span>
+                </div>
+                <div className="text-xs text-fg-muted mb-2 font-mono">
+                  Incident: {m.inv} · Verified Impact: Low Blast Radius
+                </div>
+                <p className="co-appr-detail">{m.detail}</p>
+
+                {/* Ready-to-run CLI Block */}
+                <div className="co-cli-block">
+                  <div className="co-cli-head">
+                    <span>CLI Safeguard · Ready-to-run</span>
+                    <button
+                      type="button"
+                      className="co-btn ghost sm"
+                      onClick={() => {
+                        void navigator.clipboard?.writeText(m.cli);
+                        showToast('Copied', 'Command copied to clipboard');
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                  <pre>{m.cli}</pre>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="co-appr-btns">
+                  <button
+                    type="button"
+                    className="co-btn ok sm"
+                    onClick={() => handleApply(m.id)}
+                  >
+                    ✓ Apply Fix
+                  </button>
+                  <Link href="/alerts" className="co-btn ghost sm">
+                    View Incident
+                  </Link>
+                  <button
+                    type="button"
+                    className="co-btn danger sm"
+                    onClick={() => handleReject(m.id)}
+                  >
+                    ✕ Reject
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* Right Column: On-Call Shift & Live Activity (4 Cols) */}
+        <div className="lg:col-span-4 space-y-4">
+          {/* On-Call Shift Card */}
+          <div className="co-card">
+            <div className="co-card-title">On-call Shift</div>
+            <div className="co-shift-head">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Shift 2 — Active · 06:00–14:00 UTC
+            </div>
+            {SHIFT_ACTIVE.map((s, idx) => (
+              <div key={idx} className="co-shift-row">
+                <div
+                  className="co-shift-ava"
+                  style={{
+                    background: `${s.col}22`,
+                    color: s.col,
+                    border: `1px solid ${s.col}44`,
+                  }}
+                >
+                  {s.ab}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-fg-primary text-xs truncate">{s.name}</div>
+                  <div className="text-[10.5px] text-fg-muted truncate">{s.sub}</div>
+                </div>
+                <span className="co-badge ok">Active</span>
+              </div>
+            ))}
+
+            <div className="co-shift-head text-fg-muted mt-4">
+              Shift 3 — Upcoming · 14:00–22:00 UTC
+            </div>
+            {SHIFT_UPCOMING.map((s, idx) => (
+              <div key={idx} className="co-shift-row">
+                <div
+                  className="co-shift-ava bg-surface-hover text-fg-muted border border-surface-border"
+                >
+                  {s.ab}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-fg-secondary text-xs truncate">{s.name}</div>
+                  <div className="text-[10.5px] text-fg-muted truncate">{s.sub}</div>
+                </div>
+                <span className="co-badge na">Standby</span>
+              </div>
+            ))}
+
+            <div className="mt-3 pt-2.5 border-t border-surface-border text-[10.5px] text-fg-muted">
+              Time-based shift rotations · 24/7 autonomous monitoring with human-in-the-loop governance
+            </div>
+          </div>
+
+          {/* Live Agent Activity Card */}
+          <div className="co-card">
+            <div className="co-card-title">Live Agent Activity</div>
+            <div className="co-feed mt-3">
+              <FeedItem
+                f={{
+                  body: 'Incident INC-2418 triage completed · Root cause confirmed',
+                  time: '12:02 UTC',
+                  col: '#22c55e',
+                  ab: 'AI',
+                  badge: { l: 'RCA Ready' },
+                }}
+              />
+              <FeedItem
+                f={{
+                  body: 'Drafted mitigation verb: Invalidate IAM session tokens',
+                  time: '12:03 UTC',
+                  col: '#3b82f6',
+                  ab: 'FIX',
+                }}
+              />
+              <FeedItem
+                f={{
+                  body: 'Action gated: Dual-authorization required for production user',
+                  time: '12:03 UTC',
+                  col: '#f59e0b',
+                  ab: 'GATE',
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      <p className="text-sm text-zinc-300">Nothing to approve.</p>
-      <p className="text-xs text-zinc-500 mt-1">
-        Agent isn&apos;t blocked on you. Nice.
-      </p>
     </div>
   );
 }

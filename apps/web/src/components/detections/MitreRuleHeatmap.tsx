@@ -35,7 +35,7 @@ const HEAT_BUCKETS: { min: number; class: string; label: string }[] = [
   { min: 1, class: 'bg-emerald-500/15 text-emerald-200', label: '1' },
 ];
 
-const EMPTY_CELL_CLASS = 'bg-gray-800/40 text-gray-600';
+const EMPTY_CELL_CLASS = 'bg-surface-elevated/40 text-fg-faint';
 
 function bucketClassFor(active: number, total: number): string {
   if (active === 0 && total > 0) {
@@ -140,7 +140,7 @@ export function MitreRuleHeatmap() {
       </div>
 
       {/* Heatmap */}
-      <div className="overflow-x-auto rounded-lg border border-gray-800 bg-gray-900/40 p-3">
+      <div className="overflow-x-auto rounded-lg border border-surface-border bg-surface-card/40 p-3">
         <div className="flex gap-3 min-w-max">
           {tactics.map((tactic) => {
             const cells = grouped?.get(tactic) ?? [];
@@ -150,11 +150,11 @@ export function MitreRuleHeatmap() {
                 className="flex w-32 flex-col gap-1.5"
                 data-testid={`tactic-column-${tactic}`}
               >
-                <header className="border-b border-gray-800 pb-1.5">
-                  <div className="truncate text-[11px] font-semibold uppercase tracking-wide text-gray-300">
+                <header className="border-b border-surface-border pb-1.5">
+                  <div className="truncate text-[11px] font-semibold uppercase tracking-wide text-fg-secondary">
                     {humanizeTactic(tactic)}
                   </div>
-                  <div className="text-[10px] text-gray-500">
+                  <div className="text-[10px] text-fg-muted">
                     {cells.length} technique{cells.length === 1 ? '' : 's'}
                   </div>
                 </header>
@@ -185,7 +185,7 @@ export function MitreRuleHeatmap() {
                     </div>
                   ))}
                   {cells.length === 0 && (
-                    <div className="rounded px-1.5 py-1 text-[10px] italic text-gray-600">
+                    <div className="rounded px-1.5 py-1 text-[10px] italic text-fg-faint">
                       No rules
                     </div>
                   )}
@@ -197,8 +197,8 @@ export function MitreRuleHeatmap() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap items-center gap-3 text-[11px] text-gray-500">
-        <span className="font-medium text-gray-400">Active rules:</span>
+      <div className="flex flex-wrap items-center gap-3 text-[11px] text-fg-muted">
+        <span className="font-medium text-fg-muted">Active rules:</span>
         {[...HEAT_BUCKETS]
           .reverse()
           .map((bucket) => (
@@ -231,16 +231,16 @@ function SummaryCard({ label, value, suffix, tone }: SummaryCardProps) {
       ? 'text-emerald-300'
       : tone === 'warning'
         ? 'text-amber-300'
-        : 'text-gray-100';
+        : 'text-fg-primary';
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900/40 px-3 py-2.5">
-      <div className="text-[11px] uppercase tracking-wide text-gray-500">
+    <div className="rounded-lg border border-surface-border bg-surface-card/40 px-3 py-2.5">
+      <div className="text-[11px] uppercase tracking-wide text-fg-muted">
         {label}
       </div>
       <div className={clsx('mt-1 font-mono text-xl font-semibold', toneClass)}>
         {value}
         {suffix && (
-          <span className="text-sm font-normal text-gray-500">{suffix}</span>
+          <span className="text-sm font-normal text-fg-muted">{suffix}</span>
         )}
       </div>
     </div>

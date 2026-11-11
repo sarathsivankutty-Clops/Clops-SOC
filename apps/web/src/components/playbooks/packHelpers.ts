@@ -182,7 +182,7 @@ export type SeverityLevel = (typeof SEVERITY_LEVELS)[number];
 
 const SEVERITY_COLORS: Record<SeverityLevel, string> = {
   info:     'bg-blue-900/40 text-blue-300 border-blue-800',
-  low:      'bg-gray-800/60 text-gray-400 border-gray-700',
+  low:      'bg-surface-elevated/60 text-fg-muted border-surface-border',
   medium:   'bg-yellow-900/40 text-yellow-300 border-yellow-800',
   high:     'bg-orange-900/40 text-orange-300 border-orange-800',
   critical: 'bg-red-900/40 text-red-300 border-red-800',

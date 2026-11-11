@@ -412,4 +412,94 @@ STARTER_PLAYBOOKS: list[dict] = [
         "author": "AiSOC",
         "enabled": True,
     },
+    # 13 ─ AWS CloudTrail IAM & STS Root Cause Analysis (RCA)
+    {
+        "id": "tpl-aws-cloudtrail-rca",
+        "name": "AWS CloudTrail: IAM & STS Root Cause Analysis (RCA)",
+        "description": "Enrich caller IP, query 24h CloudTrail API history for principal ARN, run AI RCA investigation, and revoke compromised STS sessions.",
+        "version": "1.0.0",
+        "tags": ["cloud", "aws", "cloudtrail", "iam", "rca"],
+        "trigger": {"on": "alert", "severity": ["high", "critical"], "tags": ["cloudtrail", "aws", "iam"]},
+        "steps": [
+            {
+                "id": "step-enrich-caller-ip",
+                "name": "Enrich CloudTrail caller IP",
+                "type": "enrich",
+                "params": {"indicator_field": "alert.src_ip"},
+            },
+            {
+                "id": "step-search-cloudtrail",
+                "name": "Search 24h AWS CloudTrail events for Principal ARN",
+                "type": "search_siem",
+                "params": {"query": "eventSource:*.amazonaws.com AND userIdentity.arn:{{alert.principal_arn}}", "window": "24h"},
+            },
+            {
+                "id": "step-ai-rca",
+                "name": "AI Root Cause Analysis (CloudTrail & IAM blast radius)",
+                "type": "investigate",
+                "params": {"focus": "cloud", "dry_run": False},
+            },
+            {
+                "id": "step-approve-revoke",
+                "name": "Wait for human approval before IAM/STS revocation",
+                "type": "approval",
+                "on_failure": "abort",
+                "params": {"prompt": "Revoke active STS sessions and detach escalated policy for {{alert.principal_arn}}?"},
+            },
+            {
+                "id": "step-revoke-session",
+                "name": "Revoke AWS IAM / STS active sessions",
+                "type": "revoke_session",
+                "params": {"user_field": "alert.user"},
+            },
+            {
+                "id": "step-ticket",
+                "name": "Create AWS CloudTrail RCA ticket",
+                "type": "create_ticket",
+                "params": {"project": "CLOUDSEC", "type": "Incident"},
+            },
+        ],
+        "author": "AiSOC",
+        "enabled": True,
+    },
+    # 14 ─ AWS Security Hub Critical Finding RCA & Remediation
+    {
+        "id": "tpl-aws-securityhub-rca",
+        "name": "AWS Security Hub: ASFF Finding RCA & Guarded Remediation",
+        "description": "Correlate AWS Security Hub ASFF findings with CloudTrail resource change history, run AI RCA, and remediate non-compliant cloud assets.",
+        "version": "1.0.0",
+        "tags": ["cloud", "aws", "securityhub", "cspm", "rca"],
+        "trigger": {"on": "alert", "severity": ["high", "critical"], "tags": ["securityhub", "aws", "cspm"]},
+        "steps": [
+            {
+                "id": "step-search-config-trail",
+                "name": "Query CloudTrail & AWS Config timeline for resource ARN",
+                "type": "search_siem",
+                "params": {"query": "resources.ARN:{{alert.resource_arn}} AND eventCategory:Management", "window": "48h"},
+            },
+            {
+                "id": "step-ai-sh-rca",
+                "name": "AI Root Cause Analysis: identify actor & exposure window",
+                "type": "investigate",
+                "params": {"focus": "cloud", "dry_run": False},
+            },
+            {
+                "id": "step-notify-cloudsec",
+                "name": "Notify Cloud SecOps channel with RCA summary",
+                "type": "notify",
+                "params": {
+                    "channel": "webhook",
+                    "message": "AWS Security Hub RCA completed for {{title}} ({{alert.resource_arn}}).",
+                },
+            },
+            {
+                "id": "step-ticket-sh",
+                "name": "Create Security Hub remediation ticket",
+                "type": "create_ticket",
+                "params": {"project": "CLOUDSEC", "type": "Remediation"},
+            },
+        ],
+        "author": "AiSOC",
+        "enabled": True,
+    },
 ]

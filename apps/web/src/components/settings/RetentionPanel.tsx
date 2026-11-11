@@ -32,7 +32,7 @@ import { retentionApi, type RetentionPolicy } from '@/lib/api';
 import { EmptyState } from '@/components/ui/EmptyState';
 
 function inputClass() {
-  return 'w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none';
+  return 'w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary placeholder-fg-muted focus:border-brand-500 focus:outline-none';
 }
 
 function describeError(err: unknown, fallback: string): string {
@@ -138,9 +138,9 @@ export function RetentionPanel() {
 
   return (
     <div data-testid="retention-panel">
-      <div className="border-b border-gray-800 px-6 py-4">
-        <h2 className="text-base font-semibold text-gray-100">Retention</h2>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="border-b border-surface-border px-6 py-4">
+        <h2 className="text-base font-semibold text-fg-primary">Retention</h2>
+        <p className="mt-1 text-sm text-fg-muted">
           How long this tenant keeps each class of data. Compliance evidence
           reads these windows, so they are worth setting even where deletion is
           not switched on.
@@ -184,7 +184,7 @@ export function RetentionPanel() {
                   deployment, so nothing is deleted on these windows yet. They
                   are still read as your stated retention policy by compliance
                   evidence. An operator enables deletion with{' '}
-                  <code className="rounded bg-gray-950 px-1 py-0.5 text-xs">
+                  <code className="rounded bg-surface-base px-1 py-0.5 text-xs">
                     RETENTION_WORKER_ENABLED
                   </code>
                   .
@@ -195,7 +195,7 @@ export function RetentionPanel() {
             <div className="space-y-4">
               {FIELDS.map((field) => (
                 <label key={field.key} className="block text-sm">
-                  <span className="mb-1 block text-gray-400">{field.label} (days)</span>
+                  <span className="mb-1 block text-fg-secondary">{field.label} (days)</span>
                   <input
                     className={inputClass()}
                     value={draft[field.key] ?? ''}
@@ -203,7 +203,7 @@ export function RetentionPanel() {
                     aria-label={`${field.label} retention in days`}
                     inputMode="numeric"
                   />
-                  <span className="mt-1 block text-xs text-gray-500">{field.help}</span>
+                  <span className="mt-1 block text-xs text-fg-muted">{field.help}</span>
                 </label>
               ))}
             </div>
@@ -212,7 +212,7 @@ export function RetentionPanel() {
               type="button"
               onClick={() => void save()}
               disabled={busy}
-              className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+              className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 disabled:opacity-50"
             >
               {busy ? 'Working…' : 'Save retention policy'}
             </button>

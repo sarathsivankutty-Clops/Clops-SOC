@@ -131,6 +131,13 @@ def test_compose_supplies_a_default_for_the_timeout_variable():
     )
 
 
+def test_compose_passes_groq_key_to_litellm_when_openai_key_is_empty():
+    compose = COMPOSE_PATH.read_text(encoding="utf-8")
+    assert (
+        "OPENAI_API_KEY: ${OPENAI_API_KEY:-${GROQ_API_KEY:-${Groq_API_KEY:-}}}" in compose
+    ), "the LiteLLM gateway must accept GROQ_API_KEY as its upstream provider credential"
+
+
 def test_num_retries_stays_a_literal():
     """Not every setting can be env-driven, and this one must not be.
 

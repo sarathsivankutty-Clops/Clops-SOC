@@ -30,15 +30,15 @@ import { caseDepthApi, type AnalystWorkloadRow } from '@/lib/api';
 function MeanToClose({ row }: { row: AnalystWorkloadRow }) {
   if (row.mean_hours_to_close === null) {
     return (
-      <span className="text-gray-600" title="This analyst has closed no cases in the window, so there is nothing to average.">
+      <span className="text-fg-subtle" title="This analyst has closed no cases in the window, so there is nothing to average.">
         no data
       </span>
     );
   }
   return (
-    <span className="text-gray-300">
+    <span className="text-fg-secondary">
       {row.mean_hours_to_close.toFixed(1)}h{' '}
-      <span className="text-gray-600 text-[11px]">over {row.mean_over_cases}</span>
+      <span className="text-fg-subtle text-[11px]">over {row.mean_over_cases}</span>
     </span>
   );
 }
@@ -50,29 +50,29 @@ export function AnalystWorkload({ days = 30 }: { days?: number }) {
 
   return (
     <section
-      className="bg-gray-900/60 border border-gray-800/60 rounded-xl overflow-hidden"
+      className="bg-surface-card border border-surface-border rounded-xl overflow-hidden"
       aria-label="Analyst workload"
     >
-      <header className="px-4 py-3 border-b border-gray-800/60 flex items-baseline justify-between">
-        <h2 className="text-sm font-semibold text-gray-200">Analyst workload</h2>
-        <span className="text-[11px] text-gray-500">last {days} days</span>
+      <header className="px-4 py-3 border-b border-surface-border flex items-baseline justify-between">
+        <h2 className="text-sm font-semibold text-fg-primary">Analyst workload</h2>
+        <span className="text-[11px] text-fg-muted">last {days} days</span>
       </header>
 
       {isLoading ? (
-        <p className="px-4 py-6 text-xs text-gray-500">Loading…</p>
+        <p className="px-4 py-6 text-xs text-fg-muted">Loading…</p>
       ) : error ? (
         <p className="px-4 py-6 text-xs text-red-400" role="alert">
           Couldn&apos;t load workload. The cases API didn&apos;t respond.
         </p>
       ) : !data || data.analysts.length === 0 ? (
-        <p className="px-4 py-6 text-xs text-gray-500">
+        <p className="px-4 py-6 text-xs text-fg-muted">
           No case has an assignee in this window, so there is no workload to show.
           {data ? ` ${data.unassigned.open_cases} open case(s) are unassigned.` : ''}
         </p>
       ) : (
         <table className="w-full text-xs">
           <thead>
-            <tr className="text-gray-500 border-b border-gray-800/60">
+            <tr className="text-fg-muted border-b border-surface-border">
               <th className="text-left font-normal px-4 py-2">Analyst</th>
               <th className="text-right font-normal px-3 py-2">Open</th>
               <th className="text-right font-normal px-3 py-2">High / critical</th>
@@ -83,25 +83,25 @@ export function AnalystWorkload({ days = 30 }: { days?: number }) {
           </thead>
           <tbody>
             {data.analysts.map((row) => (
-              <tr key={row.analyst} className="border-b border-gray-800/30 last:border-0">
-                <td className="px-4 py-2 text-gray-200 truncate max-w-[14rem]">{row.analyst}</td>
-                <td className="px-3 py-2 text-right text-gray-300">{row.open_cases}</td>
+              <tr key={row.analyst} className="border-b border-surface-border/60 last:border-0">
+                <td className="px-4 py-2 text-fg-primary truncate max-w-[14rem]">{row.analyst}</td>
+                <td className="px-3 py-2 text-right text-fg-secondary">{row.open_cases}</td>
                 <td className="px-3 py-2 text-right text-orange-300">{row.open_high_or_critical}</td>
                 <td className="px-3 py-2 text-right text-red-300">{row.overdue}</td>
-                <td className="px-3 py-2 text-right text-gray-400">{row.closed_cases}</td>
+                <td className="px-3 py-2 text-right text-fg-muted">{row.closed_cases}</td>
                 <td className="px-4 py-2 text-right">
                   <MeanToClose row={row} />
                 </td>
               </tr>
             ))}
             {data.unassigned.open_cases > 0 && (
-              <tr className="border-t border-gray-800/60 bg-gray-900/40">
-                <td className="px-4 py-2 text-gray-500 italic">Unassigned</td>
-                <td className="px-3 py-2 text-right text-gray-300">{data.unassigned.open_cases}</td>
+              <tr className="border-t border-surface-border bg-surface-elevated/50">
+                <td className="px-4 py-2 text-fg-muted italic">Unassigned</td>
+                <td className="px-3 py-2 text-right text-fg-secondary">{data.unassigned.open_cases}</td>
                 <td className="px-3 py-2 text-right text-orange-300">{data.unassigned.open_high_or_critical}</td>
-                <td className="px-3 py-2 text-right text-gray-600">—</td>
-                <td className="px-3 py-2 text-right text-gray-600">—</td>
-                <td className="px-4 py-2 text-right text-gray-600">—</td>
+                <td className="px-3 py-2 text-right text-fg-subtle">—</td>
+                <td className="px-3 py-2 text-right text-fg-subtle">—</td>
+                <td className="px-4 py-2 text-right text-fg-subtle">—</td>
               </tr>
             )}
           </tbody>

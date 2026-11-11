@@ -19,11 +19,23 @@ export function EnabledToggle({ playbook }: { playbook: Playbook }) {
   async function toggle() {
     setLoading(true);
     try {
-      await apiFetch(`/api/v1/playbooks/${playbook.id}`, {
+      const res = await apiFetch(`/api/v1/playbooks/${playbook.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ enabled: !playbook.enabled }),
       });
+      if (res.status === 404) {
+        await apiFetch('/api/v1/playbooks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...playbook,
+            id: '',
+            author: playbook.author === 'AiSOC' ? 'you' : playbook.author,
+            enabled: !playbook.enabled,
+          }),
+        });
+      }
       await mutate('/api/v1/playbooks');
     } finally {
       setLoading(false);
@@ -37,7 +49,7 @@ export function EnabledToggle({ playbook }: { playbook: Playbook }) {
       aria-label={`${playbook.enabled ? 'Disable' : 'Enable'} ${playbook.name}`}
       aria-pressed={playbook.enabled}
       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 focus:ring-offset-gray-900 disabled:opacity-50 ${
-        playbook.enabled ? 'bg-green-600' : 'bg-gray-700'
+        playbook.enabled ? 'bg-green-600' : 'bg-surface-hover'
       }`}
     >
       <span
@@ -80,16 +92,16 @@ export function RunButton({ playbook }: { playbook: Playbook }) {
       disabled={status === 'running'}
       title="Dry run"
       aria-label={`Dry-run ${playbook.name}`}
-      className={`text-xs px-2.5 py-1 rounded border border-gray-700 transition-colors ${color}`}
+      className={`text-xs px-2.5 py-1 rounded border border-surface-border transition-colors ${color}`}
     >
       {label}
     </button>
   );
 }
 
-/** Delete a playbook (used only for user-created playbooks, not shipped packs). */
+/** Delete a runbook (used only for user-created runbooks, not shipped packs). */
 export async function deletePlaybook(id: string) {
-  if (!confirm('Delete this playbook?')) return;
+  if (!confirm('Delete this runbook?')) return;
   await apiFetch(`/api/v1/playbooks/${id}`, { method: 'DELETE' });
   await mutate('/api/v1/playbooks');
 }

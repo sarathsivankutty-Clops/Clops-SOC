@@ -61,19 +61,19 @@ export function DetectionCoveragePanel() {
   return (
     <section
       aria-labelledby="ops-coverage-heading"
-      className="rounded-xl border border-gray-800/60 bg-gray-900/40"
+      className="rounded-xl border border-surface-border/60 bg-surface-card/40"
     >
       <div className="px-4 py-3">
-        <h2 id="ops-coverage-heading" className="text-sm font-medium text-gray-300">
+        <h2 id="ops-coverage-heading" className="text-sm font-medium text-fg-secondary">
           Detection coverage
         </h2>
-        <p className="mt-0.5 text-[11px] text-gray-500">
+        <p className="mt-0.5 text-[11px] text-fg-subtle">
           Techniques with at least one enabled rule. A disabled rule covers nothing.
         </p>
       </div>
 
       {isLoading && !data ? (
-        <div className="m-4 h-24 animate-pulse rounded bg-gray-800/40" />
+        <div className="m-4 h-24 animate-pulse rounded bg-surface-elevated/40" />
       ) : error ? (
         <ErrorState
           title="Coverage unavailable"
@@ -101,16 +101,16 @@ export function DetectionCoveragePanel() {
         <div className="space-y-4 px-4 pb-4">
           <div className="flex items-end gap-6">
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-gray-500">
+              <p className="text-[11px] uppercase tracking-wider text-fg-subtle">
                 Techniques covered
               </p>
-              <p className="text-2xl font-semibold text-gray-100">
+              <p className="text-2xl font-semibold text-fg-primary">
                 {`${summary.coveredTechniques} / ${summary.techniques}`}
               </p>
             </div>
             <div>
-              <p className="text-[11px] uppercase tracking-wider text-gray-500">Active rules</p>
-              <p className="text-2xl font-semibold text-gray-100">
+              <p className="text-[11px] uppercase tracking-wider text-fg-subtle">Active rules</p>
+              <p className="text-2xl font-semibold text-fg-primary">
                 {summary.activeRules.toLocaleString()}
               </p>
               {summary.inactiveRules > 0 && (
@@ -123,7 +123,7 @@ export function DetectionCoveragePanel() {
 
           {ratio !== null && (
             <div>
-              <div className="h-1.5 rounded-full bg-gray-800">
+              <div className="h-1.5 rounded-full bg-surface-elevated">
                 <div
                   className={clsx(
                     'h-1.5 rounded-full',
@@ -132,7 +132,7 @@ export function DetectionCoveragePanel() {
                   style={{ width: `${Math.round(ratio * 100)}%` }}
                 />
               </div>
-              <p className="mt-1 text-[11px] text-gray-500">
+              <p className="mt-1 text-[11px] text-fg-subtle">
                 {`${Math.round(ratio * 100)}% of known techniques have an enabled rule.`}
               </p>
             </div>
@@ -140,14 +140,14 @@ export function DetectionCoveragePanel() {
 
           {data && (
             <div>
-              <p className="mb-2 text-[11px] uppercase tracking-wider text-gray-500">
+              <p className="mb-2 text-[11px] uppercase tracking-wider text-fg-subtle">
                 Thinnest tactics
               </p>
               <ul className="space-y-1.5">
                 {thinnestTactics(data).map((t) => (
                   <li key={t.tactic} className="flex items-baseline justify-between gap-3">
-                    <span className="truncate text-xs text-gray-300">{t.tactic}</span>
-                    <span className="shrink-0 text-[11px] text-gray-500">
+                    <span className="truncate text-xs text-fg-secondary">{t.tactic}</span>
+                    <span className="shrink-0 text-[11px] text-fg-subtle">
                       {`${t.covered}/${t.total} covered`}
                     </span>
                   </li>

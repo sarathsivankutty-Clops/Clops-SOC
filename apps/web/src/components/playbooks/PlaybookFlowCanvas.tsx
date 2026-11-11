@@ -76,8 +76,8 @@ function StepNode({ data }: { data: StepNodeData }) {
     <div
       onClick={() => onClick(step.id)}
       style={{
-        border: selected ? `2px solid ${meta.color}` : '1px solid #374151',
-        background: selected ? meta.bgColor : '#111827',
+        border: selected ? `2px solid ${meta.color}` : '1px solid var(--surface-border)',
+        background: selected ? meta.bgColor : 'var(--surface-card)',
         borderRadius: 10,
         minWidth: 200,
         padding: '10px 14px',
@@ -100,7 +100,7 @@ function StepNode({ data }: { data: StepNodeData }) {
           {meta.label}
         </span>
       </div>
-      <div style={{ color: '#f3f4f6', fontSize: 13, fontWeight: 500 }}>
+      <div style={{ color: 'var(--fg-primary)', fontSize: 13, fontWeight: 500 }}>
         {step.name}
       </div>
       {step.condition && (
@@ -108,7 +108,7 @@ function StepNode({ data }: { data: StepNodeData }) {
           style={{
             marginTop: 4,
             fontSize: 11,
-            color: '#9ca3af',
+            color: 'var(--fg-muted)',
             fontFamily: 'monospace',
           }}
         >
@@ -121,8 +121,8 @@ function StepNode({ data }: { data: StepNodeData }) {
           <span
             style={{
               fontSize: 10,
-              background: '#374151',
-              color: '#9ca3af',
+              background: 'var(--surface-sunken)',
+              color: 'var(--fg-muted)',
               borderRadius: 4,
               padding: '1px 5px',
             }}
@@ -134,8 +134,8 @@ function StepNode({ data }: { data: StepNodeData }) {
           <span
             style={{
               fontSize: 10,
-              background: '#374151',
-              color: '#9ca3af',
+              background: 'var(--surface-sunken)',
+              color: 'var(--fg-muted)',
               borderRadius: 4,
               padding: '1px 5px',
             }}
@@ -405,7 +405,7 @@ export function PlaybookFlowCanvas({
       style={{
         width: '100%',
         height: '100%',
-        background: '#0d1117',
+        background: 'var(--surface-sunken)',
         position: 'relative',
         outline: 'none',
       }}
@@ -445,9 +445,9 @@ export function PlaybookFlowCanvas({
               zIndex: 10,
               padding: '6px 10px',
               borderRadius: 6,
-              border: '1px solid #374151',
-              background: '#111827',
-              color: '#9ca3af',
+              border: '1px solid var(--surface-border)',
+              background: 'var(--surface-card)',
+              color: 'var(--fg-muted)',
               fontSize: 11,
               boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
             }}
@@ -497,12 +497,12 @@ export function PlaybookFlowCanvas({
           variant={BackgroundVariant.Dots}
           gap={20}
           size={1}
-          color="#1f2937"
+          color="var(--surface-border)"
         />
         <Controls
           style={{
-            background: '#111827',
-            border: '1px solid #374151',
+            background: 'var(--surface-card)',
+            border: '1px solid var(--surface-border)',
             borderRadius: 8,
           }}
           showInteractive={false}
@@ -514,11 +514,11 @@ export function PlaybookFlowCanvas({
             return STEP_TYPE_META[step.type].color;
           }}
           style={{
-            background: '#111827',
-            border: '1px solid #374151',
+            background: 'var(--surface-card)',
+            border: '1px solid var(--surface-border)',
             borderRadius: 8,
           }}
-          maskColor="#0d111788"
+          maskColor="rgba(10, 15, 18, 0.45)"
         />
       </ReactFlow>
     </div>

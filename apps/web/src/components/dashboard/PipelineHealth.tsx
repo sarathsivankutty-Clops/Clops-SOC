@@ -74,8 +74,8 @@ function statusStyles(status: Status) {
     default:
       return {
         dot: 'bg-gray-600',
-        ring: 'ring-gray-600/30',
-        text: 'text-gray-500',
+        ring: 'ring-surface-border-strong/30',
+        text: 'text-fg-subtle',
         bar: 'bg-gray-600/50',
       };
   }
@@ -84,7 +84,7 @@ function statusStyles(status: Status) {
 /** The pill an uninstrumented cell gets, so absence never reads as zero. */
 function NotMeasured() {
   return (
-    <span className="text-gray-500" title="Not instrumented on this stage yet">
+    <span className="text-fg-subtle" title="Not instrumented on this stage yet">
       n/a
     </span>
   );
@@ -130,9 +130,9 @@ function StageCard({ stage }: { stage: PipelineStage }) {
   const styles = statusStyles(stage.status);
   const unmeasured = new Set(stage.unmeasured ?? []);
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4 min-w-0">
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-xl p-4 min-w-0">
       <div className="flex items-center justify-between mb-1">
-        <p className="text-sm font-semibold text-gray-100 truncate">
+        <p className="text-sm font-semibold text-fg-primary truncate">
           {STAGE_LABELS[stage.stage]}
         </p>
         <span
@@ -140,26 +140,26 @@ function StageCard({ stage }: { stage: PipelineStage }) {
           aria-label={`status ${stage.status}`}
         />
       </div>
-      <p className="text-[11px] text-gray-500 truncate">
+      <p className="text-[11px] text-fg-subtle truncate">
         {STAGE_DESCRIPTIONS[stage.stage]}
       </p>
 
       <dl className="mt-3 space-y-1.5">
         <div className="flex items-baseline justify-between text-xs">
-          <dt className="text-gray-500">Backlog</dt>
-          <dd className="font-medium text-gray-200 tabular-nums">
+          <dt className="text-fg-subtle">Backlog</dt>
+          <dd className="font-medium text-fg-secondary tabular-nums">
             {unmeasured.has('backlog') ? <NotMeasured /> : formatBacklog(stage.backlog)}
           </dd>
         </div>
         <div className="flex items-baseline justify-between text-xs">
-          <dt className="text-gray-500">p95</dt>
-          <dd className="font-medium text-gray-200 tabular-nums">
+          <dt className="text-fg-subtle">p95</dt>
+          <dd className="font-medium text-fg-secondary tabular-nums">
             {unmeasured.has('p95_latency_ms') ? <NotMeasured /> : formatLatency(stage.p95_latency_ms)}
           </dd>
         </div>
         <div className="flex items-baseline justify-between text-xs">
-          <dt className="text-gray-500">Errors</dt>
-          <dd className={clsx('font-medium tabular-nums', unmeasured.has('error_rate') ? 'text-gray-500' : styles.text)}>
+          <dt className="text-fg-subtle">Errors</dt>
+          <dd className={clsx('font-medium tabular-nums', unmeasured.has('error_rate') ? 'text-fg-subtle' : styles.text)}>
             {unmeasured.has('error_rate') ? <NotMeasured /> : formatErrorRate(stage.error_rate)}
           </dd>
         </div>
@@ -170,20 +170,20 @@ function StageCard({ stage }: { stage: PipelineStage }) {
 
 function LoadingStage({ stage }: { stage: PipelineStage['stage'] }) {
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4 min-w-0">
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-xl p-4 min-w-0">
       <div className="flex items-center justify-between mb-1">
-        <p className="text-sm font-semibold text-gray-100 truncate">
+        <p className="text-sm font-semibold text-fg-primary truncate">
           {STAGE_LABELS[stage]}
         </p>
-        <span className="h-2.5 w-2.5 rounded-full bg-gray-700 animate-pulse" />
+        <span className="h-2.5 w-2.5 rounded-full bg-surface-hover animate-pulse" />
       </div>
-      <p className="text-[11px] text-gray-500 truncate">
+      <p className="text-[11px] text-fg-subtle truncate">
         {STAGE_DESCRIPTIONS[stage]}
       </p>
       <div className="mt-3 space-y-2">
-        <div className="h-3 w-full rounded bg-gray-800/60 animate-pulse" />
-        <div className="h-3 w-full rounded bg-gray-800/60 animate-pulse" />
-        <div className="h-3 w-2/3 rounded bg-gray-800/60 animate-pulse" />
+        <div className="h-3 w-full rounded bg-surface-hover animate-pulse" />
+        <div className="h-3 w-full rounded bg-surface-hover animate-pulse" />
+        <div className="h-3 w-2/3 rounded bg-surface-hover animate-pulse" />
       </div>
     </div>
   );
@@ -191,13 +191,13 @@ function LoadingStage({ stage }: { stage: PipelineStage['stage'] }) {
 
 function MissingStage({ stage, reason }: { stage: PipelineStage['stage']; reason: string }) {
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4 min-w-0">
+    <div className="bg-surface-card border border-surface-border shadow-xs rounded-xl p-4 min-w-0">
       <div className="flex items-center justify-between mb-1">
-        <p className="text-sm font-semibold text-gray-100 truncate">{STAGE_LABELS[stage]}</p>
-        <span className="h-2.5 w-2.5 rounded-full bg-gray-700 ring-2 ring-gray-700/30" role="img" aria-label="status unknown" />
+        <p className="text-sm font-semibold text-fg-primary truncate">{STAGE_LABELS[stage]}</p>
+        <span className="h-2.5 w-2.5 rounded-full bg-surface-hover ring-2 ring-surface-border/30" role="img" aria-label="status unknown" />
       </div>
-      <p className="text-[11px] text-gray-500 truncate">{STAGE_DESCRIPTIONS[stage]}</p>
-      <p className="mt-3 text-xs text-gray-500">{reason}</p>
+      <p className="text-[11px] text-fg-subtle truncate">{STAGE_DESCRIPTIONS[stage]}</p>
+      <p className="mt-3 text-xs text-fg-subtle">{reason}</p>
     </div>
   );
 }
@@ -222,22 +222,22 @@ export function PipelineHealth() {
     <div>
       <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-base font-semibold text-gray-100">
+          <h2 className="text-base font-semibold text-fg-primary">
             Pipeline Health
           </h2>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-fg-subtle mt-0.5">
             Ingest → normalize → fuse → correlate → alert
           </p>
         </div>
         {error ? (
           <span className="text-xs text-red-400">unavailable</span>
         ) : data ? (
-          <span className="text-xs text-gray-500">Live</span>
+          <span className="text-xs text-fg-subtle">Live</span>
         ) : (
           // `Live` was shown whenever `error` was falsy, which includes the
           // whole first-paint window: the header asserted liveness before a
           // single byte had arrived.
-          <span className="text-xs text-gray-500">Loading…</span>
+          <span className="text-xs text-fg-subtle">Loading…</span>
         )}
       </div>
 

@@ -25,7 +25,7 @@ const STATUS_COPY: Record<
   DetectionProposalStatus,
   { label: string; tone: string }
 > = {
-  proposed: { label: 'Proposed', tone: 'bg-gray-700/40 text-gray-200' },
+  proposed: { label: 'Proposed', tone: 'bg-surface-hover/40 text-fg-primary' },
   in_review: { label: 'In review', tone: 'bg-blue-500/20 text-blue-200' },
   eval_passed: {
     label: 'Eval passed',
@@ -143,12 +143,12 @@ export function DetectionProposalsView() {
     <div className="space-y-5">
       <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-100">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-semibold text-fg-primary */>
             Detection proposals
           </h1>
-          <p className="mt-1 max-w-2xl text-sm text-gray-500">
+          <p className="mt-1 max-w-2xl text-sm text-fg-muted">
             Detection-as-code lifecycle. Every proposal is graded by{' '}
-            <code className="rounded bg-gray-800 px-1 py-0.5 text-xs text-gray-300">
+            <code className="rounded bg-surface-elevated px-1 py-0.5 text-xs text-fg-secondary">
               run_evals.py
             </code>{' '}
             and a ≥ 1pp MITRE accuracy regression vs. the active baseline
@@ -158,7 +158,7 @@ export function DetectionProposalsView() {
         <div className="flex items-center gap-2">
           <Link
             href="/detection"
-            className="rounded-md border border-gray-800 px-3 py-2 text-sm text-gray-300 hover:bg-gray-800"
+            className="rounded-md border border-surface-border px-3 py-2 text-sm text-fg-secondary hover:bg-surface-elevated"
           >
             ← Active rules
           </Link>
@@ -176,7 +176,7 @@ export function DetectionProposalsView() {
               'rounded-md border px-3 py-1.5 text-xs transition-colors',
               filter === opt
                 ? 'border-blue-500/40 bg-blue-500/10 text-blue-200'
-                : 'border-gray-800 text-gray-400 hover:bg-gray-800/50',
+                : 'border-surface-border text-fg-muted hover:bg-surface-elevated/50',
             )}
           >
             {opt === 'all' ? 'All' : STATUS_COPY[opt].label}
@@ -207,7 +207,7 @@ export function DetectionProposalsView() {
           {proposals.map((p) => (
             <li
               key={p.id}
-              className="rounded-lg border border-gray-800 bg-gray-900/40 p-4"
+              className="rounded-lg border border-surface-border bg-surface-card/40 p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
@@ -220,19 +220,19 @@ export function DetectionProposalsView() {
                     >
                       {STATUS_COPY[p.status].label}
                     </span>
-                    <h3 className="truncate text-base font-medium text-gray-100">
+                    <h3 className="truncate text-base font-medium text-fg-primary">
                       {p.name}
                     </h3>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-fg-muted">
                       {p.rule_language.toUpperCase()} · {p.severity}
                     </span>
                   </div>
                   {p.description && (
-                    <p className="mt-1 text-sm text-gray-400">
+                    <p className="mt-1 text-sm text-fg-muted">
                       {p.description}
                     </p>
                   )}
-                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+                  <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-fg-muted">
                     <span suppressHydrationWarning>
                       Updated{' '}
                       {formatDistanceToNow(new Date(p.updated_at), {
@@ -244,21 +244,21 @@ export function DetectionProposalsView() {
                     )}
                   </div>
                   {p.eval_result && 'candidate' in p.eval_result && (
-                    <div className="mt-3 grid grid-cols-2 gap-3 rounded-md border border-gray-800 bg-gray-950/60 p-3 text-xs sm:grid-cols-4">
+                    <div className="mt-3 grid grid-cols-2 gap-3 rounded-md border border-surface-border bg-surface-sunken/60 p-3 text-xs sm:grid-cols-4">
                       <div>
-                        <div className="text-gray-500">Candidate MITRE</div>
-                        <div className="font-mono text-gray-200">
+                        <div className="text-fg-muted">Candidate MITRE</div>
+                        <div className="font-mono text-fg-primary">
                           {fmtPct(p.eval_result.candidate?.mitre_accuracy)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-gray-500">Baseline MITRE</div>
-                        <div className="font-mono text-gray-200">
+                        <div className="text-fg-muted">Baseline MITRE</div>
+                        <div className="font-mono text-fg-primary">
                           {fmtPct(p.eval_result.baseline?.mitre_accuracy)}
                         </div>
                       </div>
                       <div>
-                        <div className="text-gray-500">Regression</div>
+                        <div className="text-fg-muted">Regression</div>
                         <div
                           className={clsx(
                             'font-mono',
@@ -273,7 +273,7 @@ export function DetectionProposalsView() {
                         </div>
                       </div>
                       <div>
-                        <div className="text-gray-500">Gate</div>
+                        <div className="text-fg-muted">Gate</div>
                         <div
                           className={clsx(
                             'font-medium',

@@ -359,7 +359,7 @@ export default function ResponderSettingsPage() {
   return (
     <div className="px-4 pt-4 pb-2">
       <h1 className="text-xl font-semibold tracking-tight">Settings</h1>
-      <p className="text-xs text-zinc-500 mt-0.5">
+      <p className="text-xs text-fg-subtle mt-0.5">
         Notifications, install, and passkeys for this device.
       </p>
 
@@ -368,15 +368,15 @@ export default function ResponderSettingsPage() {
         title="Account"
         description="The person paged when alerts route to you."
       >
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 px-4 py-3">
-          <div className="text-xs uppercase tracking-wider text-zinc-500">
+        <div className="rounded-xl border border-surface-border/80 bg-surface-card/50 px-4 py-3">
+          <div className="text-xs uppercase tracking-wider text-fg-subtle">
             Signed in as
           </div>
-          <div className="text-sm font-medium text-zinc-100 truncate">
+          <div className="text-sm font-medium text-fg-primary truncate">
             {profile?.name ?? profile?.email ?? '—'}
           </div>
           {profile?.email ? (
-            <div className="text-[11px] text-zinc-500 truncate mt-0.5">
+            <div className="text-[11px] text-fg-subtle truncate mt-0.5">
               {profile.email}
             </div>
           ) : null}
@@ -397,10 +397,10 @@ export default function ResponderSettingsPage() {
         }
       >
         <div className="space-y-3">
-          <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 px-4 py-3">
+          <div className="rounded-xl border border-surface-border/80 bg-surface-card/50 px-4 py-3">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0">
-                <div className="text-sm font-medium text-zinc-100">
+                <div className="text-sm font-medium text-fg-primary">
                   Push notifications
                 </div>
                 <div className="mt-0.5">
@@ -412,7 +412,7 @@ export default function ResponderSettingsPage() {
                   type="button"
                   onClick={() => void disableNotifications()}
                   disabled={pushBusy}
-                  className="px-3 py-2 text-xs font-medium rounded-lg border border-zinc-700 hover:border-zinc-500 text-zinc-300 hover:text-zinc-100 transition disabled:opacity-60"
+                  className="px-3 py-2 text-xs font-medium rounded-lg border border-surface-border hover:border-surface-border-strong text-fg-secondary hover:text-fg-primary transition disabled:opacity-60"
                 >
                   Disable
                 </button>
@@ -425,7 +425,7 @@ export default function ResponderSettingsPage() {
                     pushState === 'unsupported' ||
                     pushState === 'denied'
                   }
-                  className="px-3 py-2 text-xs font-medium rounded-lg bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white transition disabled:bg-zinc-800 disabled:text-zinc-500"
+                  className="px-3 py-2 text-xs font-medium rounded-lg bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white transition disabled:bg-surface-elevated disabled:text-fg-subtle"
                 >
                   {pushBusy ? '…' : 'Enable'}
                 </button>
@@ -436,20 +436,20 @@ export default function ResponderSettingsPage() {
           {/* Topic preferences — visible when push is supported, even before
               subscribe, so users can pre-pick what they want. */}
           {pushState !== 'unsupported' ? (
-            <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/30">
-              <div className="px-4 py-2.5 border-b border-zinc-800/80">
-                <div className="text-xs uppercase tracking-wider text-zinc-500">
+            <div className="rounded-xl border border-surface-border/80 bg-surface-card/30">
+              <div className="px-4 py-2.5 border-b border-surface-border/80">
+                <div className="text-xs uppercase tracking-wider text-fg-subtle">
                   What to push
                 </div>
               </div>
-              <ul className="divide-y divide-zinc-800/80">
+              <ul className="divide-y divide-surface-border/80">
                 {ALL_TOPICS.map((t) => {
                   const enabled = topics.has(t.id);
                   return (
                     <li key={t.id} className="px-4 py-3 flex items-start gap-3">
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm text-zinc-100">{t.label}</div>
-                        <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+                        <div className="text-sm text-fg-primary">{t.label}</div>
+                        <div className="text-[11px] text-fg-subtle mt-0.5 leading-snug">
                           {t.help}
                         </div>
                       </div>
@@ -461,7 +461,7 @@ export default function ResponderSettingsPage() {
                         onClick={() => void toggleTopic(t.id)}
                         className={clsx(
                           'shrink-0 w-11 h-6 rounded-full relative transition',
-                          enabled ? 'bg-indigo-500' : 'bg-zinc-700',
+                          enabled ? 'bg-indigo-500' : 'bg-surface-hover',
                         )}
                       >
                         <span
@@ -483,7 +483,7 @@ export default function ResponderSettingsPage() {
               type="button"
               onClick={() => void sendTestPush()}
               disabled={pushBusy}
-              className="w-full px-3 py-2.5 text-sm font-medium rounded-lg bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-zinc-200 transition disabled:opacity-60"
+              className="w-full px-3 py-2.5 text-sm font-medium rounded-lg bg-surface-card/50 hover:bg-surface-card border border-surface-border hover:border-surface-border text-fg-primary transition disabled:opacity-60"
             >
               Send test notification
             </button>
@@ -500,13 +500,13 @@ export default function ResponderSettingsPage() {
             : 'Add AiSOC to your home screen for full-screen access and faster cold-starts.'
         }
       >
-        <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/50 px-4 py-3">
+        <div className="rounded-xl border border-surface-border/80 bg-surface-card/50 px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <div className="text-sm font-medium text-zinc-100">
+              <div className="text-sm font-medium text-fg-primary">
                 Add to home screen
               </div>
-              <div className="text-[11px] text-zinc-500 mt-0.5 leading-snug">
+              <div className="text-[11px] text-fg-subtle mt-0.5 leading-snug">
                 {standalone
                   ? 'Already installed.'
                   : installAvailable
@@ -523,7 +523,7 @@ export default function ResponderSettingsPage() {
                 type="button"
                 onClick={() => void handleInstall()}
                 disabled={!installAvailable}
-                className="px-3 py-2 text-xs font-medium rounded-lg bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white transition disabled:bg-zinc-800 disabled:text-zinc-500"
+                className="px-3 py-2 text-xs font-medium rounded-lg bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white transition disabled:bg-surface-elevated disabled:text-fg-subtle"
               >
                 Install
               </button>
@@ -546,25 +546,25 @@ export default function ResponderSettingsPage() {
         {credentials === null ? (
           <SkeletonList />
         ) : credentials.length === 0 ? (
-          <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/30 px-4 py-6 text-center">
-            <p className="text-sm text-zinc-300">No passkeys enrolled yet.</p>
-            <p className="text-[11px] text-zinc-500 mt-1">
+          <div className="rounded-xl border border-surface-border/80 bg-surface-card/30 px-4 py-6 text-center">
+            <p className="text-sm text-fg-secondary">No passkeys enrolled yet.</p>
+            <p className="text-[11px] text-fg-subtle mt-1">
               Enrolling here means this device — phone, fingerprint, Face ID —
               becomes your sign-in.
             </p>
           </div>
         ) : (
-          <ul className="rounded-xl border border-zinc-800/80 bg-zinc-900/30 divide-y divide-zinc-800/80 overflow-hidden">
+          <ul className="rounded-xl border border-surface-border/80 bg-surface-card/30 divide-y divide-surface-border/80 overflow-hidden">
             {credentials.map((c) => (
               <li
                 key={c.id}
                 className="px-4 py-3 flex items-center gap-3"
               >
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm text-zinc-100 truncate">
+                  <div className="text-sm text-fg-primary truncate">
                     {c.device_name || 'Unnamed device'}
                   </div>
-                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-zinc-500">
+                  <div className="mt-0.5 flex items-center gap-2 text-[11px] text-fg-subtle">
                     <span>added {formatRelative(c.created_at)}</span>
                     {c.last_used_at ? (
                       <>
@@ -596,7 +596,7 @@ export default function ResponderSettingsPage() {
           type="button"
           onClick={() => void handleEnrollPasskey()}
           disabled={!webauthnSupported || enrolling}
-          className="mt-3 w-full px-3 py-3 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white transition flex items-center justify-center gap-2 disabled:bg-zinc-800 disabled:text-zinc-500"
+          className="mt-3 w-full px-3 py-3 text-sm font-medium rounded-lg bg-indigo-500 hover:bg-indigo-400 active:bg-indigo-600 text-white transition flex items-center justify-center gap-2 disabled:bg-surface-elevated disabled:text-fg-subtle"
         >
           {enrolling ? (
             <>
@@ -638,7 +638,7 @@ export default function ResponderSettingsPage() {
       {/* ── Diagnostics ──────────────────────────────────────────────── */}
       <Section title="Diagnostics" collapsed onToggle={() => setShowDiagnostics((v) => !v)} expanded={showDiagnostics}>
         {showDiagnostics ? (
-          <div className="rounded-xl border border-zinc-800/80 bg-zinc-900/30 px-4 py-3 space-y-2">
+          <div className="rounded-xl border border-surface-border/80 bg-surface-card/30 px-4 py-3 space-y-2">
             <DiagRow
               label="Service worker"
               value={
@@ -680,19 +680,19 @@ export default function ResponderSettingsPage() {
       </Section>
 
       {/* ── Footer / sign out ────────────────────────────────────────── */}
-      <div className="mt-6 pt-4 border-t border-zinc-900">
+      <div className="mt-6 pt-4 border-t border-surface-border">
         <button
           type="button"
           onClick={handleSignOut}
-          className="w-full px-3 py-3 text-sm font-medium rounded-lg border border-zinc-800 hover:border-red-500/50 text-zinc-300 hover:text-red-300 transition"
+          className="w-full px-3 py-3 text-sm font-medium rounded-lg border border-surface-border hover:border-red-500/50 text-fg-secondary hover:text-red-300 transition"
         >
           Sign out
         </button>
-        <p className="mt-3 text-[10px] uppercase tracking-widest text-zinc-700 text-center">
+        <p className="mt-3 text-[10px] uppercase tracking-widest text-fg-primary text-center">
           AiSOC · MIT-licensed AI SOC ·{' '}
           <Link
             href="/responder/triage"
-            className="hover:text-zinc-500 underline-offset-2 hover:underline"
+            className="hover:text-fg-subtle underline-offset-2 hover:underline"
           >
             Back to triage
           </Link>
@@ -702,7 +702,7 @@ export default function ResponderSettingsPage() {
       {toast ? (
         <div
           role="status"
-          className="fixed left-1/2 -translate-x-1/2 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 px-4 py-2 rounded-lg bg-zinc-100 text-zinc-900 text-sm shadow-lg"
+          className="fixed left-1/2 -translate-x-1/2 bottom-[calc(5rem+env(safe-area-inset-bottom))] z-40 px-4 py-2 rounded-lg bg-surface-hover text-fg-primary text-sm shadow-lg"
         >
           {toast}
         </div>
@@ -734,11 +734,11 @@ function Section({
     <section className="mt-5">
       <div className="px-1 mb-2 flex items-baseline justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-xs uppercase tracking-wider text-zinc-500">
+          <h2 className="text-xs uppercase tracking-wider text-fg-subtle">
             {title}
           </h2>
           {description ? (
-            <p className="text-[11px] text-zinc-500/80 mt-1 leading-snug">
+            <p className="text-[11px] text-fg-subtle/80 mt-1 leading-snug">
               {description}
             </p>
           ) : null}
@@ -747,7 +747,7 @@ function Section({
           <button
             type="button"
             onClick={onToggle}
-            className="text-[11px] uppercase tracking-wider text-zinc-500 hover:text-zinc-300"
+            className="text-[11px] uppercase tracking-wider text-fg-subtle hover:text-fg-secondary"
           >
             {expanded ? 'Hide' : 'Show'}
           </button>
@@ -785,7 +785,7 @@ function Pill({
     emerald: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
     amber: 'bg-amber-500/15 text-amber-300 border-amber-500/30',
     red: 'bg-red-500/15 text-red-300 border-red-500/30',
-    zinc: 'bg-zinc-800 text-zinc-400 border-zinc-700',
+    zinc: 'bg-surface-elevated text-fg-muted border-surface-border',
   };
   return (
     <span
@@ -810,12 +810,12 @@ function DiagRow({
 }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <div className="text-[11px] uppercase tracking-wider text-zinc-500 shrink-0">
+      <div className="text-[11px] uppercase tracking-wider text-fg-subtle shrink-0">
         {label}
       </div>
       <div
         className={clsx(
-          'text-[11px] text-zinc-300 text-right break-all',
+          'text-[11px] text-fg-secondary text-right break-all',
           mono && 'font-mono',
         )}
       >
@@ -828,16 +828,16 @@ function DiagRow({
 function SkeletonList() {
   return (
     <ul
-      className="rounded-xl border border-zinc-800/60 bg-zinc-900/20 divide-y divide-zinc-800/60 overflow-hidden"
+      className="rounded-xl border border-surface-border/60 bg-surface-card/20 divide-y divide-surface-border/60 overflow-hidden"
       aria-hidden
     >
       {Array.from({ length: 2 }).map((_, i) => (
         <li key={i} className="px-4 py-3 flex items-center gap-3">
           <div className="flex-1">
-            <div className="h-3 w-1/2 bg-zinc-800/80 rounded animate-pulse" />
-            <div className="h-2.5 w-1/3 bg-zinc-800/60 rounded mt-2 animate-pulse" />
+            <div className="h-3 w-1/2 bg-surface-elevated/80 rounded animate-pulse" />
+            <div className="h-2.5 w-1/3 bg-surface-elevated/60 rounded mt-2 animate-pulse" />
           </div>
-          <div className="h-7 w-16 bg-zinc-800/60 rounded animate-pulse" />
+          <div className="h-7 w-16 bg-surface-elevated/60 rounded animate-pulse" />
         </li>
       ))}
     </ul>

@@ -105,19 +105,19 @@ function BackendPicker({
   const allSelected = selected.size === 0 || selected.size === backends.length;
 
   return (
-    <fieldset className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4">
-      <legend className="px-1 text-xs font-medium uppercase tracking-wider text-gray-500">
+    <fieldset className="rounded-xl border border-surface-border/70 bg-surface-sunken/60 p-4">
+      <legend className="px-1 text-xs font-medium uppercase tracking-wider text-fg-muted">
         Backends to query
       </legend>
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-fg-muted">
           {backends.length} federated-capable {backends.length === 1 ? 'connector' : 'connectors'}{' '}
           enabled for this tenant.
         </p>
         <button
           type="button"
           onClick={() => onSelectAll(!allSelected)}
-          className="text-xs text-blue-400 underline underline-offset-2 hover:text-blue-300"
+          className="text-xs text-brand-400 underline underline-offset-2 hover:text-brand-300"
         >
           {allSelected ? 'Clear selection' : 'Select all'}
         </button>
@@ -132,32 +132,32 @@ function BackendPicker({
                 className={clsx(
                   'flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2 transition-colors',
                   checked
-                    ? 'border-blue-500/50 bg-blue-500/5'
-                    : 'border-gray-800/60 bg-gray-900/40 hover:border-gray-700',
+                    ? 'border-brand-500/50 bg-blue-500/5'
+                    : 'border-surface-border/70 bg-surface-sunken/60 hover:border-surface-border-strong',
                 )}
               >
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border-gray-600 bg-gray-800 text-blue-500"
+                  className="h-4 w-4 rounded border-surface-border-strong bg-surface-elevated text-blue-500"
                   checked={checked}
                   onChange={() => onToggle(b.connector_id)}
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm text-gray-200">{b.name}</span>
-                  <span className="block text-[11px] text-gray-500">
+                  <span className="block truncate text-sm text-fg-primary">{b.name}</span>
+                  <span className="block text-[11px] text-fg-muted">
                     {backendLabel(b.connector_type)}
                   </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-1.5" title={`Connector health: ${b.health_status}`}>
                   <span className={clsx('h-1.5 w-1.5 rounded-full', health.dot)} />
-                  <span className="text-[11px] text-gray-400">{health.label}</span>
+                  <span className="text-[11px] text-fg-secondary">{health.label}</span>
                 </span>
               </label>
             </li>
           );
         })}
       </ul>
-      <p className="mt-3 text-[11px] text-gray-600">
+      <p className="mt-3 text-[11px] text-fg-subtle">
         Health is the connector&apos;s last recorded poll status, not a live probe. A
         backend that is reachable for ingest can still fail this query — the
         per-backend result below is the authoritative answer.
@@ -173,7 +173,7 @@ function SourceVerdictCard({ verdict }: { verdict: FederatedSourceVerdict }) {
     verdict.status === 'ok'
       ? 'border-green-500/30 bg-green-500/5'
       : verdict.status === 'unsupported'
-        ? 'border-gray-700 bg-gray-900/40'
+        ? 'border-surface-border-strong bg-surface-sunken/60'
         : 'border-red-500/30 bg-red-500/5';
 
   const statusLabel =
@@ -189,19 +189,19 @@ function SourceVerdictCard({ verdict }: { verdict: FederatedSourceVerdict }) {
       data-testid={`source-verdict-${verdict.connector_id}`}
     >
       <div className="flex items-baseline justify-between gap-2">
-        <span className="truncate text-sm font-medium text-gray-200">
+        <span className="truncate text-sm font-medium text-fg-primary">
           {verdict.connector_name}
         </span>
         <span
           className={clsx(
             'shrink-0 text-[11px] font-medium',
-            verdict.status === 'ok' ? 'text-green-300' : verdict.status === 'error' ? 'text-red-300' : 'text-gray-400',
+            verdict.status === 'ok' ? 'text-green-300' : verdict.status === 'error' ? 'text-red-300' : 'text-fg-secondary',
           )}
         >
           {statusLabel}
         </span>
       </div>
-      <div className="mt-1 flex items-center gap-3 text-[11px] text-gray-500">
+      <div className="mt-1 flex items-center gap-3 text-[11px] text-fg-muted">
         <span>{backendLabel(verdict.connector_type)}</span>
         {/* Row count is only meaningful for a backend that answered. Printing
             "0 rows" for one that failed reads as "nothing matched". */}
@@ -226,10 +226,10 @@ function SourceVerdictStrip({ sources }: { sources: FederatedSourceVerdict[] }) 
   return (
     <section aria-labelledby="fed-sources-heading">
       <div className="mb-2 flex items-baseline justify-between">
-        <h2 id="fed-sources-heading" className="text-sm font-medium text-gray-300">
+        <h2 id="fed-sources-heading" className="text-sm font-medium text-fg-secondary">
           Per-backend result
         </h2>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-fg-muted">
           {`${answered} of ${sources.length} answered`}
           {failed > 0 ? `, ${failed} failed` : ''}
         </p>
@@ -275,23 +275,23 @@ function ResultRow({ row, index }: { row: FederatedRow; index: number }) {
   const pivots = pivotableFields(fields);
 
   return (
-    <li className="rounded-lg border border-gray-800/60 bg-gray-900/40">
+    <li className="rounded-lg border border-surface-border/70 bg-surface-sunken/60">
       <div className="flex items-start gap-3 px-3 py-2.5">
-        <span className="mt-0.5 shrink-0 font-mono text-[11px] text-gray-600">
+        <span className="mt-0.5 shrink-0 font-mono text-[11px] text-fg-subtle">
           {index + 1}
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
             {source && (
-              <span className="rounded border border-gray-700/60 bg-gray-800/60 px-1.5 py-0.5 text-[10px] text-gray-300">
+              <span className="rounded border border-surface-border-strong bg-surface-sunken px-1.5 py-0.5 text-[10px] text-fg-secondary">
                 {source.connector_name}
               </span>
             )}
             {Object.entries(fields)
               .slice(0, 4)
               .map(([k, v]) => (
-                <span key={k} className="truncate text-xs text-gray-300">
-                  <span className="text-gray-500">{k}=</span>
+                <span key={k} className="truncate text-xs text-fg-secondary">
+                  <span className="text-fg-muted">{k}=</span>
                   <span className="font-mono">{renderCell(v)}</span>
                 </span>
               ))}
@@ -302,7 +302,7 @@ function ResultRow({ row, index }: { row: FederatedRow; index: number }) {
                 <Link
                   key={`${p.type}:${p.value}`}
                   href={pivotPathForValue(p.type, p.value)}
-                  className="rounded border border-gray-700/60 bg-gray-800/40 px-1.5 py-0.5 text-[10px] text-blue-300 hover:border-blue-500/50 hover:text-blue-200"
+                  className="rounded border border-surface-border-strong bg-surface-sunken/50 px-1.5 py-0.5 text-[10px] text-brand-300 hover:border-brand-500/50 hover:text-blue-200"
                 >
                   {`Pivot ${p.type}: ${p.value}`}
                 </Link>
@@ -314,13 +314,13 @@ function ResultRow({ row, index }: { row: FederatedRow; index: number }) {
           type="button"
           onClick={() => setExpanded((v) => !v)}
           aria-expanded={expanded}
-          className="shrink-0 rounded border border-gray-700/60 px-2 py-0.5 text-[11px] text-gray-400 hover:border-gray-600 hover:text-gray-200"
+          className="shrink-0 rounded border border-surface-border-strong px-2 py-0.5 text-[11px] text-fg-secondary hover:border-surface-border-strong hover:text-fg-primary"
         >
           {expanded ? 'Hide' : 'Raw'}
         </button>
       </div>
       {expanded && (
-        <pre className="overflow-x-auto border-t border-gray-800/60 px-3 py-2 text-[11px] text-gray-400">
+        <pre className="overflow-x-auto border-t border-surface-border/70 px-3 py-2 text-[11px] text-fg-secondary">
           {JSON.stringify(fields, null, 2)}
         </pre>
       )}
@@ -451,8 +451,8 @@ export function FederatedSearchView() {
   return (
     <div className="space-y-5">
       <header>
-        <h1 className="text-xl font-semibold text-gray-100">Federated search</h1>
-        <p className="mt-1 text-sm text-gray-500">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-xl font-semibold text-fg-primary */>Federated search</h1>
+        <p className="mt-1 text-sm text-fg-muted">
           One query, fanned out in parallel to every SIEM this tenant has connected,
           using that tenant&apos;s own stored credentials. Each backend answers
           independently.
@@ -460,7 +460,7 @@ export function FederatedSearchView() {
       </header>
 
       {backendsLoading ? (
-        <div className="h-32 animate-pulse rounded-xl bg-gray-800/30" />
+        <div className="h-32 animate-pulse rounded-xl bg-surface-elevated/30" />
       ) : backends.length === 0 ? (
         <EmptyState
           title="No SIEM connectors are connected"
@@ -468,7 +468,7 @@ export function FederatedSearchView() {
           action={
             <Link
               href="/connectors"
-              className="text-sm text-blue-400 underline underline-offset-2 hover:text-blue-300"
+              className="text-sm text-brand-400 underline underline-offset-2 hover:text-brand-300"
             >
               Connect a SIEM
             </Link>
@@ -484,14 +484,14 @@ export function FederatedSearchView() {
           />
 
           <form
-            className="space-y-4 rounded-xl border border-gray-800/60 bg-gray-900/40 p-4"
+            className="space-y-4 rounded-xl border border-surface-border/70 bg-surface-sunken/60 p-4"
             onSubmit={(e) => {
               e.preventDefault();
               void run();
             }}
           >
             <div>
-              <label htmlFor="fed-free-text" className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500">
+              <label htmlFor="fed-free-text" className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-fg-muted">
                 Search text
               </label>
               <input
@@ -500,9 +500,9 @@ export function FederatedSearchView() {
                 value={freeText}
                 onChange={(e) => setFreeText(e.target.value)}
                 placeholder="e.g. failed logon, or an indicator like 10.0.0.7"
-                className="w-full rounded-lg border border-gray-700 bg-gray-950/60 px-3 py-2 text-sm text-gray-100 placeholder:text-gray-600 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-lg border border-surface-border-strong bg-surface-sunken px-3 py-2 text-sm text-fg-primary placeholder:text-fg-subtle focus:border-brand-500 focus:outline-none"
               />
-              <p className="mt-1 text-[11px] text-gray-600">
+              <p className="mt-1 text-[11px] text-fg-subtle">
                 Translated per backend into SPL, KQL, ES|QL or AQL. You never write
                 vendor query syntax here.
               </p>
@@ -510,19 +510,19 @@ export function FederatedSearchView() {
 
             <div>
               <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-xs font-medium uppercase tracking-wider text-gray-500">
+                <span className="text-xs font-medium uppercase tracking-wider text-fg-muted">
                   Field filters
                 </span>
                 <button
                   type="button"
                   onClick={() => setIndicators((prev) => [...prev, newIndicator()])}
-                  className="text-xs text-blue-400 underline underline-offset-2 hover:text-blue-300"
+                  className="text-xs text-brand-400 underline underline-offset-2 hover:text-brand-300"
                 >
                   Add filter
                 </button>
               </div>
               {indicators.length === 0 ? (
-                <p className="text-[11px] text-gray-600">
+                <p className="text-[11px] text-fg-subtle">
                   Optional. Filters are AND-joined with each other and with the
                   search text above.
                 </p>
@@ -540,7 +540,7 @@ export function FederatedSearchView() {
                             prev.map((p) => (p.id === ind.id ? { ...p, field: e.target.value } : p)),
                           )
                         }
-                        className="min-w-0 flex-1 rounded-lg border border-gray-700 bg-gray-950/60 px-2.5 py-1.5 text-sm text-gray-100 placeholder:text-gray-600 focus:border-blue-500 focus:outline-none"
+                        className="min-w-0 flex-1 rounded-lg border border-surface-border-strong bg-surface-sunken px-2.5 py-1.5 text-sm text-fg-primary placeholder:text-fg-subtle focus:border-brand-500 focus:outline-none"
                       />
                       <select
                         aria-label={`Filter ${idx + 1} operator`}
@@ -554,7 +554,7 @@ export function FederatedSearchView() {
                             ),
                           )
                         }
-                        className="rounded-lg border border-gray-700 bg-gray-950/60 px-2 py-1.5 text-sm text-gray-100 focus:border-blue-500 focus:outline-none"
+                        className="rounded-lg border border-surface-border-strong bg-surface-sunken px-2 py-1.5 text-sm text-fg-primary focus:border-brand-500 focus:outline-none"
                       >
                         {FEDERATED_OPERATORS.map((op) => (
                           <option key={op} value={op}>
@@ -572,13 +572,13 @@ export function FederatedSearchView() {
                             prev.map((p) => (p.id === ind.id ? { ...p, value: e.target.value } : p)),
                           )
                         }
-                        className="min-w-0 flex-1 rounded-lg border border-gray-700 bg-gray-950/60 px-2.5 py-1.5 text-sm text-gray-100 placeholder:text-gray-600 focus:border-blue-500 focus:outline-none"
+                        className="min-w-0 flex-1 rounded-lg border border-surface-border-strong bg-surface-sunken px-2.5 py-1.5 text-sm text-fg-primary placeholder:text-fg-subtle focus:border-brand-500 focus:outline-none"
                       />
                       <button
                         type="button"
                         aria-label={`Remove filter ${idx + 1}`}
                         onClick={() => setIndicators((prev) => prev.filter((p) => p.id !== ind.id))}
-                        className="rounded border border-gray-700/60 px-2 py-1 text-xs text-gray-400 hover:border-red-500/50 hover:text-red-300"
+                        className="rounded border border-surface-border-strong px-2 py-1 text-xs text-fg-secondary hover:border-red-500/50 hover:text-red-300"
                       >
                         Remove
                       </button>
@@ -590,14 +590,14 @@ export function FederatedSearchView() {
 
             <div className="flex flex-wrap items-end gap-4">
               <div>
-                <label htmlFor="fed-window" className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500">
+                <label htmlFor="fed-window" className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-fg-muted">
                   Time window
                 </label>
                 <select
                   id="fed-window"
                   value={sinceSeconds}
                   onChange={(e) => setSinceSeconds(Number(e.target.value))}
-                  className="rounded-lg border border-gray-700 bg-gray-950/60 px-2.5 py-1.5 text-sm text-gray-100 focus:border-blue-500 focus:outline-none"
+                  className="rounded-lg border border-surface-border-strong bg-surface-sunken px-2.5 py-1.5 text-sm text-fg-primary focus:border-brand-500 focus:outline-none"
                 >
                   {TIME_WINDOWS.map((w) => (
                     <option key={w.seconds} value={w.seconds}>
@@ -607,14 +607,14 @@ export function FederatedSearchView() {
                 </select>
               </div>
               <div>
-                <label htmlFor="fed-limit" className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-gray-500">
+                <label htmlFor="fed-limit" className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-fg-muted">
                   Row cap
                 </label>
                 <select
                   id="fed-limit"
                   value={limit}
                   onChange={(e) => setLimit(Number(e.target.value))}
-                  className="rounded-lg border border-gray-700 bg-gray-950/60 px-2.5 py-1.5 text-sm text-gray-100 focus:border-blue-500 focus:outline-none"
+                  className="rounded-lg border border-surface-border-strong bg-surface-sunken px-2.5 py-1.5 text-sm text-fg-primary focus:border-brand-500 focus:outline-none"
                 >
                   {ROW_LIMITS.map((l) => (
                     <option key={l} value={l}>
@@ -629,14 +629,14 @@ export function FederatedSearchView() {
                 className={clsx(
                   'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
                   canRun && !running
-                    ? 'bg-blue-600 text-white hover:bg-blue-500'
-                    : 'cursor-not-allowed bg-gray-800 text-gray-500',
+                    ? 'bg-brand-600 text-white hover:bg-brand-500'
+                    : 'cursor-not-allowed bg-surface-elevated text-fg-muted',
                 )}
               >
                 {running ? 'Searching…' : 'Run federated search'}
               </button>
               {!canRun && (
-                <p className="text-[11px] text-gray-600">
+                <p className="text-[11px] text-fg-subtle">
                   Enter search text or at least one field filter.
                 </p>
               )}
@@ -660,10 +660,10 @@ export function FederatedSearchView() {
 
               <section aria-labelledby="fed-rows-heading">
                 <div className="mb-2 flex items-baseline justify-between">
-                  <h2 id="fed-rows-heading" className="text-sm font-medium text-gray-300">
+                  <h2 id="fed-rows-heading" className="text-sm font-medium text-fg-secondary">
                     Merged rows
                   </h2>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-fg-muted">
                     {`${result.row_count} ${result.row_count === 1 ? 'row' : 'rows'}`}
                     {ranAt ? ` · ${new Date(ranAt).toLocaleTimeString()}` : ''}
                   </p>

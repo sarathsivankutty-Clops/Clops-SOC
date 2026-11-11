@@ -1,0 +1,109 @@
+{
+  "id": "cloud-aws-cloudtrail-console-no-mfa-rca-v1",
+  "name": "AWS CloudTrail: Console Sign-In Without MFA & Anomalous API RCA",
+  "description": "Triggered when AWS CloudTrail records a ConsoleLogin without MFA or from an anomalous ASN. Enriches caller IP, audits post-login CloudTrail read/write API calls for RCA, challenges or revokes the console session, and opens a tracked cloud identity ticket.",
+  "version": "1.0.0",
+  "tags": [
+    "cloud-misconfig",
+    "cloud",
+    "aws",
+    "cloudtrail",
+    "console-login",
+    "mfa",
+    "rca",
+    "mitre.t1078.004"
+  ],
+  "trigger": {
+    "on": "alert",
+    "severity": [
+      "medium",
+      "high",
+      "critical"
+    ],
+    "tags": [
+      "cloud-misconfig",
+      "cloudtrail",
+      "aws-cloudtrail",
+      "mfa"
+    ]
+  },
+  "author": "AiSOC",
+  "enabled": true,
+  "created_at": "2026-05-03T00:00:00+00:00",
+  "updated_at": "2026-05-03T00:00:00+00:00",
+  "steps": [
+    {
+      "id": "enrich-login-ip",
+      "name": "Enrich ConsoleLogin source IP & geo-velocity",
+      "type": "enrich",
+      "params": {
+        "indicator_field": "alert.src_ip"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 30
+    },
+    {
+      "id": "audit-post-login-calls",
+      "name": "Fetch post-login CloudTrail mutating API calls",
+      "type": "http",
+      "params": {
+        "url": "${AWS_URL}/cloudtrail/lookup?user={{alert.user}}&event_category=management&window=6h",
+        "method": "GET"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    },
+    {
+      "id": "rca-console-session",
+      "name": "AI Root Cause Analysis: evaluate console session intent & post-auth mutations",
+      "type": "investigate",
+      "params": {
+        "case_id_field": "alert.case_id",
+        "focus": "cloud"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 180
+    },
+    {
+      "id": "revoke-console-session",
+      "name": "Revoke active AWS console session & enforce MFA step-up",
+      "type": "http",
+      "params": {
+        "url": "${AWS_URL}/iam/users/{{alert.user}}/sessions/revoke",
+        "method": "POST"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    },
+    {
+      "id": "notify-identity-soc",
+      "name": "Notify SOC of non-MFA AWS Console sign-in RCA",
+      "type": "notify",
+      "params": {
+        "channel": "slack",
+        "message_template": "AWS ConsoleLogin without MFA investigated for {{alert.user}} ({{alert.src_ip}}). Active session revoked.",
+        "webhook_env": "SLACK_CLOUD_WEBHOOK"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 10
+    },
+    {
+      "id": "ticket-console-mfa",
+      "name": "Open AWS Console non-MFA RCA ticket",
+      "type": "create_ticket",
+      "params": {
+        "priority": "P2",
+        "title_template": "AWS ConsoleLogin without MFA: {{alert.user}}",
+        "queue": "soc"
+      },
+      "on_failure": "continue",
+      "retry_max": 0,
+      "timeout_seconds": 20
+    }
+  ]
+}

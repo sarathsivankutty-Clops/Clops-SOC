@@ -80,12 +80,12 @@ const fetcher = (url: string) =>
 function riskTone(risk: number): string {
   if (risk >= 70) return "text-red-400";
   if (risk >= 40) return "text-yellow-400";
-  return "text-gray-300";
+  return "text-fg-secondary";
 }
 
 /** A link we have, or an explicit statement that we do not. Never a blank. */
 function Link({ value, missing }: { value: string | null; missing: string }) {
-  if (value) return <span className="text-gray-300">{value}</span>;
+  if (value) return <span className="text-fg-secondary">{value}</span>;
   return (
     <span className="text-amber-400" title={missing}>
       not learned
@@ -100,7 +100,7 @@ function SanctionBadge({ sanctioned }: { sanctioned: boolean | null }) {
   if (sanctioned === false) {
     return <span className="inline-flex px-2 py-0.5 rounded text-xs bg-red-900/40 text-red-300">refused</span>;
   }
-  return <span className="inline-flex px-2 py-0.5 rounded text-xs bg-gray-800 text-gray-400">undecided</span>;
+  return <span className="inline-flex px-2 py-0.5 rounded text-xs bg-surface-elevated text-fg-muted">undecided</span>;
 }
 
 export default function AiEstateView() {
@@ -127,8 +127,8 @@ export default function AiEstateView() {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-100">AI estate</h1>
-        <p className="text-sm text-gray-500 mt-1">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-gray-100 */>AI estate</h1>
+        <p className="text-sm text-fg-subtle mt-1">
           What AiSOC has observed running, not what was registered. The interesting row is the one nobody
           declared.
         </p>
@@ -136,7 +136,7 @@ export default function AiEstateView() {
 
       <div className="flex flex-wrap gap-3 mb-4 items-center">
         <select
-          className="border border-gray-600 bg-gray-800 text-gray-200 rounded-md px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
+          className="border border-surface-border-strong bg-surface-elevated text-fg-primary rounded-md px-3 py-1.5 text-sm outline-none focus:ring-2 focus:ring-blue-500"
           value={kind}
           onChange={(e) => setKind(e.target.value)}
         >
@@ -146,19 +146,19 @@ export default function AiEstateView() {
             </option>
           ))}
         </select>
-        <label className="flex items-center gap-2 text-sm text-gray-400">
+        <label className="flex items-center gap-2 text-sm text-fg-muted">
           <input type="checkbox" checked={unlinkedOnly} onChange={(e) => setUnlinkedOnly(e.target.checked)} />
           Only assets with nobody accountable
         </label>
-        {data?.total != null && <span className="text-xs text-gray-500">{data.total} observed</span>}
+        {data?.total != null && <span className="text-xs text-fg-subtle">{data.total} observed</span>}
       </div>
 
       {data?.observedSources?.length ? (
-        <div className="mb-4 text-xs text-gray-500 space-y-1">
+        <div className="mb-4 text-xs text-fg-subtle space-y-1">
           <p className="uppercase tracking-wide">What the sources behind this list can and cannot see</p>
           {data.observedSources.map((s) => (
             <p key={s}>
-              <span className="text-gray-400">{s}</span>
+              <span className="text-fg-muted">{s}</span>
               {": "}
               {SOURCE_LIMITS[s] ?? "Unrecognised discovery source."}
             </p>
@@ -166,46 +166,46 @@ export default function AiEstateView() {
         </div>
       ) : null}
 
-      <div className="bg-gray-900/60 border border-gray-700 rounded-lg overflow-hidden">
+      <div className="bg-surface-card/60 border border-surface-border rounded-lg overflow-hidden">
         {isLoading ? (
-          <div className="p-8 text-center text-sm text-gray-500">Loading the AI estate…</div>
+          <div className="p-8 text-center text-sm text-fg-subtle">Loading the AI estate…</div>
         ) : error ? (
           <div className="p-8 text-center text-sm text-red-400">
             Could not load the AI estate. This is not a report that none exists.
           </div>
         ) : !data?.items?.length ? (
-          <div className="p-8 text-center text-sm text-gray-500">
+          <div className="p-8 text-center text-sm text-fg-subtle">
             No AI assets observed yet. AiSOC builds this list from AI runtime telemetry, endpoint process
             activity and provider audit logs — if none of those is connected, this stays empty whatever is
             running.
           </div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-800 border-b border-gray-700">
+            <thead className="bg-surface-elevated border-b border-surface-border">
               <tr>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">Asset</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">Kind</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">Person</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">Device</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">First seen</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">Last seen</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">Risk</th>
-                <th className="px-4 py-3 text-left font-medium text-gray-400">Status</th>
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">Asset</th>
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">Kind</th>
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">Person</th>
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">Device</th>
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">First seen</th>
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">Last seen</th>
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">Risk</th>
+                <th className="px-4 py-3 text-left font-medium text-fg-muted">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className="divide-y divide-surface-border">
               {data.items.map((asset) => (
                 <>
                   <tr
                     key={asset.id}
-                    className="hover:bg-gray-800/50 cursor-pointer"
+                    className="hover:bg-surface-elevated/50 cursor-pointer"
                     onClick={() => setExpanded(expanded === asset.id ? null : asset.id)}
                   >
-                    <td className="px-4 py-3 text-gray-100 max-w-xs truncate">
+                    <td className="px-4 py-3 text-fg-primary max-w-xs truncate">
                       {asset.displayName ?? asset.externalId}
-                      {asset.vendor ? <span className="text-gray-500"> · {asset.vendor}</span> : null}
+                      {asset.vendor ? <span className="text-fg-subtle"> · {asset.vendor}</span> : null}
                     </td>
-                    <td className="px-4 py-3 text-gray-400">{asset.kind.replace(/_/g, " ")}</td>
+                    <td className="px-4 py-3 text-fg-muted">{asset.kind.replace(/_/g, " ")}</td>
                     <td className="px-4 py-3">
                       <Link
                         value={asset.principal}
@@ -218,10 +218,10 @@ export default function AiEstateView() {
                         missing={`No source linked a device. ${SOURCE_LIMITS[asset.discoverySource] ?? ""}`}
                       />
                     </td>
-                    <td className="px-4 py-3 text-gray-500" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-fg-subtle" suppressHydrationWarning>
                       {new Date(asset.firstSeen).toLocaleString()}
                     </td>
-                    <td className="px-4 py-3 text-gray-500" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-fg-subtle" suppressHydrationWarning>
                       {new Date(asset.lastSeen).toLocaleString()}
                     </td>
                     <td className={`px-4 py-3 font-semibold ${riskTone(asset.risk)}`}>{asset.risk}</td>
@@ -230,21 +230,21 @@ export default function AiEstateView() {
                     </td>
                   </tr>
                   {expanded === asset.id && (
-                    <tr key={`${asset.id}-detail`} className="bg-gray-900">
+                    <tr key={`${asset.id}-detail`} className="bg-surface-card">
                       <td colSpan={8} className="px-6 py-4">
-                        <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+                        <p className="text-xs uppercase tracking-wide text-fg-subtle mb-2">
                           Why it scores {asset.risk}
                         </p>
                         {asset.riskReasons.length ? (
-                          <ul className="list-disc pl-5 space-y-1 text-sm text-gray-300">
+                          <ul className="list-disc pl-5 space-y-1 text-sm text-fg-secondary">
                             {asset.riskReasons.map((reason) => (
                               <li key={reason}>{reason}</li>
                             ))}
                           </ul>
                         ) : (
-                          <p className="text-sm text-gray-500">Nothing about this asset raised its score.</p>
+                          <p className="text-sm text-fg-subtle">Nothing about this asset raised its score.</p>
                         )}
-                        <p className="text-xs text-gray-500 mt-3">
+                        <p className="text-xs text-fg-subtle mt-3">
                           Seen {asset.observationCount} times via {asset.discoverySource}.
                           {asset.effectivePermissions
                             ? " Effective permissions were resolved at the last sighting."
@@ -265,7 +265,7 @@ export default function AiEstateView() {
                           </button>
                           <button
                             onClick={() => void sanction(asset.id, null)}
-                            className="px-3 py-1.5 text-xs bg-gray-700 text-gray-200 rounded hover:bg-gray-600"
+                            className="px-3 py-1.5 text-xs bg-surface-hover text-fg-primary rounded hover:bg-gray-600"
                           >
                             Back to undecided
                           </button>

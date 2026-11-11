@@ -200,10 +200,10 @@ function RatioStat({
   // off sample data while the queue below it was disclosed as unavailable.
   if (alertCount === undefined || incidentCount === undefined) {
     return (
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl px-4 py-3">
-        <p className="text-xs text-gray-500">Alert → Incident</p>
-        <p className="text-2xl font-bold mt-1 text-gray-600">—</p>
-        <p className="text-[10px] text-gray-600 mt-0.5">not measured</p>
+      <div className="bg-surface-card border border-surface-border rounded-xl px-4 py-3">
+        <p className="text-xs text-fg-muted">Alert → Incident</p>
+        <p className="text-2xl font-bold mt-1 text-fg-subtle">—</p>
+        <p className="text-[10px] text-fg-subtle mt-0.5">not measured</p>
       </div>
     );
   }
@@ -220,8 +220,8 @@ function RatioStat({
     ? '0:0'
     : `${ratio.toFixed(1)}:1`;
   return (
-    <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl px-4 py-3">
-      <p className="text-xs text-gray-500">Alert → Incident</p>
+    <div className="bg-surface-card border border-surface-border rounded-xl px-4 py-3">
+      <p className="text-xs text-fg-muted">Alert → Incident</p>
       <p
         className={clsx(
           'text-2xl font-bold mt-1',
@@ -230,7 +230,7 @@ function RatioStat({
       >
         {display}
       </p>
-      <p className="text-[10px] text-gray-600 mt-0.5">
+      <p className="text-[10px] text-fg-subtle mt-0.5">
         2026 bar ≥ 50:1 {meets ? '✓' : '↑'}
       </p>
     </div>
@@ -257,7 +257,7 @@ function SeverityHistogram({
         return (
           <span
             key={sev}
-            className="flex items-center gap-1 text-[11px] text-gray-400"
+            className="flex items-center gap-1 text-[11px] text-fg-muted"
             title={`${count} ${sev}`}
           >
             <span
@@ -285,7 +285,7 @@ function ScoreBar({
   const pct = Math.min(100, (score / max) * 100);
   return (
     <div className="flex items-center gap-2 w-32 shrink-0">
-      <div className="flex-1 h-1.5 bg-gray-800 rounded-full overflow-hidden">
+      <div className="flex-1 h-1.5 bg-surface-elevated rounded-full overflow-hidden">
         <div
           className={clsx('h-full rounded-full', band.bar)}
           style={{ width: `${pct}%` }}
@@ -311,7 +311,7 @@ function EntityRow({
     <button
       type="button"
       onClick={onSelect}
-      className="w-full flex items-center gap-4 px-4 py-3 hover:bg-gray-800/20 transition-colors border-b border-gray-800/40 last:border-0 text-left"
+      className="w-full flex items-center gap-4 px-4 py-3 hover:bg-surface-elevated/20 transition-colors border-b border-surface-border/70 last:border-0 text-left"
     >
       <span className="text-base shrink-0" aria-hidden>
         {cfg.icon}
@@ -322,7 +322,7 @@ function EntityRow({
           <span className={clsx('text-xs uppercase tracking-wider', cfg.tint)}>
             {cfg.label}
           </span>
-          <span className="text-sm text-gray-200 truncate font-medium">
+          <span className="text-sm text-fg-primary truncate font-medium">
             {record.entity_value}
           </span>
           {record.promoted && (
@@ -332,13 +332,13 @@ function EntityRow({
           )}
         </div>
         <div className="flex items-center gap-3 mt-1">
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-fg-muted">
             {record.alert_count} alert{record.alert_count === 1 ? '' : 's'}
           </span>
-          <span className="text-gray-700">·</span>
+          <span className="text-fg-subtle">·</span>
           <SeverityHistogram histogram={record.severity_histogram} />
-          <span className="text-gray-700">·</span>
-          <span className="text-xs text-gray-500" suppressHydrationWarning>
+          <span className="text-fg-subtle">·</span>
+          <span className="text-xs text-fg-muted" suppressHydrationWarning>
             last seen{' '}
             {formatDistanceToNow(new Date(record.last_seen), {
               addSuffix: true,
@@ -387,8 +387,8 @@ function EntityDetailDrawer({
         onClick={onClose}
         aria-hidden="true"
       />
-      <aside className="w-[480px] max-w-[90vw] bg-gray-950 border-l border-gray-800 overflow-y-auto">
-        <header className="px-5 py-4 border-b border-gray-800 flex items-start justify-between gap-3 sticky top-0 bg-gray-950 z-10">
+      <aside className="w-[480px] max-w-[90vw] bg-surface-card border-l border-surface-border overflow-y-auto">
+        <header className="px-5 py-4 border-b border-surface-border flex items-start justify-between gap-3 sticky top-0 bg-surface-card z-10">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <span className="text-base" aria-hidden>
@@ -403,13 +403,13 @@ function EntityDetailDrawer({
                 {cfg.label}
               </span>
             </div>
-            <h2 className="text-lg text-gray-100 font-medium truncate mt-1">
+            <h2 className="text-lg text-fg-primary font-medium truncate mt-1">
               {record.entity_value}
             </h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-300 text-xl leading-none px-2"
+            className="text-fg-muted hover:text-fg-secondary text-xl leading-none px-2"
             aria-label="Close"
           >
             ×
@@ -419,24 +419,24 @@ function EntityDetailDrawer({
         <div className="px-5 py-4 space-y-4">
           <div className="grid grid-cols-2 gap-3">
             <div className={clsx('rounded-xl px-3 py-2.5 border', band.bg)}>
-              <p className="text-[10px] uppercase tracking-wider text-gray-500">
+              <p className="text-[10px] uppercase tracking-wider text-fg-muted">
                 Risk score
               </p>
               <p className={clsx('text-2xl font-bold', band.text)}>
                 {Math.round(record.score)}
               </p>
-              <p className="text-[10px] text-gray-500 mt-0.5">
+              <p className="text-[10px] text-fg-muted mt-0.5">
                 threshold {Math.round(record.threshold)}
               </p>
             </div>
-            <div className="rounded-xl px-3 py-2.5 border border-gray-800/60 bg-gray-900/60">
-              <p className="text-[10px] uppercase tracking-wider text-gray-500">
+            <div className="rounded-xl px-3 py-2.5 border border-surface-border bg-surface-card">
+              <p className="text-[10px] uppercase tracking-wider text-fg-muted">
                 Alerts (window)
               </p>
-              <p className="text-2xl font-bold text-gray-200">
+              <p className="text-2xl font-bold text-fg-primary">
                 {record.alert_count}
               </p>
-              <p className="text-[10px] text-gray-500 mt-0.5" suppressHydrationWarning>
+              <p className="text-[10px] text-fg-muted mt-0.5" suppressHydrationWarning>
                 first seen{' '}
                 {formatDistanceToNow(new Date(record.first_seen), {
                   addSuffix: true,
@@ -457,11 +457,11 @@ function EntityDetailDrawer({
           )}
 
           <div>
-            <h3 className="text-xs uppercase tracking-wider text-gray-500 mb-2">
+            <h3 className="text-xs uppercase tracking-wider text-fg-muted mb-2">
               Contributing alerts
             </h3>
             {record.contributions.length === 0 ? (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-fg-subtle">
                 No contributions in the current decay window.
               </p>
             ) : (
@@ -469,7 +469,7 @@ function EntityDetailDrawer({
                 {record.contributions.map((c) => (
                   <li
                     key={c.alert_id}
-                    className="flex items-start gap-2 text-sm border border-gray-800/60 bg-gray-900/40 rounded-lg px-3 py-2"
+                    className="flex items-start gap-2 text-sm border border-surface-border bg-surface-elevated/50 rounded-lg px-3 py-2"
                   >
                     <span
                       className={clsx(
@@ -479,16 +479,16 @@ function EntityDetailDrawer({
                     />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-gray-200 truncate">
+                        <span className="text-fg-primary truncate">
                           {c.title ?? c.alert_id}
                         </span>
-                        <span className="text-[10px] text-gray-500 shrink-0">
+                        <span className="text-[10px] text-fg-muted shrink-0">
                           +{Math.round(c.raw_points)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2 mt-0.5 text-[11px] text-gray-500">
+                      <div className="flex items-center gap-2 mt-0.5 text-[11px] text-fg-muted">
                         {c.source && <span>{c.source}</span>}
-                        {c.source && <span className="text-gray-700">·</span>}
+                        {c.source && <span className="text-fg-subtle">·</span>}
                         <span suppressHydrationWarning>
                           {formatDistanceToNow(new Date(c.observed_at), {
                             addSuffix: true,
@@ -562,47 +562,47 @@ export function EntityRiskQueue() {
 
       {/* Stats strip — anchored on the 2026 KPI bar */}
       <div className="grid grid-cols-4 gap-3">
-        <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl px-4 py-3">
-          <p className="text-xs text-gray-500">Active entities</p>
+        <div className="bg-surface-card border border-surface-border rounded-xl px-4 py-3">
+          <p className="text-xs text-fg-muted">Active entities</p>
           <p
             className={clsx(
               'text-2xl font-bold mt-1',
-              total === undefined ? 'text-gray-600' : 'text-gray-200',
+              total === undefined ? 'text-fg-subtle' : 'text-fg-primary',
             )}
           >
             {total ?? '—'}
           </p>
-          <p className="text-[10px] text-gray-600 mt-0.5">
+          <p className="text-[10px] text-fg-subtle mt-0.5">
             {total === undefined
               ? 'not measured'
               : `threshold ${Math.round(threshold)} pts`}
           </p>
         </div>
-        <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl px-4 py-3">
-          <p className="text-xs text-gray-500">Promoted</p>
+        <div className="bg-surface-card border border-surface-border rounded-xl px-4 py-3">
+          <p className="text-xs text-fg-muted">Promoted</p>
           <p
             className={clsx(
               'text-2xl font-bold mt-1',
-              promotedCount === undefined ? 'text-gray-600' : 'text-red-400',
+              promotedCount === undefined ? 'text-fg-subtle' : 'text-red-400',
             )}
           >
             {promotedCount ?? '—'}
           </p>
-          <p className="text-[10px] text-gray-600 mt-0.5">
+          <p className="text-[10px] text-fg-subtle mt-0.5">
             {promotedCount === undefined ? 'not measured' : 'entity-incidents'}
           </p>
         </div>
-        <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl px-4 py-3">
-          <p className="text-xs text-gray-500">Contributing alerts</p>
+        <div className="bg-surface-card border border-surface-border rounded-xl px-4 py-3">
+          <p className="text-xs text-fg-muted">Contributing alerts</p>
           <p
             className={clsx(
               'text-2xl font-bold mt-1',
-              alertCount === undefined ? 'text-gray-600' : 'text-gray-200',
+              alertCount === undefined ? 'text-fg-subtle' : 'text-fg-primary',
             )}
           >
             {alertCount ?? '—'}
           </p>
-          <p className="text-[10px] text-gray-600 mt-0.5">
+          <p className="text-[10px] text-fg-subtle mt-0.5">
             {alertCount === undefined ? 'not measured' : 'current decay window'}
           </p>
         </div>
@@ -610,15 +610,15 @@ export function EntityRiskQueue() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3 flex-wrap py-3 px-4 bg-gray-900/40 border border-gray-800/60 rounded-xl">
+      <div className="flex items-center gap-3 flex-wrap py-3 px-4 bg-surface-elevated/50 border border-surface-border rounded-xl">
         <div className="flex items-center gap-1">
           <button
             onClick={() => setPromotedOnly(false)}
             className={clsx(
               'text-xs px-2.5 py-1 rounded-lg transition-colors',
               !promotedOnly
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/60',
+                ? 'bg-brand-500 text-white'
+                : 'text-fg-muted hover:text-fg-secondary hover:bg-surface-elevated',
             )}
           >
             All entities
@@ -629,31 +629,31 @@ export function EntityRiskQueue() {
               'text-xs px-2.5 py-1 rounded-lg transition-colors',
               promotedOnly
                 ? 'bg-red-600 text-white'
-                : 'text-gray-500 hover:text-gray-300 hover:bg-gray-800/60',
+                : 'text-fg-muted hover:text-fg-secondary hover:bg-surface-elevated',
             )}
           >
             Promoted only
           </button>
         </div>
-        <span className="ml-auto text-xs text-gray-600">
+        <span className="ml-auto text-xs text-fg-subtle">
           {entities.length} shown
         </span>
       </div>
 
       {/* Queue */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl overflow-hidden">
-        <div className="flex items-center px-4 py-2 border-b border-gray-800/60 bg-gray-900/80 gap-4">
-          <span className="text-xs text-gray-500 flex-1">ENTITY</span>
-          <span className="text-xs text-gray-500 w-32">RISK</span>
-          <span className="text-xs text-gray-500 w-20 text-center">BAND</span>
+      <div className="bg-surface-card border border-surface-border rounded-xl overflow-hidden">
+        <div className="flex items-center px-4 py-2 border-b border-surface-border bg-surface-elevated/70 gap-4">
+          <span className="text-xs text-fg-muted flex-1">ENTITY</span>
+          <span className="text-xs text-fg-muted w-32">RISK</span>
+          <span className="text-xs text-fg-muted w-20 text-center">BAND</span>
         </div>
 
         {queueError ? (
-          <div className="flex flex-col items-center justify-center h-32 text-gray-500 gap-1 px-4 text-center">
+          <div className="flex flex-col items-center justify-center h-32 text-fg-muted gap-1 px-4 text-center">
             <p className="text-sm text-amber-200/80">
               The entity queue could not be loaded.
             </p>
-            <p className="text-[11px] text-gray-600">
+            <p className="text-[11px] text-fg-subtle">
               Treat this as unknown rather than as an empty queue — see the
               message above.
             </p>
@@ -663,13 +663,13 @@ export function EntityRiskQueue() {
             <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : entities.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-32 text-gray-500 gap-1">
+          <div className="flex flex-col items-center justify-center h-32 text-fg-muted gap-1">
             <p className="text-sm">
               {promotedOnly
                 ? 'No entities have crossed the promotion threshold yet.'
                 : 'No entities are currently being tracked.'}
             </p>
-            <p className="text-[11px] text-gray-600">
+            <p className="text-[11px] text-fg-subtle">
               Decay window: 24h · half-life: 4h
             </p>
           </div>

@@ -194,7 +194,7 @@ export function ResponderShell({ children }: { children: React.ReactNode }) {
   // Render login (and other public) routes without the chrome.
   if (isPublicRoute) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 antialiased">
+      <div className="min-h-screen bg-surface-base text-fg-primary antialiased">
         {children}
       </div>
     );
@@ -203,21 +203,21 @@ export function ResponderShell({ children }: { children: React.ReactNode }) {
   // Avoid flashing protected content while we resolve auth state.
   if (!authReady || !authed) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex items-center justify-center">
-        <div className="text-sm text-zinc-500">Loading…</div>
+      <div className="min-h-screen bg-surface-base text-fg-primary flex items-center justify-center">
+        <div className="text-sm text-fg-subtle">Loading…</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] bg-zinc-950 text-zinc-100 antialiased flex flex-col">
+    <div className="min-h-[100dvh] bg-surface-base text-fg-primary antialiased flex flex-col">
       {/* Top bar: identity + sign out. Stays compact for portrait phones. */}
-      <header className="sticky top-0 z-30 bg-zinc-950/95 backdrop-blur border-b border-zinc-900 supports-[padding:max(0px)]:pt-[max(0px,env(safe-area-inset-top))]">
+      <header className="sticky top-0 z-30 bg-surface-base/95 backdrop-blur border-b border-surface-border supports-[padding:max(0px)]:pt-[max(0px,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
               <svg
-                className="w-5 h-5 text-white"
+                className="w-5 h-5 text-fg-primary"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -233,7 +233,7 @@ export function ResponderShell({ children }: { children: React.ReactNode }) {
             <div className="leading-tight">
               <div className="text-sm font-semibold">AiSOC Responder</div>
               {profileName ? (
-                <div className="text-[10px] uppercase tracking-wider text-zinc-500 truncate max-w-[140px]">
+                <div className="text-[10px] uppercase tracking-wider text-fg-subtle truncate max-w-[140px]">
                   {profileName}
                 </div>
               ) : null}
@@ -242,7 +242,7 @@ export function ResponderShell({ children }: { children: React.ReactNode }) {
           <button
             type="button"
             onClick={handleSignOut}
-            className="text-xs text-zinc-400 hover:text-zinc-200 px-2 py-1.5 rounded-md border border-zinc-800 hover:border-zinc-700 transition"
+            className="text-xs text-fg-muted hover:text-fg-primary px-2 py-1.5 rounded-md border border-surface-border hover:border-surface-border transition"
           >
             Sign out
           </button>
@@ -255,7 +255,7 @@ export function ResponderShell({ children }: { children: React.ReactNode }) {
       </main>
 
       {/* Bottom nav: thumb-reachable on portrait phones. */}
-      <nav className="fixed bottom-0 inset-x-0 z-30 bg-zinc-950/95 backdrop-blur border-t border-zinc-900 supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
+      <nav className="fixed bottom-0 inset-x-0 z-30 bg-surface-base/95 backdrop-blur border-t border-surface-border supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]">
         <ul className="grid grid-cols-5 h-16">
           {NAV_ITEMS.map((item) => {
             const active = item.match(pathname);
@@ -267,7 +267,7 @@ export function ResponderShell({ children }: { children: React.ReactNode }) {
                     'flex-1 flex flex-col items-center justify-center gap-0.5 text-[10px] uppercase tracking-wider transition',
                     active
                       ? 'text-indigo-400'
-                      : 'text-zinc-500 hover:text-zinc-300',
+                      : 'text-fg-subtle hover:text-fg-secondary',
                   )}
                   aria-current={active ? 'page' : undefined}
                 >

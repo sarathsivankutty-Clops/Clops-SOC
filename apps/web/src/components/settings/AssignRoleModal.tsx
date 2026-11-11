@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { rbacApi, type RbacRole, type TenantUser } from '@/lib/api';
+import { DialogBehavior } from '@/components/ui/Dialog';
 
 interface AssignRoleModalProps {
   user: TenantUser;
@@ -53,12 +54,13 @@ export function AssignRoleModal({ user, roles, isSelf, adminCount, onClose, onAs
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
+      <DialogBehavior onClose={onClose} /> {/* [P6 overlay-dialog] role=dialog, focus trap, Escape */}
       <div
-        className="w-full max-w-md rounded-2xl border border-gray-800 bg-gray-900 p-6 shadow-2xl"
+        className="w-full max-w-md rounded-2xl border border-surface-border bg-surface-card p-6 shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="text-base font-semibold text-gray-100">Assign role</h3>
-        <p className="mt-1 text-sm text-gray-400">
+        <h3 className="text-base font-semibold text-fg-primary">Assign role</h3>
+        <p className="mt-1 text-sm text-fg-secondary">
           {user.username} · {user.email}
           {!user.is_active && <span className="ml-2 rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] uppercase text-amber-300">disabled — assignments refused</span>}
         </p>
@@ -69,7 +71,7 @@ export function AssignRoleModal({ user, roles, isSelf, adminCount, onClose, onAs
           </p>
         )}
 
-        <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-gray-500" htmlFor="assign-role-select">
+        <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-fg-muted" htmlFor="assign-role-select">
           Role
         </label>
         <select
@@ -80,7 +82,7 @@ export function AssignRoleModal({ user, roles, isSelf, adminCount, onClose, onAs
             setConfirmAdmin(false);
           }}
           disabled={!user.is_active}
-          className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100 focus:border-indigo-500 focus:outline-none"
+          className="mt-1 w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary focus:border-indigo-500 focus:outline-none"
         >
           {roles.map((r) => (
             <option key={r.id} value={r.name}>
@@ -90,10 +92,10 @@ export function AssignRoleModal({ user, roles, isSelf, adminCount, onClose, onAs
           ))}
         </select>
         {roles.find((r) => r.name === selected)?.description && (
-          <p className="mt-1.5 text-xs text-gray-500">{roles.find((r) => r.name === selected)?.description}</p>
+          <p className="mt-1.5 text-xs text-fg-muted">{roles.find((r) => r.name === selected)?.description}</p>
         )}
 
-        <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-gray-500" htmlFor="assign-role-reason">
+        <label className="mt-4 block text-xs font-semibold uppercase tracking-wide text-fg-muted" htmlFor="assign-role-reason">
           Reason (required, audited)
         </label>
         <textarea
@@ -103,7 +105,7 @@ export function AssignRoleModal({ user, roles, isSelf, adminCount, onClose, onAs
           rows={2}
           maxLength={500}
           placeholder="Why is this role changing? Stored in the audit log with actor, target, old and new role."
-          className="mt-1 w-full rounded-lg border border-gray-700 bg-gray-950 px-3 py-2 text-sm text-gray-100 placeholder-gray-600 focus:border-indigo-500 focus:outline-none"
+          className="mt-1 w-full rounded-lg border border-surface-border-strong bg-surface-base px-3 py-2 text-sm text-fg-primary placeholder-fg-muted focus:border-indigo-500 focus:outline-none"
         />
 
         {grantingAdmin && (
@@ -123,7 +125,7 @@ export function AssignRoleModal({ user, roles, isSelf, adminCount, onClose, onAs
         )}
 
         <div className="mt-5 flex justify-end gap-3">
-          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-gray-400 hover:bg-gray-800">
+          <button type="button" onClick={onClose} className="rounded-lg px-4 py-2 text-sm text-fg-secondary hover:bg-surface-elevated">
             Cancel
           </button>
           <button

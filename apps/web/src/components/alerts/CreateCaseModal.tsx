@@ -120,17 +120,17 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
       onClick={onClose}
     >
       <div
-        className="w-full max-w-lg rounded-xl border border-gray-800 bg-gray-900 shadow-2xl"
+        className="w-full max-w-lg rounded-xl border border-surface-border bg-surface-card shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-800 px-5 py-4">
-          <h2 className="text-base font-semibold text-white">
+        <div className="flex items-center justify-between border-b border-surface-border px-5 py-4">
+          <h2 className="text-base font-semibold text-fg-primary">
             Promote alert to case
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-400 hover:text-white"
+            className="text-fg-muted hover:text-fg-primary"
             aria-label="Close"
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -141,13 +141,13 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
         </div>
 
         <div className="px-5 pt-4">
-          <div className="inline-flex rounded-lg bg-gray-800 p-0.5 text-sm">
+          <div className="inline-flex rounded-lg bg-surface-elevated p-0.5 text-sm">
             <button
               type="button"
               onClick={() => setMode('new')}
               className={clsx(
                 'px-3 py-1.5 rounded-md font-medium transition-colors',
-                mode === 'new' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:text-white',
+                mode === 'new' ? 'bg-brand-500 text-white' : 'text-fg-secondary hover:text-fg-primary',
               )}
             >
               Create new case
@@ -157,7 +157,7 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
               onClick={() => setMode('existing')}
               className={clsx(
                 'px-3 py-1.5 rounded-md font-medium transition-colors',
-                mode === 'existing' ? 'bg-blue-600 text-white' : 'text-gray-300 hover:text-white',
+                mode === 'existing' ? 'bg-brand-500 text-white' : 'text-fg-secondary hover:text-fg-primary',
               )}
             >
               Add to existing case
@@ -169,7 +169,7 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
           {mode === 'new' ? (
             <>
               <div>
-                <label htmlFor="case-title" className="mb-1 block text-xs font-medium text-gray-400">
+                <label htmlFor="case-title" className="mb-1 block text-xs font-medium text-fg-muted">
                   Title
                 </label>
                 <input
@@ -177,32 +177,32 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-fg-primary focus:border-brand-500 focus:outline-none"
                   placeholder="Short case title"
                 />
               </div>
               <div>
-                <label htmlFor="case-description" className="mb-1 block text-xs font-medium text-gray-400">
-                  Description <span className="text-gray-600">(optional)</span>
+                <label htmlFor="case-description" className="mb-1 block text-xs font-medium text-fg-muted">
+                  Description <span className="text-fg-subtle">(optional)</span>
                 </label>
                 <textarea
                   id="case-description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                  className="w-full resize-none rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-fg-primary focus:border-brand-500 focus:outline-none"
                   placeholder="Why is this alert being promoted?"
                 />
               </div>
               <div>
-                <label htmlFor="case-severity" className="mb-1 block text-xs font-medium text-gray-400">
+                <label htmlFor="case-severity" className="mb-1 block text-xs font-medium text-fg-muted">
                   Severity
                 </label>
                 <select
                   id="case-severity"
                   value={severity}
                   onChange={(e) => setSeverity(e.target.value as CaseSeverity)}
-                  className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none"
+                  className="w-full rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-fg-primary focus:border-brand-500 focus:outline-none"
                 >
                   <option value="critical">Critical</option>
                   <option value="high">High</option>
@@ -213,7 +213,7 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
             </>
           ) : (
             <div>
-              <label htmlFor="case-existing" className="mb-1 block text-xs font-medium text-gray-400">
+              <label htmlFor="case-existing" className="mb-1 block text-xs font-medium text-fg-muted">
                 Open case
               </label>
               <select
@@ -221,7 +221,7 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
                 value={selectedCaseId}
                 onChange={(e) => setSelectedCaseId(e.target.value)}
                 disabled={casesLoading}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white focus:border-blue-500 focus:outline-none disabled:opacity-60"
+                className="w-full rounded-lg border border-surface-border bg-surface-elevated px-3 py-2 text-sm text-fg-primary focus:border-brand-500 focus:outline-none disabled:opacity-60"
               >
                 <option value="">
                   {casesLoading ? 'Loading cases…' : 'Select a case…'}
@@ -233,7 +233,7 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
                 ))}
               </select>
               {!casesLoading && openCases && openCases.cases.length === 0 && (
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-fg-muted">
                   No open cases yet — create a new one instead.
                 </p>
               )}
@@ -241,11 +241,11 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-2 border-t border-gray-800 px-5 py-4">
+        <div className="flex items-center justify-end gap-2 border-t border-surface-border px-5 py-4">
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-300 hover:text-white"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-fg-secondary hover:text-fg-primary"
           >
             Cancel
           </button>
@@ -253,7 +253,7 @@ export function CreateCaseModal({ open, onClose, alert }: CreateCaseModalProps) 
             type="button"
             onClick={handleSubmit}
             disabled={submitting}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+            className="rounded-lg bg-brand-500 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-400 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting
               ? 'Working…'

@@ -49,7 +49,7 @@ const STATUS_STYLES: Record<string, string> = {
   approved: 'bg-emerald-100 text-emerald-800 border-emerald-200',
   review: 'bg-yellow-100 text-yellow-800 border-yellow-200',
   rejected: 'bg-red-100 text-red-800 border-red-200',
-  missing: 'bg-gray-100 text-gray-600 border-gray-200',
+  missing: 'bg-surface-hover text-fg-secondary border-surface-border',
 };
 
 const STATUS_DOT: Record<string, string> = {
@@ -73,8 +73,8 @@ function StatusBadge({ status }: { status: string }) {
 
 function SummaryCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4">
-      <p className="text-sm text-gray-500">{label}</p>
+    <div className="bg-white rounded-lg border border-surface-border p-4">
+      <p className="text-sm text-fg-subtle">{label}</p>
       <p className={`text-3xl font-bold mt-1 ${color}`}>{value}</p>
     </div>
   );
@@ -138,8 +138,8 @@ export function SOC2View() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">SOC 2 Evidence Dashboard</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-gray-900 */>SOC 2 Evidence Dashboard</h1>
+          <p className="text-sm text-fg-subtle mt-1">
             Trust Services Criteria — auto-collected from platform activity
           </p>
         </div>
@@ -154,7 +154,7 @@ export function SOC2View() {
           <button
             onClick={handleExport}
             disabled={exporting || !data}
-            className="px-4 py-2 text-sm font-medium bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            className="px-4 py-2 text-sm font-medium bg-white border border-surface-border text-fg-primary rounded-lg hover:bg-surface-subtle disabled:opacity-50 transition-colors"
           >
             {exporting ? 'Generating…' : '⬇ Export PDF'}
           </button>
@@ -165,24 +165,24 @@ export function SOC2View() {
       {data && (
         <>
           {/* Readiness gauge */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="bg-white rounded-xl border border-surface-border p-6">
             <div className="flex items-center justify-between mb-3">
-              <span className="font-semibold text-gray-900">Overall Readiness</span>
+              <span className="font-semibold text-fg-primary">Overall Readiness</span>
               <span className="text-2xl font-bold text-indigo-600">{data.summary.pct}%</span>
             </div>
-            <div className="w-full bg-gray-100 rounded-full h-3">
+            <div className="w-full bg-surface-hover rounded-full h-3">
               <div
                 className="h-3 rounded-full bg-emerald-500 transition-all duration-700"
                 style={{ width: `${data.summary.pct}%` }}
               />
             </div>
-            <p className="text-xs text-gray-400 mt-2">
+            <p className="text-xs text-fg-muted mt-2">
               {data.summary.collected + data.summary.approved} of {data.summary.total} controls have evidence
             </p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <SummaryCard label="Total Controls" value={data.summary.total} color="text-gray-900" />
+            <SummaryCard label="Total Controls" value={data.summary.total} color="text-fg-primary" />
             <SummaryCard label="Collected" value={data.summary.collected} color="text-green-600" />
             <SummaryCard label="Needs Review" value={data.summary.review} color="text-yellow-600" />
             <SummaryCard label="Approved" value={data.summary.approved} color="text-emerald-600" />
@@ -198,7 +198,7 @@ export function SOC2View() {
             className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
               !categoryFilter
                 ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
-                : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                : 'bg-white border-surface-border text-fg-secondary hover:border-surface-border'
             }`}
           >
             All
@@ -210,7 +210,7 @@ export function SOC2View() {
               className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
                 categoryFilter === cat
                   ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
-                  : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                  : 'bg-white border-surface-border text-fg-secondary hover:border-surface-border'
               }`}
             >
               {cat}
@@ -221,7 +221,7 @@ export function SOC2View() {
 
       {/* Loading / error states */}
       {isLoading && (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400 text-sm">
+        <div className="bg-white rounded-xl border border-surface-border p-12 text-center text-fg-muted text-sm">
           Loading compliance data…
         </div>
       )}
@@ -237,10 +237,10 @@ export function SOC2View() {
           {filtered.map((item) => (
             <div
               key={item.control.id}
-              className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+              className="bg-white rounded-xl border border-surface-border shadow-sm overflow-hidden"
             >
               <button
-                className="w-full text-left px-5 py-4 flex items-start gap-4 hover:bg-gray-50 transition-colors"
+                className="w-full text-left px-5 py-4 flex items-start gap-4 hover:bg-surface-subtle transition-colors"
                 onClick={() =>
                   setExpandedId(expandedId === item.control.id ? null : item.control.id)
                 }
@@ -251,25 +251,25 @@ export function SOC2View() {
                   </span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900">{item.control.title}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">{item.control.category}</p>
+                  <p className="text-sm font-semibold text-fg-primary">{item.control.title}</p>
+                  <p className="text-xs text-fg-muted mt-0.5">{item.control.category}</p>
                 </div>
                 <StatusBadge status={item.latest_status} />
-                <span className="text-gray-400 text-xs ml-2">
+                <span className="text-fg-muted text-xs ml-2">
                   {expandedId === item.control.id ? '▲' : '▼'}
                 </span>
               </button>
 
               {expandedId === item.control.id && (
-                <div className="px-5 pb-5 border-t border-gray-100 bg-gray-50">
+                <div className="px-5 pb-5 border-t border-surface-border bg-surface-subtle">
                   {item.control.description && (
-                    <p className="text-sm text-gray-600 mt-3 mb-4">{item.control.description}</p>
+                    <p className="text-sm text-fg-secondary mt-3 mb-4">{item.control.description}</p>
                   )}
-                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                  <h4 className="text-xs font-semibold text-fg-subtle uppercase tracking-wider mb-2">
                     Evidence ({item.evidence.length})
                   </h4>
                   {item.evidence.length === 0 ? (
-                    <p className="text-sm text-gray-400 italic">
+                    <p className="text-sm text-fg-muted italic">
                       No evidence collected yet. Click &ldquo;Collect Evidence&rdquo; to auto-gather.
                     </p>
                   ) : (
@@ -277,14 +277,14 @@ export function SOC2View() {
                       {item.evidence.map((ev) => (
                         <div
                           key={ev.id}
-                          className="bg-white rounded-lg border border-gray-200 p-3 flex items-start gap-3"
+                          className="bg-white rounded-lg border border-surface-border p-3 flex items-start gap-3"
                         >
                           <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-800">{ev.title}</p>
+                            <p className="text-sm font-medium text-fg-primary">{ev.title}</p>
                             {ev.description && (
-                              <p className="text-xs text-gray-500 mt-0.5">{ev.description}</p>
+                              <p className="text-xs text-fg-subtle mt-0.5">{ev.description}</p>
                             )}
-                            <p className="text-xs text-gray-400 mt-1" suppressHydrationWarning>
+                            <p className="text-xs text-fg-muted mt-1" suppressHydrationWarning>
                               {new Date(ev.collected_at).toLocaleString()} · {ev.evidence_type}
                             </p>
                           </div>
@@ -301,8 +301,8 @@ export function SOC2View() {
       )}
 
       {!isLoading && !error && data && data.controls.length === 0 && (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <p className="text-gray-500 text-sm mb-4">No SOC 2 controls found in the database.</p>
+        <div className="bg-white rounded-xl border border-surface-border p-12 text-center">
+          <p className="text-fg-subtle text-sm mb-4">No SOC 2 controls found in the database.</p>
           <button
             onClick={handleCollect}
             className="px-4 py-2 text-sm font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"

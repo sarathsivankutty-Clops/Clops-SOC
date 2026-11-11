@@ -51,7 +51,7 @@ const SAMPLE_ACHIEVEMENTS: Achievement[] = [
 
 const RANK_ACCENTS: Record<number, { ring: string; text: string; label: string }> = {
   1: { ring: 'ring-2 ring-amber-400/60',  text: 'text-amber-400',  label: '🥇' },
-  2: { ring: 'ring-2 ring-gray-300/40',   text: 'text-gray-300',   label: '🥈' },
+  2: { ring: 'ring-2 ring-surface-border/40',   text: 'text-fg-secondary',   label: '🥈' },
   3: { ring: 'ring-2 ring-orange-400/40', text: 'text-orange-400', label: '🥉' },
 };
 
@@ -125,8 +125,8 @@ export function TeamAnalyticsView() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-white">Team Analytics</h1>
-        <p className="mt-1 text-sm text-gray-400">Analyst performance and gamification leaderboard</p>
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold tracking-tight text-white */>Team Analytics</h1>
+        <p className="mt-1 text-sm text-fg-muted">Analyst performance and gamification leaderboard</p>
       </div>
 
       {/* Aggregate stats */}
@@ -137,26 +137,26 @@ export function TeamAnalyticsView() {
           { label: 'Team Accuracy Rate',       value: teamAccuracy === null ? '—' : `${teamAccuracy}%`,      accent: 'text-violet-400' },
           { label: 'Total Badges Earned',      value: hasData ? totalBadges.toString() : '—', accent: 'text-amber-400' },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-5 space-y-4">
-            <p className="text-xs font-medium uppercase tracking-wider text-gray-400">{stat.label}</p>
+          <div key={stat.label} className="rounded-xl border border-surface-border/60 bg-surface-card/40 p-5 space-y-4">
+            <p className="text-xs font-medium uppercase tracking-wider text-fg-muted">{stat.label}</p>
             <p className={clsx('text-3xl font-bold', stat.accent)}>{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Leaderboard */}
-      <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-5 space-y-4">
+      <div className="rounded-xl border border-surface-border/60 bg-surface-card/40 p-5 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-semibold text-white">Analyst Leaderboard</h2>
+          <h2 className="text-lg font-semibold text-fg-primary">Analyst Leaderboard</h2>
           <div className="flex items-center gap-3">
             <input
               type="search"
               placeholder="Search analyst…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="rounded-lg border border-gray-700/60 bg-gray-900 px-3 py-1.5 text-xs text-gray-200 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/60 w-44"
+              className="rounded-lg border border-surface-border/60 bg-surface-card px-3 py-1.5 text-xs text-fg-primary placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-indigo-500/60 w-44"
             />
-            <span className="text-xs font-medium uppercase tracking-wider text-gray-500">Sort</span>
+            <span className="text-xs font-medium uppercase tracking-wider text-fg-subtle">Sort</span>
             {SORT_OPTIONS.map((opt) => (
               <button
                 key={opt.key}
@@ -164,8 +164,8 @@ export function TeamAnalyticsView() {
                 className={clsx(
                   'rounded-md px-2.5 py-1 text-xs font-medium transition',
                   sortBy === opt.key
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-500 hover:text-gray-300',
+                    ? 'bg-surface-hover text-fg-primary'
+                    : 'text-fg-subtle hover:text-fg-secondary',
                 )}
               >
                 {opt.label}
@@ -189,7 +189,7 @@ export function TeamAnalyticsView() {
               <button
                 type="button"
                 onClick={() => setSearch('')}
-                className="rounded-lg bg-gray-800 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 transition-colors"
+                className="rounded-lg bg-surface-elevated px-4 py-2 text-sm text-fg-primary hover:bg-surface-hover transition-colors"
               >
                 Clear search
               </button>
@@ -199,7 +199,7 @@ export function TeamAnalyticsView() {
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="border-b border-gray-800/60 text-xs uppercase tracking-wider text-gray-500">
+              <tr className="border-b border-surface-border/60 text-xs uppercase tracking-wider text-fg-subtle">
                 <th className="pb-3 pr-3 font-medium w-12">Rank</th>
                 <th className="pb-3 pr-3 font-medium">Analyst</th>
                 <th className="pb-3 pr-3 font-medium text-right">Cases</th>
@@ -209,14 +209,14 @@ export function TeamAnalyticsView() {
                 <th className="pb-3 font-medium">Badges</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800/40">
+            <tbody className="divide-y divide-surface-border/40">
               {sorted.map((analyst, i) => {
                 const rank = i + 1;
                 const accent = RANK_ACCENTS[rank];
                 return (
                   <tr key={analyst.id} className="group transition hover:bg-white/[0.02]">
                     <td className="py-3 pr-3">
-                      <span className={clsx('text-sm font-bold', accent?.text ?? 'text-gray-500')}>
+                      <span className={clsx('text-sm font-bold', accent?.text ?? 'text-fg-subtle')}>
                         {accent?.label ?? `#${rank}`}
                       </span>
                     </td>
@@ -224,34 +224,34 @@ export function TeamAnalyticsView() {
                       <div className="flex items-center gap-3">
                         <div
                           className={clsx(
-                            'flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white',
+                            'flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-fg-primary',
                             analyst.avatarColor,
                             accent?.ring,
                           )}
                         >
                           {analyst.initials}
                         </div>
-                        <span className="font-medium text-white">{analyst.name}</span>
+                        <span className="font-medium text-fg-primary">{analyst.name}</span>
                       </div>
                     </td>
-                    <td className="py-3 pr-3 text-right tabular-nums text-gray-300">
+                    <td className="py-3 pr-3 text-right tabular-nums text-fg-secondary">
                       {analyst.casesClosed}
                     </td>
-                    <td className="py-3 pr-3 text-right tabular-nums text-gray-300">
+                    <td className="py-3 pr-3 text-right tabular-nums text-fg-secondary">
                       {analyst.avgResolutionMin} min
                     </td>
-                    <td className="py-3 pr-3 text-right tabular-nums text-gray-300">
+                    <td className="py-3 pr-3 text-right tabular-nums text-fg-secondary">
                       {analyst.accuracy.toFixed(1)}%
                     </td>
                     <td className="py-3 pr-3 text-right">
-                      <span className={clsx('tabular-nums font-bold', accent?.text ?? 'text-white')}>
+                      <span className={clsx('tabular-nums font-bold', accent?.text ?? 'text-fg-primary')}>
                         {analyst.score}
                       </span>
                     </td>
                     <td className="py-3">
                       <div className="flex flex-wrap gap-1.5">
                         {analyst.badges.map((badge) => {
-                          const bc = BADGE_COLORS[badge] ?? { bg: 'bg-gray-500/15', text: 'text-gray-300', border: 'border-gray-500/30' };
+                          const bc = BADGE_COLORS[badge] ?? { bg: 'bg-gray-500/15', text: 'text-fg-secondary', border: 'border-surface-border-strong/30' };
                           return (
                             <span
                               key={badge}
@@ -276,23 +276,23 @@ export function TeamAnalyticsView() {
       </div>
 
       {/* Team Highlights */}
-      <div className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-5 space-y-4">
-        <h2 className="text-lg font-semibold text-white">Team Highlights</h2>
+      <div className="rounded-xl border border-surface-border/60 bg-surface-card/40 p-5 space-y-4">
+        <h2 className="text-lg font-semibold text-fg-primary">Team Highlights</h2>
         {achievements.length === 0 ? (
-          <p className="text-sm text-gray-500">No team milestones are recorded yet.</p>
+          <p className="text-sm text-fg-subtle">No team milestones are recorded yet.</p>
         ) : (
         <div className="space-y-3">
           {achievements.map((ach, i) => (
             <div
               key={i}
-              className="flex items-start gap-3 rounded-lg border border-gray-800/40 bg-black/20 p-3.5"
+              className="flex items-start gap-3 rounded-lg border border-surface-border/40 bg-black/20 p-3.5"
             >
-              <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/5">
+              <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-hover">
                 {achievementIcon(ach.icon)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-200">{ach.text}</p>
-                <p className="mt-0.5 text-xs text-gray-500">{ach.timeAgo}</p>
+                <p className="text-sm font-medium text-fg-primary">{ach.text}</p>
+                <p className="mt-0.5 text-xs text-fg-subtle">{ach.timeAgo}</p>
               </div>
             </div>
           ))}

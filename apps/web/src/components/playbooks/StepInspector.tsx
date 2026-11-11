@@ -121,7 +121,7 @@ export function StepInspector({
 
       {/* Name */}
       <div>
-        <label htmlFor={`${uid}-name`} className="block text-gray-400 text-xs mb-1">
+        <label htmlFor={`${uid}-name`} className="block text-fg-muted text-xs mb-1">
           Step Name
         </label>
         <input
@@ -129,13 +129,13 @@ export function StepInspector({
           value={local.name}
           onChange={(e) => update({ name: e.target.value })}
           disabled={readOnly}
-          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60"
+          className="w-full bg-surface-elevated border border-surface-border rounded px-3 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60"
         />
       </div>
 
       {/* Type */}
       <div>
-        <label htmlFor={`${uid}-type`} className="block text-gray-400 text-xs mb-1">
+        <label htmlFor={`${uid}-type`} className="block text-fg-muted text-xs mb-1">
           Step Type
         </label>
         <select
@@ -143,7 +143,7 @@ export function StepInspector({
           value={local.type}
           onChange={(e) => changeType(e.target.value as StepType)}
           disabled={readOnly}
-          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60"
+          className="w-full bg-surface-elevated border border-surface-border rounded px-3 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60"
         >
           {typeOptions.map((t) => (
             <option key={t} value={t}>
@@ -160,7 +160,7 @@ export function StepInspector({
       <div>
         <label
           htmlFor={`${uid}-on-failure`}
-          className="block text-gray-400 text-xs mb-1"
+          className="block text-fg-muted text-xs mb-1"
         >
           On Failure
         </label>
@@ -169,7 +169,7 @@ export function StepInspector({
           value={local.on_failure}
           onChange={(e) => update({ on_failure: e.target.value as OnFailure })}
           disabled={readOnly}
-          className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60"
+          className="w-full bg-surface-elevated border border-surface-border rounded px-3 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60"
         >
           <option value="abort">Abort playbook</option>
           <option value="continue">Continue</option>
@@ -182,7 +182,7 @@ export function StepInspector({
         <div>
           <label
             htmlFor={`${uid}-retry-max`}
-            className="block text-gray-400 text-xs mb-1"
+            className="block text-fg-muted text-xs mb-1"
           >
             Retry Max
           </label>
@@ -194,13 +194,13 @@ export function StepInspector({
             value={local.retry_max}
             onChange={(e) => update({ retry_max: Number(e.target.value) })}
             disabled={readOnly}
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60"
+            className="w-full bg-surface-elevated border border-surface-border rounded px-3 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60"
           />
         </div>
         <div>
           <label
             htmlFor={`${uid}-timeout`}
-            className="block text-gray-400 text-xs mb-1"
+            className="block text-fg-muted text-xs mb-1"
           >
             Timeout (s)
           </label>
@@ -214,7 +214,7 @@ export function StepInspector({
               update({ timeout_seconds: Number(e.target.value) })
             }
             disabled={readOnly}
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60"
+            className="w-full bg-surface-elevated border border-surface-border rounded px-3 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60"
           />
         </div>
       </div>
@@ -222,10 +222,10 @@ export function StepInspector({
       {/* Condition — a group of three controls, so a fieldset rather than a
           label pointing at nothing in particular. */}
       <fieldset className="border-0 p-0 m-0">
-        <legend className="block text-gray-400 text-xs mb-1">
+        <legend className="block text-fg-muted text-xs mb-1">
           Condition (optional)
         </legend>
-        <div className="space-y-2 border border-gray-700 rounded p-3">
+        <div className="space-y-2 border border-surface-border rounded p-3">
           <div>
             <label htmlFor={`${uid}-cond-field`} className="sr-only">
               Condition field
@@ -244,7 +244,7 @@ export function StepInspector({
                 })
               }
               disabled={readOnly}
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60"
+              className="w-full bg-surface-elevated border border-surface-border rounded px-3 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60"
             />
           </div>
           <div className="grid grid-cols-2 gap-2">
@@ -270,7 +270,7 @@ export function StepInspector({
                 })
               }
               disabled={readOnly}
-              className="bg-gray-800 border border-gray-700 rounded px-2 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60"
+              className="bg-surface-elevated border border-surface-border rounded px-2 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60"
             >
               <option value="eq">eq</option>
               <option value="ne">ne</option>
@@ -296,14 +296,14 @@ export function StepInspector({
                 })
               }
               disabled={readOnly}
-              className="bg-gray-800 border border-gray-700 rounded px-3 py-1.5 text-white text-sm focus:outline-none focus:border-blue-500 disabled:opacity-60"
+              className="bg-surface-elevated border border-surface-border rounded px-3 py-1.5 text-fg-primary text-sm focus:outline-none focus:border-brand-500 disabled:opacity-60"
             />
           </div>
           {local.condition?.field && (
             <button
               onClick={() => update({ condition: undefined })}
               disabled={readOnly}
-              className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+              className="text-xs text-fg-muted hover:text-red-400 transition-colors"
             >
               Clear condition
             </button>
@@ -313,7 +313,7 @@ export function StepInspector({
 
       {/* Params — schema-driven */}
       <fieldset className="border-0 p-0 m-0">
-        <legend className="block text-gray-400 text-xs mb-1">Params</legend>
+        <legend className="block text-fg-muted text-xs mb-1">Params</legend>
         <SchemaForm
           schema={schema}
           value={(local.params ?? {}) as Record<string, unknown>}
@@ -324,7 +324,7 @@ export function StepInspector({
       </fieldset>
 
       {/* Step ID */}
-      <div className="text-xs text-gray-600 font-mono">id: {local.id}</div>
+      <div className="text-xs text-fg-faint font-mono">id: {local.id}</div>
     </div>
   );
 }

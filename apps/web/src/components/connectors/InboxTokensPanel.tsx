@@ -121,7 +121,7 @@ function SecretDisclosureModal({
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="w-full max-w-xl rounded-xl border border-amber-500/30 bg-gray-900 p-5 shadow-2xl"
+          className="w-full max-w-xl rounded-xl border border-amber-500/30 bg-surface-card p-5 shadow-2xl"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 20, opacity: 0 }}
@@ -131,7 +131,7 @@ function SecretDisclosureModal({
               <h3 className="text-base font-semibold text-amber-200">
                 Copy this URL — it won&apos;t be shown again
               </h3>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-fg-secondary mt-1">
                 Paste the URL into your vendor&apos;s webhook configuration. AiSOC
                 stores only a fingerprint after this dialog closes; if you
                 lose it, rotate the token to mint a new one.
@@ -140,64 +140,64 @@ function SecretDisclosureModal({
             <button
               type="button"
               onClick={onClose}
-              className="text-gray-500 hover:text-gray-300 text-lg leading-none"
+              className="text-fg-muted hover:text-fg-secondary text-lg leading-none"
               aria-label="Close"
             >
               ×
             </button>
           </div>
 
-          <label className="block text-xs text-gray-400 mb-1">
+          <label className="block text-xs text-fg-secondary mb-1">
             Inbox URL
           </label>
           <div className="flex gap-2 mb-3">
             <input
               readOnly
               value={secret.inbox_url}
-              className="flex-1 bg-gray-950 border border-gray-700 rounded-md px-2 py-1.5 text-xs text-gray-100 font-mono"
+              className="flex-1 bg-surface-base border border-surface-border-strong rounded-md px-2 py-1.5 text-xs text-fg-primary font-mono"
               onFocus={(e) => e.currentTarget.select()}
             />
             <button
               type="button"
               onClick={() => handleCopy(secret.inbox_url, 'URL')}
-              className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-3 py-1.5 rounded-md"
+              className="bg-brand-600 hover:bg-brand-500 text-white text-xs px-3 py-1.5 rounded-md"
             >
               Copy URL
             </button>
           </div>
 
-          <label className="block text-xs text-gray-400 mb-1">
+          <label className="block text-xs text-fg-secondary mb-1">
             Token (already embedded in URL — exposed for SDK / scripted setups)
           </label>
           <div className="flex gap-2 mb-3">
             <input
               readOnly
               value={secret.token}
-              className="flex-1 bg-gray-950 border border-gray-700 rounded-md px-2 py-1.5 text-xs text-gray-100 font-mono"
+              className="flex-1 bg-surface-base border border-surface-border-strong rounded-md px-2 py-1.5 text-xs text-fg-primary font-mono"
               onFocus={(e) => e.currentTarget.select()}
             />
             <button
               type="button"
               onClick={() => handleCopy(secret.token, 'token')}
-              className="bg-gray-700 hover:bg-gray-600 text-white text-xs px-3 py-1.5 rounded-md"
+              className="bg-surface-hover hover:bg-gray-600 text-fg-primary text-xs px-3 py-1.5 rounded-md"
             >
               Copy token
             </button>
           </div>
 
           {secret.has_hmac_secret && (
-            <p className="text-xs text-gray-400 mb-3">
+            <p className="text-xs text-fg-secondary mb-3">
               HMAC verification is enabled. Configure your vendor to sign
               requests with header <code className="text-amber-200">X-Signature</code>{' '}
               or <code className="text-amber-200">X-Hub-Signature-256</code>.
             </p>
           )}
 
-          <div className="flex justify-end pt-2 border-t border-gray-800">
+          <div className="flex justify-end pt-2 border-t border-surface-border">
             <button
               type="button"
               onClick={onClose}
-              className="bg-gray-700 hover:bg-gray-600 text-white text-sm px-4 py-1.5 rounded-md"
+              className="bg-surface-hover hover:bg-gray-600 text-fg-primary text-sm px-4 py-1.5 rounded-md"
             >
               Done
             </button>
@@ -291,16 +291,16 @@ function MintForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-xl border border-gray-800 bg-gray-900/40 p-4 space-y-4"
+      className="rounded-xl border border-surface-border bg-surface-sunken/60 p-4 space-y-4"
     >
       <div>
-        <label className="block text-xs text-gray-400 mb-1.5">
+        <label className="block text-xs text-fg-secondary mb-1.5">
           Vendor template
         </label>
         <select
           value={templateId}
           onChange={(e) => setTemplateId(e.target.value)}
-          className="w-full bg-gray-950 border border-gray-700 rounded-md px-2 py-1.5 text-sm text-gray-100"
+          className="w-full bg-surface-base border border-surface-border-strong rounded-md px-2 py-1.5 text-sm text-fg-primary"
         >
           {orderedCategories.map((cat) => (
             <optgroup key={cat} label={categoryLabel(cat)}>
@@ -313,12 +313,12 @@ function MintForm({
           ))}
         </select>
         {selected && (
-          <p className="text-xs text-gray-500 mt-1.5">{selected.description}</p>
+          <p className="text-xs text-fg-muted mt-1.5">{selected.description}</p>
         )}
       </div>
 
       <div>
-        <label className="block text-xs text-gray-400 mb-1.5">
+        <label className="block text-xs text-fg-secondary mb-1.5">
           Label (optional)
         </label>
         <input
@@ -326,16 +326,16 @@ function MintForm({
           value={label}
           onChange={(e) => setLabel(e.target.value)}
           placeholder="PagerDuty on-call"
-          className="w-full bg-gray-950 border border-gray-700 rounded-md px-2 py-1.5 text-sm text-gray-100"
+          className="w-full bg-surface-base border border-surface-border-strong rounded-md px-2 py-1.5 text-sm text-fg-primary"
         />
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs text-fg-muted mt-1">
           Helps you tell tokens apart when the same template is used by
           multiple vendors or environments.
         </p>
       </div>
 
       <div>
-        <label className="flex items-center gap-2 text-xs text-gray-300">
+        <label className="flex items-center gap-2 text-xs text-fg-secondary">
           <input
             type="checkbox"
             checked={hmacEnabled}
@@ -344,7 +344,7 @@ function MintForm({
           />
           Require HMAC signature on inbound requests
         </label>
-        <p className="text-xs text-gray-500 mt-1 pl-6">
+        <p className="text-xs text-fg-muted mt-1 pl-6">
           Recommended when the vendor supports it. Without HMAC the URL
           token is the sole authenticator.
         </p>
@@ -354,22 +354,22 @@ function MintForm({
             value={hmacSecret}
             onChange={(e) => setHmacSecret(e.target.value)}
             placeholder="Shared secret (≥ 16 chars)"
-            className="mt-2 w-full bg-gray-950 border border-gray-700 rounded-md px-2 py-1.5 text-sm text-gray-100 font-mono"
+            className="mt-2 w-full bg-surface-base border border-surface-border-strong rounded-md px-2 py-1.5 text-sm text-fg-primary font-mono"
             minLength={16}
             maxLength={512}
           />
         )}
       </div>
 
-      <div className="flex justify-end pt-2 border-t border-gray-800">
+      <div className="flex justify-end pt-2 border-t border-surface-border">
         <button
           type="submit"
           disabled={submitting || !templateId}
           className={clsx(
-            'text-sm px-4 py-1.5 rounded-md text-white transition-colors',
+            'text-sm px-4 py-1.5 rounded-md text-fg-primary transition-colors',
             submitting || !templateId
               ? 'bg-blue-700/50 cursor-not-allowed'
-              : 'bg-blue-600 hover:bg-blue-500',
+              : 'bg-brand-600 hover:bg-brand-500',
           )}
         >
           {submitting ? 'Minting…' : 'Mint URL'}
@@ -402,9 +402,9 @@ function TokensTable({
 
   if (tokens.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-gray-800 bg-gray-900/30 p-6 text-center">
-        <p className="text-sm text-gray-400">No inbox URLs yet.</p>
-        <p className="text-xs text-gray-500 mt-1">
+      <div className="rounded-xl border border-dashed border-surface-border bg-surface-sunken/40 p-6 text-center">
+        <p className="text-sm text-fg-secondary">No inbox URLs yet.</p>
+        <p className="text-xs text-fg-muted mt-1">
           Mint one above to give a vendor a place to push alerts.
         </p>
       </div>
@@ -412,9 +412,9 @@ function TokensTable({
   }
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-900/40 overflow-hidden">
+    <div className="rounded-xl border border-surface-border bg-surface-sunken/60 overflow-hidden">
       <table className="w-full text-xs">
-        <thead className="bg-gray-900/80 text-gray-500 uppercase tracking-wide">
+        <thead className="bg-surface-card text-fg-muted uppercase tracking-wide">
           <tr>
             <th className="text-left px-3 py-2 font-medium">Template</th>
             <th className="text-left px-3 py-2 font-medium">Label</th>
@@ -425,14 +425,14 @@ function TokensTable({
             <th className="text-right px-3 py-2 font-medium">Actions</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-gray-800/80">
+        <tbody className="divide-y divide-surface-border/80">
           {tokens.map((t) => {
             const busy = busyFingerprint === t.fingerprint;
             return (
-              <tr key={t.fingerprint} className="text-gray-200">
+              <tr key={t.fingerprint} className="text-fg-primary">
                 <td className="px-3 py-2">{labelFor(t.template_id)}</td>
-                <td className="px-3 py-2 text-gray-400">{t.label ?? '—'}</td>
-                <td className="px-3 py-2 font-mono text-gray-400">
+                <td className="px-3 py-2 text-fg-secondary">{t.label ?? '—'}</td>
+                <td className="px-3 py-2 font-mono text-fg-secondary">
                   {t.fingerprint}
                 </td>
                 <td className="px-3 py-2">
@@ -442,13 +442,13 @@ function TokensTable({
                       on
                     </span>
                   ) : (
-                    <span className="text-gray-500">off</span>
+                    <span className="text-fg-muted">off</span>
                   )}
                 </td>
-                <td className="px-3 py-2 text-gray-400">
+                <td className="px-3 py-2 text-fg-secondary">
                   {formatRelative(t.created_at)}
                 </td>
-                <td className="px-3 py-2 text-gray-400">
+                <td className="px-3 py-2 text-fg-secondary">
                   {formatRelative(t.last_used_at)}
                 </td>
                 <td className="px-3 py-2 text-right">
@@ -460,8 +460,8 @@ function TokensTable({
                       className={clsx(
                         'text-xs px-2 py-1 rounded-md',
                         busy
-                          ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
-                          : 'bg-gray-800 hover:bg-gray-700 text-gray-200',
+                          ? 'bg-surface-elevated text-fg-muted cursor-not-allowed'
+                          : 'bg-surface-elevated hover:bg-surface-hover text-fg-primary',
                       )}
                       title="Mint a new token with the same template/label/HMAC and revoke this one"
                     >
@@ -474,7 +474,7 @@ function TokensTable({
                       className={clsx(
                         'text-xs px-2 py-1 rounded-md',
                         busy
-                          ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
+                          ? 'bg-surface-elevated text-fg-muted cursor-not-allowed'
                           : 'bg-red-600/20 hover:bg-red-600/30 text-red-300',
                       )}
                       title="Permanently revoke this token. Vendor traffic will be rejected."
@@ -610,7 +610,7 @@ export function InboxTokensPanel() {
   );
 
   return (
-    <div className="rounded-xl border border-gray-800/60 bg-gray-900/40">
+    <div className="rounded-xl border border-surface-border/70 bg-surface-sunken/60">
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
@@ -621,7 +621,7 @@ export function InboxTokensPanel() {
           <span
             className={clsx(
               'inline-flex h-7 w-7 items-center justify-center rounded-md',
-              'bg-blue-500/15 text-blue-300',
+              'bg-brand-500/15 text-brand-300',
             )}
           >
             <svg
@@ -639,10 +639,10 @@ export function InboxTokensPanel() {
             </svg>
           </span>
           <div>
-            <h2 className="text-sm font-semibold text-gray-100">
+            <h2 className="text-sm font-semibold text-fg-primary">
               Universal capture (push)
             </h2>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-fg-muted mt-0.5">
               Mint webhook URLs for any vendor that can POST JSON, send
               email, or speak CEF/HEC. {open ? '' : `${activeCount} active`}
             </p>
@@ -650,7 +650,7 @@ export function InboxTokensPanel() {
         </div>
         <svg
           className={clsx(
-            'w-4 h-4 text-gray-500 transition-transform',
+            'w-4 h-4 text-fg-muted transition-transform',
             open ? 'rotate-180' : '',
           )}
           fill="none"
@@ -676,7 +676,7 @@ export function InboxTokensPanel() {
             transition={{ duration: 0.18 }}
             className="overflow-hidden"
           >
-            <div className="px-4 pb-4 space-y-4 border-t border-gray-800/60 pt-4">
+            <div className="px-4 pb-4 space-y-4 border-t border-surface-border/70 pt-4">
               {loadError && (
                 <div className="rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-xs text-amber-200">
                   {loadError}{' '}
@@ -690,7 +690,7 @@ export function InboxTokensPanel() {
                 </div>
               )}
               {loading && templates.length === 0 ? (
-                <div className="text-xs text-gray-500 py-4 text-center">
+                <div className="text-xs text-fg-muted py-4 text-center">
                   Loading…
                 </div>
               ) : (

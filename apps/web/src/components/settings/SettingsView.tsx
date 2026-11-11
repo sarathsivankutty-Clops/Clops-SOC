@@ -48,6 +48,7 @@ import { ErrorState } from '@/components/ui/ErrorState';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { AutonomyPolicyPanel } from '@/components/settings/AutonomyPolicy';
 import { AssignRoleModal } from '@/components/settings/AssignRoleModal';
+import { AddConnectorModal } from '@/components/connectors/AddConnectorModal';
 import { RetroHuntSettingsPanel } from './RetroHuntSettings';
 import { ScimTokensPanel } from './ScimTokensPanel';
 import { BrandingPanel } from './BrandingPanel';
@@ -244,7 +245,7 @@ const DEMO_AUDIT: AuditEntry[] = [
 
 const STATUS_PILL: Record<ConnectorStatus, string> = {
   active: 'bg-emerald-500/10 text-emerald-300 ring-emerald-500/40',
-  inactive: 'bg-gray-500/10 text-gray-400 ring-gray-500/30',
+  inactive: 'bg-gray-500/10 text-fg-secondary ring-surface-border-strong/30',
   error: 'bg-red-500/10 text-red-300 ring-red-500/40',
   configuring: 'bg-amber-500/10 text-amber-300 ring-amber-500/40',
 };
@@ -382,54 +383,116 @@ const TABS: { id: TabId; label: string; description: string }[] = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+const PRIMARY_TAB_IDS: TabId[] = [
+  'integrations',
+  'workspace',
+  'api-keys',
+  'autonomy',
+  'deployment',
+  'audit',
+  'profile',
+];
+
 export function SettingsView() {
-  const [tab, setTab] = useState<TabId>('profile');
+  const [tab, setTab] = useState<TabId>('integrations');
+
+  const primaryTabs = PRIMARY_TAB_IDS.map(
+    (id) => TABS.find((t) => t.id === id)!,
+  ).filter(Boolean);
+  const secondaryTabs = TABS.filter((t) => !PRIMARY_TAB_IDS.includes(t.id));
 
   return (
-    <div className="space-y-5">
-      <header className="flex flex-col gap-2">
-        <h1 className="text-2xl font-semibold text-gray-100">Settings</h1>
-        <p className="max-w-2xl text-sm text-gray-500">
-          Configure your account, the workspace, and the integrations that feed
-          the SOC. Most preferences sync across devices; appearance and
-          notification preferences live on this device only.
-        </p>
+    <div className="space-y-4">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-[17px] font-semibold tracking-[-0.015em] text-fg-primary */>
+            Settings &amp; Integrations
+          </h1>
+          <p className="text-[12.5px] text-fg-secondary mt-0.5">
+            Connect security tools, manage team roles, configure AI behavior, and export audit reports.
+          </p>
+        </div>
       </header>
 
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start">
-        {/* ── Sidebar ── */}
-        <nav
-          aria-label="Settings sections"
-          className="lg:sticky lg:top-4 lg:w-64 lg:shrink-0"
-        >
-          <ul className="space-y-1 rounded-xl border border-gray-800 bg-gray-900/40 p-2">
-            {TABS.map((t) => {
-              const active = tab === t.id;
-              return (
-                <li key={t.id}>
-                  <button
-                    type="button"
-                    onClick={() => setTab(t.id)}
-                    className={clsx(
-                      'flex w-full flex-col items-start gap-0.5 rounded-lg px-3 py-2.5 text-left text-sm transition-colors',
-                      active
-                        ? 'bg-gray-800/80 text-gray-50 ring-1 ring-blue-500/40'
-                        : 'text-gray-300 hover:bg-gray-800/50 hover:text-gray-100',
-                    )}
-                  >
-                    <span className="font-medium">{t.label}</span>
-                    <span className="text-xs text-gray-500">
-                      {t.description}
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+      {/* [HIDDEN-UI P4 tab-demoted] Old two-tier tab bar (primary underline tabs + secondary pill bar)
+          replaced by the sticky section rail below. Same setTab state. Original markup:
+      [Primary Horizontal Tab Bar (matches #p-settings .tabs in design-mockup/index.html)]
+      <nav aria-label="Settings sections" className="space-y-2">
+        <div className="flex items-center gap-1 border-b border-surface-border overflow-x-auto">
+          {primaryTabs.map((t) => {
+            const active = tab === t.id;
+            const displayLabel = t.id === 'integrations' ? 'Connectors' : t.label;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={clsx(
+                  'px-3.5 py-2 text-[13px] font-medium border-b-2 -mb-px transition-colors whitespace-nowrap',
+                  active
+                    ? 'border-brand-500 text-brand-400 font-semibold'
+                    : 'border-transparent text-fg-muted hover:text-fg-primary',
+                )}
+              >
+                {displayLabel}
+              </button>
+            );
+          })}
+        </div>
 
-        {/* ── Panel ── */}
-        <div className="flex-1 min-w-0">
+        [Compact secondary pill bar for operator & governance panels]
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="text-[11px] font-semibold uppercase tracking-wider text-fg-subtle mr-1">
+            Platform &amp; Governance:
+          </span>
+          {secondaryTabs.map((t) => {
+            const active = tab === t.id;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                className={clsx(
+                  'px-2.5 py-1 rounded-[8px] text-[11.5px] font-medium border transition-colors',
+                  active
+                    ? 'border-brand-500/40 bg-brand-500/15 text-brand-400'
+                    : 'border-surface-border bg-surface-card text-fg-muted hover:text-fg-primary hover:bg-surface-hover',
+                )}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+      */}
+
+      <div className="grid items-start gap-4 lg:grid-cols-[200px_minmax(0,1fr)]">
+        {/* [P4] Sticky section rail: one list; selecting a section switches the panel (no tabs-under-tabs). */}
+        <nav aria-label="Settings sections" className="flex flex-row flex-wrap gap-1 lg:sticky lg:top-4 lg:flex-col lg:flex-nowrap">
+          {[...primaryTabs, ...secondaryTabs].map((t) => {
+            const active = tab === t.id;
+            const displayLabel = t.id === 'integrations' ? 'Connectors' : t.label;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                onClick={() => setTab(t.id)}
+                aria-current={active ? 'page' : undefined}
+                className={clsx(
+                  'rounded-[0.75rem] px-3 py-1.5 text-left text-[13px] font-medium transition-colors',
+                  active
+                    ? 'bg-[var(--co-ac-bg)] font-semibold text-[var(--co-ac)]'
+                    : 'text-fg-muted hover:bg-surface-hover hover:text-fg-primary',
+                )}
+              >
+                {displayLabel}
+              </button>
+            );
+          })}
+        </nav>
+        {/* Panel */}
+        <div className="min-w-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={tab}
@@ -437,7 +500,7 @@ export function SettingsView() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -4 }}
               transition={{ duration: 0.18 }}
-              className="rounded-xl border border-gray-800 bg-gray-900/40"
+              className="rounded-xl border border-surface-border bg-surface-sunken/60"
             >
               {tab === 'profile' && <ProfilePanel />}
               {tab === 'workspace' && <WorkspacePanel />}
@@ -479,10 +542,10 @@ function PanelHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-3 border-b border-gray-800 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 border-b border-surface-border px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
       <div>
-        <h2 className="text-lg font-semibold text-gray-100">{title}</h2>
-        <p className="mt-1 max-w-xl text-sm text-gray-500">{description}</p>
+        <h2 className="text-lg font-semibold text-fg-primary">{title}</h2>
+        <p className="mt-1 max-w-xl text-sm text-fg-muted">{description}</p>
       </div>
       {action ? <div className="shrink-0">{action}</div> : null}
     </div>
@@ -500,17 +563,17 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-1.5">
-      <span className="text-sm font-medium text-gray-300">{label}</span>
+      <span className="text-sm font-medium text-fg-secondary">{label}</span>
       {children}
-      {hint ? <span className="text-xs text-gray-500">{hint}</span> : null}
+      {hint ? <span className="text-xs text-fg-muted">{hint}</span> : null}
     </label>
   );
 }
 
 function inputClass() {
   return clsx(
-    'w-full rounded-lg border border-gray-700 bg-gray-950/60 px-3 py-2 text-sm text-gray-100',
-    'placeholder:text-gray-600 focus:border-blue-500/60 focus:outline-none focus:ring-1 focus:ring-blue-500/40',
+    'w-full rounded-lg border border-surface-border-strong bg-surface-sunken px-3 py-2 text-sm text-fg-primary',
+    'placeholder:text-fg-subtle focus:border-brand-500/60 focus:outline-none focus:ring-1 focus:ring-brand-500/40',
   );
 }
 
@@ -526,11 +589,11 @@ function Toggle({
   description?: string;
 }) {
   return (
-    <div className="flex items-start justify-between gap-4 rounded-lg border border-gray-800 bg-gray-950/40 p-4">
+    <div className="flex items-start justify-between gap-4 rounded-lg border border-surface-border bg-surface-sunken/50 p-4">
       <div className="min-w-0">
-        <p className="text-sm font-medium text-gray-200">{label}</p>
+        <p className="text-sm font-medium text-fg-primary">{label}</p>
         {description ? (
-          <p className="mt-1 text-xs text-gray-500">{description}</p>
+          <p className="mt-1 text-xs text-fg-muted">{description}</p>
         ) : null}
       </div>
       <button
@@ -540,8 +603,8 @@ function Toggle({
         aria-label={label}
         onClick={() => onChange(!checked)}
         className={clsx(
-          'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500/50',
-          checked ? 'bg-blue-500/80' : 'bg-gray-700',
+          'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-brand-500/50',
+          checked ? 'bg-blue-500/80' : 'bg-surface-hover',
         )}
       >
         <span
@@ -596,8 +659,8 @@ function ProfilePanel() {
             className={clsx(
               'rounded-lg px-4 py-2 text-sm font-medium transition-colors',
               dirty
-                ? 'bg-blue-600 text-white hover:bg-blue-500'
-                : 'cursor-not-allowed bg-gray-800 text-gray-500',
+                ? 'bg-brand-600 text-white hover:bg-brand-500'
+                : 'cursor-not-allowed bg-surface-elevated text-fg-muted',
             )}
           >
             Save changes
@@ -608,16 +671,16 @@ function ProfilePanel() {
         <div className="flex items-center gap-4">
           <div
             aria-hidden
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-blue-600 text-xl font-semibold text-white ring-2 ring-gray-800"
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-600 text-xl font-semibold text-white ring-2 ring-surface-border"
           >
             {initials || '?'}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-base font-semibold text-gray-100">
+            <p className="truncate text-base font-semibold text-fg-primary">
               {profile.displayName || 'Unnamed user'}
             </p>
-            <p className="truncate text-sm text-gray-400">{profile.email}</p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="truncate text-sm text-fg-secondary">{profile.email}</p>
+            <p className="mt-1 text-xs text-fg-muted">
               Avatar generated from initials.{' '}
               <span className="inline-flex items-center gap-1">
                 Custom avatars
@@ -665,7 +728,7 @@ function ProfilePanel() {
           </Field>
         </div>
 
-        <div className="rounded-lg border border-gray-800 bg-gray-950/40 p-4 text-xs text-gray-500">
+        <div className="rounded-lg border border-surface-border bg-surface-sunken/50 p-4 text-xs text-fg-muted">
           Profile preferences are persisted to your user account and sync
           across devices when you sign in.
         </div>
@@ -745,10 +808,10 @@ function WorkspacePanel() {
           />
         </div>
       )}
-      <div className="border-t border-gray-800 px-6 py-5">
-        <h3 className="text-sm font-semibold text-gray-200">Members</h3>
+      <div className="border-t border-surface-border px-6 py-5">
+        <h3 className="text-sm font-semibold text-fg-primary">Members</h3>
         {usersLoading ? null : usersError || !users ? null : (
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-fg-muted">
             {activeCount} active operator{activeCount === 1 ? '' : 's'} in this workspace
             {users.length !== activeCount ? ` (${users.length} total)` : ''}.
           </p>
@@ -768,25 +831,25 @@ function WorkspacePanel() {
             />
           </div>
         ) : (
-          <ul className="mt-3 divide-y divide-gray-800 rounded-lg border border-gray-800 bg-gray-950/40">
+          <ul className="mt-3 divide-y divide-surface-border rounded-lg border border-surface-border bg-surface-sunken/50">
             {users.map((u) => (
               <li
                 key={u.id}
                 className="flex items-center justify-between px-4 py-3 text-sm"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-gray-100">
+                  <p className="truncate text-fg-primary">
                     {u.username}
                     {!u.is_active && (
-                      <span className="ml-2 rounded-full bg-gray-800 px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-500 ring-1 ring-gray-700">
+                      <span className="ml-2 rounded-full bg-surface-elevated px-2 py-0.5 text-[10px] uppercase tracking-wide text-fg-muted ring-1 ring-surface-border-strong">
                         Inactive
                       </span>
                     )}
                   </p>
-                  <p className="truncate text-xs text-gray-500">{u.email}</p>
+                  <p className="truncate text-xs text-fg-muted">{u.email}</p>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <span className="rounded-full bg-gray-800 px-2.5 py-1 text-xs text-gray-300 ring-1 ring-gray-700">
+                  <span className="rounded-full bg-surface-elevated px-2.5 py-1 text-xs text-fg-secondary ring-1 ring-surface-border-strong">
                     {u.role}
                   </span>
                   {canAssign && (
@@ -799,7 +862,7 @@ function WorkspacePanel() {
                           ? 'You are the only active admin — promote another admin before changing your own role'
                           : `Change ${u.email}'s role`
                       }
-                      className="rounded-md border border-gray-700 px-2 py-1 text-xs text-gray-300 hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="rounded-md border border-surface-border-strong px-2 py-1 text-xs text-fg-secondary hover:bg-surface-elevated disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       Assign role
                     </button>
@@ -830,11 +893,11 @@ function WorkspacePanel() {
 
 function InfoTile({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-950/40 p-4">
-      <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
+    <div className="rounded-lg border border-surface-border bg-surface-sunken/50 p-4">
+      <p className="text-xs uppercase tracking-wide text-fg-muted">{label}</p>
       <p
         className={clsx(
-          'mt-1.5 text-sm text-gray-100',
+          'mt-1.5 text-sm text-fg-primary',
           mono && 'font-mono text-xs',
         )}
       >
@@ -846,6 +909,17 @@ function InfoTile({ label, value, mono }: { label: string; value: string; mono?:
 
 // ─── Panel: Integrations ──────────────────────────────────────────────────────
 
+function connectorCategory(type: string): 'cloud' | 'edr' | 'siem' {
+  const t = type.toLowerCase();
+  if (t.includes('crowd') || t.includes('mde') || t.includes('defender') || t.includes('edr') || t.includes('sentinelone')) {
+    return 'edr';
+  }
+  if (t.includes('zscaler') || t.includes('splunk') || t.includes('sentinel') || t.includes('dns') || t.includes('firewall')) {
+    return 'siem';
+  }
+  return 'cloud';
+}
+
 function IntegrationsPanel() {
   const { data, error, isLoading, mutate } = useSWR(
     'settings:connectors',
@@ -853,19 +927,22 @@ function IntegrationsPanel() {
     { revalidateOnFocus: false, shouldRetryOnError: false },
   );
 
-  // Sample connectors only in the hosted demo. Showing three healthy,
-  // recently-synced connectors when the API is unreachable implies data is
-  // flowing into the platform when none is.
+  const [catFilter, setCatFilter] = useState<'all' | 'cloud' | 'edr' | 'siem'>('all');
+  const [searchText, setSearchText] = useState('');
+
   const useFallback = !!error && canUseDemoData();
   const connectors = data?.connectors ?? (useFallback ? DEMO_CONNECTORS : []);
 
-  const counts = useMemo(() => {
-    const c = { active: 0, error: 0, inactive: 0, configuring: 0 };
-    for (const x of connectors) {
-      c[x.status] = (c[x.status] ?? 0) + 1;
-    }
-    return c;
-  }, [connectors]);
+  const filteredConnectors = useMemo(() => {
+    return connectors.filter((c) => {
+      if (catFilter !== 'all' && connectorCategory(c.type) !== catFilter) return false;
+      if (searchText.trim()) {
+        const q = searchText.toLowerCase();
+        return c.name.toLowerCase().includes(q) || c.type.toLowerCase().includes(q);
+      }
+      return true;
+    });
+  }, [connectors, catFilter, searchText]);
 
   const onTest = async (connector: Connector) => {
     if (useFallback) {
@@ -909,133 +986,167 @@ function IntegrationsPanel() {
   };
 
   return (
-    <div>
-      <PanelHeader
-        title="Integrations"
-        description="Manage the connectors that stream telemetry into AiSOC."
-        action={
-          <Link
-            href="/connectors/new"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500"
-          >
-            + Add connector
-          </Link>
-        }
-      />
-      <div className="px-6 py-5 space-y-5">
-        {/* Stat row */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <StatTile label="Active" value={counts.active} tone="emerald" />
-          <StatTile label="Errors" value={counts.error} tone="red" />
-          <StatTile label="Configuring" value={counts.configuring} tone="amber" />
-          <StatTile label="Disabled" value={counts.inactive} tone="gray" />
-        </div>
-
-        {/* List */}
-        {isLoading && !data ? (
-          <div className="space-y-3">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <Skeleton key={i} className="h-20 w-full rounded-lg" />
+    <div className="p-5 space-y-4">
+      {/* Top Filter & Action Bar (matches #s-connectors in design-mockup/index.html) */}
+      <div className="flex flex-wrap items-center justify-between gap-2.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex rounded-[9px] border border-surface-border bg-surface-base p-0.5">
+            {(
+              [
+                { id: 'all', label: 'All' },
+                { id: 'cloud', label: 'Cloud & IAM' },
+                { id: 'edr', label: 'Endpoint / EDR' },
+                { id: 'siem', label: 'Network / SIEM' },
+              ] as const
+            ).map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => setCatFilter(f.id)}
+                className={clsx(
+                  'px-2.5 py-1 text-xs font-medium rounded-[7px] transition-colors',
+                  catFilter === f.id
+                    ? 'bg-surface-card text-fg-primary shadow-xs'
+                    : 'text-fg-muted hover:text-fg-primary',
+                )}
+              >
+                {f.label}
+              </button>
             ))}
           </div>
-        ) : error && !useFallback ? (
-          <ErrorState
-            title="Could not load integrations"
-            error={error}
-            onRetry={() => mutate()}
+          <input
+            type="text"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Filter connectors…"
+            className="w-56 rounded-[9px] border border-surface-border bg-surface-base px-3 py-1.5 text-xs text-fg-primary placeholder:text-fg-subtle focus:border-brand-500 focus:outline-none"
           />
-        ) : connectors.length === 0 ? (
-          <EmptyState
-            title="No connectors yet"
-            description="Add your first integration to start streaming events into AiSOC."
-            action={
-              <Link
-                href="/connectors/new"
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500"
-              >
-                Add connector
-              </Link>
-            }
-          />
-        ) : (
-          <ul className="space-y-2">
-            {connectors.map((c) => (
-              <li
-                key={c.id}
-                className="rounded-lg border border-gray-800 bg-gray-950/40 p-4 transition-colors hover:border-gray-700"
-              >
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="truncate text-sm font-semibold text-gray-100">
-                        {c.name}
-                      </h3>
-                      <span
-                        className={clsx(
-                          'rounded-full px-2 py-0.5 text-xs ring-1 ring-inset',
-                          STATUS_PILL[c.status],
-                        )}
-                      >
-                        {STATUS_LABEL[c.status]}
-                      </span>
-                    </div>
-                    {c.description ? (
-                      <p className="mt-1 text-xs text-gray-500">{c.description}</p>
-                    ) : null}
-                    <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-gray-500">
-                      <span>
-                        <span className="text-gray-400">Type:</span>{' '}
-                        <span className="font-mono">{c.type}</span>
-                      </span>
-                      {c.lastSync ? (
-                        <span suppressHydrationWarning>
-                          Last sync{' '}
-                          {formatDistanceToNow(new Date(c.lastSync), {
-                            addSuffix: true,
-                          })}
-                        </span>
-                      ) : null}
-                      {typeof c.alertsIngested === 'number' ||
-                      typeof c.alertCount === 'number' ? (
-                        <span>
-                          {(c.alertsIngested ?? c.alertCount ?? 0).toLocaleString()}{' '}
-                          events
-                        </span>
-                      ) : null}
-                    </div>
-                    {c.errorMessage ? (
-                      <p className="mt-2 rounded border border-red-500/30 bg-red-500/5 px-2 py-1 text-xs text-red-300">
-                        {c.errorMessage}
-                      </p>
-                    ) : null}
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => onTest(c)}
-                      className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-800"
-                    >
-                      Test
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => onToggle(c)}
-                      className={clsx(
-                        'rounded-lg px-3 py-1.5 text-xs font-medium',
-                        c.enabled ?? c.status === 'active'
-                          ? 'bg-amber-500/10 text-amber-300 ring-1 ring-amber-500/30 hover:bg-amber-500/20'
-                          : 'bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/30 hover:bg-emerald-500/20',
-                      )}
-                    >
-                      {c.enabled ?? c.status === 'active' ? 'Disable' : 'Enable'}
-                    </button>
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        </div>
+        <Link
+          href="/connectors/new"
+          className="inline-flex items-center gap-1.5 rounded-[9px] bg-brand-500 hover:bg-brand-400 px-3.5 py-1.5 text-xs font-semibold text-fg-inverse transition-colors"
+        >
+          + Connect new source
+        </Link>
       </div>
+
+      {/* 3-Column Connector Card Grid (matches .cgrid in design-mockup/index.html) */}
+      {isLoading && !data ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-44 w-full rounded-[12px]" />
+          ))}
+        </div>
+      ) : error && !useFallback ? (
+        <ErrorState
+          title="Could not load integrations"
+          error={error}
+          onRetry={() => mutate()}
+        />
+      ) : filteredConnectors.length === 0 ? (
+        <EmptyState
+          title="No connectors yet"
+          description="Add your first integration to start streaming events into AiSOC."
+          action={
+            <Link
+              href="/connectors/new"
+              className="rounded-[9px] bg-brand-500 px-3.5 py-1.5 text-xs font-semibold text-fg-inverse hover:bg-brand-400"
+            >
+              Add connector
+            </Link>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+          {filteredConnectors.map((c) => {
+            const initials = c.name
+              .split(/[\s—-]+/)
+              .filter(Boolean)
+              .slice(0, 2)
+              .map((w) => w[0]?.toUpperCase())
+              .join('');
+            const isEnabled = c.enabled ?? c.status === 'active';
+            return (
+              <div
+                key={c.id}
+                className="rounded-[12px] border border-surface-border bg-surface-card p-4 flex flex-col gap-3 transition-colors hover:border-brand-500/40"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-[38px] h-[38px] rounded-[10px] border border-surface-border bg-brand-500/12 text-brand-400 font-bold text-[13px] flex items-center justify-center shrink-0">
+                    {initials || 'CN'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="truncate text-[13.5px] font-semibold text-fg-primary">
+                      {c.name}
+                    </h3>
+                    <div className="text-[11.5px] text-fg-muted font-mono">{c.type}</div>
+                  </div>
+                  <span
+                    className={clsx(
+                      'rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ring-inset shrink-0',
+                      STATUS_PILL[c.status],
+                    )}
+                  >
+                    {STATUS_LABEL[c.status]}
+                  </span>
+                </div>
+
+                {c.description && (
+                  <p className="text-xs text-fg-secondary line-clamp-2">{c.description}</p>
+                )}
+
+                <div className="flex items-center justify-between text-[11.5px] text-fg-muted mt-auto">
+                  <span>
+                    24h events:{' '}
+                    <strong className="font-mono text-fg-primary">
+                      {(c.alertsIngested ?? c.alertCount ?? 0).toLocaleString()}
+                    </strong>
+                  </span>
+                  {c.lastSync && (
+                    <span suppressHydrationWarning>
+                      Sync {formatDistanceToNow(new Date(c.lastSync), { addSuffix: true })}
+                    </span>
+                  )}
+                </div>
+
+                {c.errorMessage && (
+                  <p className="rounded border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-[11px] text-rose-300">
+                    {c.errorMessage}
+                  </p>
+                )}
+
+                <div className="pt-2.5 border-t border-surface-border flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onTest(c)}
+                    className="rounded-[8px] border border-surface-border bg-surface-raised px-2.5 py-1 text-xs font-medium text-fg-primary hover:bg-surface-hover transition-colors"
+                  >
+                    Test connection
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onToggle(c)}
+                    className={clsx(
+                      'inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-[8px] transition-colors',
+                      isEnabled
+                        ? 'bg-emerald-500/15 text-emerald-400'
+                        : 'bg-surface-hover text-fg-muted',
+                    )}
+                  >
+                    <span
+                      className={clsx(
+                        'w-2 h-2 rounded-full',
+                        isEnabled ? 'bg-emerald-400' : 'bg-fg-subtle',
+                      )}
+                    />
+                    {isEnabled ? 'Streaming' : 'Disabled'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
@@ -1053,11 +1164,11 @@ function StatTile({
     emerald: 'text-emerald-300',
     red: 'text-red-300',
     amber: 'text-amber-300',
-    gray: 'text-gray-300',
+    gray: 'text-fg-secondary',
   };
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-950/40 p-4">
-      <p className="text-xs uppercase tracking-wide text-gray-500">{label}</p>
+    <div className="rounded-lg border border-surface-border bg-surface-sunken/50 p-4">
+      <p className="text-xs uppercase tracking-wide text-fg-muted">{label}</p>
       <p className={clsx('mt-1 text-2xl font-semibold tabular-nums', tones[tone])}>
         {value}
       </p>
@@ -1170,7 +1281,7 @@ function ApiKeysPanel() {
       />
       <div className="space-y-5 px-6 py-5">
         {/* Create */}
-        <div className="flex flex-col gap-3 rounded-lg border border-gray-800 bg-gray-950/40 p-4 sm:flex-row sm:items-end">
+        <div className="flex flex-col gap-3 rounded-lg border border-surface-border bg-surface-sunken/50 p-4 sm:flex-row sm:items-end">
           <Field label="Name">
             <input
               className={inputClass()}
@@ -1183,7 +1294,7 @@ function ApiKeysPanel() {
             type="button"
             onClick={() => void create()}
             disabled={creating}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+            className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 disabled:opacity-50"
           >
             {creating ? 'Generating…' : 'Generate key'}
           </button>
@@ -1202,20 +1313,20 @@ function ApiKeysPanel() {
                 Save this key now — it will not be shown again.
               </p>
               <div className="mt-3 flex items-center gap-2">
-                <code className="block flex-1 truncate rounded bg-gray-950 px-3 py-2 font-mono text-sm text-amber-100 ring-1 ring-amber-500/30">
+                <code className="block flex-1 truncate rounded bg-surface-base px-3 py-2 font-mono text-sm text-amber-100 ring-1 ring-amber-500/30">
                   {createdSecret}
                 </code>
                 <button
                   type="button"
                   onClick={() => copy(createdSecret)}
-                  className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-200 hover:bg-gray-800"
+                  className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-2 text-sm text-fg-primary hover:bg-surface-elevated"
                 >
                   Copy
                 </button>
                 <button
                   type="button"
                   onClick={() => setCreatedSecret(null)}
-                  className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-200 hover:bg-gray-800"
+                  className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-2 text-sm text-fg-primary hover:bg-surface-elevated"
                 >
                   Dismiss
                 </button>
@@ -1238,9 +1349,9 @@ function ApiKeysPanel() {
             description="Create your first key above to authenticate pipelines."
           />
         ) : (
-          <div className="overflow-hidden rounded-lg border border-gray-800">
+          <div className="overflow-hidden rounded-lg border border-surface-border">
             <table className="w-full text-sm">
-              <thead className="bg-gray-900/60 text-xs uppercase tracking-wide text-gray-500">
+              <thead className="bg-surface-card text-xs uppercase tracking-wide text-fg-muted">
                 <tr>
                   <th className="px-4 py-2 text-left">Name</th>
                   <th className="px-4 py-2 text-left">Prefix</th>
@@ -1250,11 +1361,11 @@ function ApiKeysPanel() {
                   <th className="px-4 py-2 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-800 bg-gray-950/40">
+              <tbody className="divide-y divide-surface-border bg-surface-sunken/50">
                 {keys.map((k) => (
                   <tr key={k.id}>
-                    <td className="px-4 py-3 font-medium text-gray-100">{k.name}</td>
-                    <td className="px-4 py-3 font-mono text-xs text-gray-400">
+                    <td className="px-4 py-3 font-medium text-fg-primary">{k.name}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-fg-secondary">
                       {k.prefix}
                     </td>
                     <td className="px-4 py-3">
@@ -1262,17 +1373,17 @@ function ApiKeysPanel() {
                         {k.scopes.map((s) => (
                           <span
                             key={s}
-                            className="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-[11px] text-gray-300 ring-1 ring-gray-700"
+                            className="rounded bg-surface-elevated px-1.5 py-0.5 font-mono text-[11px] text-fg-secondary ring-1 ring-surface-border-strong"
                           >
                             {s}
                           </span>
                         ))}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-xs text-fg-secondary" suppressHydrationWarning>
                       {format(new Date(k.createdAt), 'PPP')}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400" suppressHydrationWarning>
+                    <td className="px-4 py-3 text-xs text-fg-secondary" suppressHydrationWarning>
                       {k.lastUsedAt
                         ? formatDistanceToNow(new Date(k.lastUsedAt), {
                             addSuffix: true,
@@ -1343,7 +1454,7 @@ function NotificationsPanel() {
           onChange={(v) => update('copilotAutoOpen', v)}
         />
 
-        <div className="rounded-lg border border-gray-800 bg-gray-950/40 p-4">
+        <div className="rounded-lg border border-surface-border bg-surface-sunken/50 p-4">
           <Field
             label="Email digest frequency"
             hint="Roll-up email summarizing alerts and case activity."
@@ -1366,7 +1477,7 @@ function NotificationsPanel() {
           </Field>
         </div>
 
-        <div className="rounded-lg border border-gray-800 bg-gray-950/40 p-4">
+        <div className="rounded-lg border border-surface-border bg-surface-sunken/50 p-4">
           <Field
             label="Default time range"
             hint="Used by Hunt, Dashboard, and Cases when you first arrive."
@@ -1431,8 +1542,8 @@ function AppearancePanel() {
       <div className="space-y-5 px-6 py-5">
         {/* Theme */}
         <div>
-          <p className="text-sm font-medium text-gray-300">Theme</p>
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="text-sm font-medium text-fg-secondary">Theme</p>
+          <p className="mt-1 text-xs text-fg-muted">
             Pick the palette this browser uses. Synced to your user profile.
           </p>
           <div className="mt-3 grid grid-cols-3 gap-3">
@@ -1447,14 +1558,14 @@ function AppearancePanel() {
                   className={clsx(
                     'rounded-xl border p-3 text-left transition-colors',
                     active
-                      ? 'border-blue-500/60 bg-blue-500/10'
-                      : 'border-gray-800 bg-gray-950/40 hover:border-gray-700',
+                      ? 'border-brand-500/60 bg-brand-500/10'
+                      : 'border-surface-border bg-surface-sunken/50 hover:border-surface-border-strong',
                   )}
                 >
-                  <span className="block text-sm font-medium capitalize text-gray-100">
+                  <span className="block text-sm font-medium capitalize text-fg-primary">
                     {t}
                   </span>
-                  <span className="mt-1 block text-xs text-gray-500">
+                  <span className="mt-1 block text-xs text-fg-muted">
                     {t === 'system'
                       ? 'Match OS preference'
                       : t === 'dark'
@@ -1469,7 +1580,7 @@ function AppearancePanel() {
 
         {/* Density */}
         <div>
-          <p className="text-sm font-medium text-gray-300">Density</p>
+          <p className="text-sm font-medium text-fg-secondary">Density</p>
           <div className="mt-3 grid grid-cols-2 gap-3">
             {(['comfortable', 'compact'] as const).map((d) => {
               const active = prefs.density === d;
@@ -1481,14 +1592,14 @@ function AppearancePanel() {
                   className={clsx(
                     'rounded-xl border p-3 text-left transition-colors',
                     active
-                      ? 'border-blue-500/60 bg-blue-500/10'
-                      : 'border-gray-800 bg-gray-950/40 hover:border-gray-700',
+                      ? 'border-brand-500/60 bg-brand-500/10'
+                      : 'border-surface-border bg-surface-sunken/50 hover:border-surface-border-strong',
                   )}
                 >
-                  <span className="block text-sm font-medium capitalize text-gray-100">
+                  <span className="block text-sm font-medium capitalize text-fg-primary">
                     {d}
                   </span>
-                  <span className="mt-1 block text-xs text-gray-500">
+                  <span className="mt-1 block text-xs text-fg-muted">
                     {d === 'comfortable'
                       ? 'Default — relaxed spacing'
                       : 'Tighter rows for high-density workloads'}
@@ -1603,7 +1714,7 @@ function DeploymentAIPanel() {
                 llm.mutate();
               }}
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-fg-muted">
               The air-gap policy and provider snapshot above are sampled live
               from this pod and mirror the egress gate exactly. To change them
               cluster-wide, update environment variables and redeploy. See{' '}
@@ -1611,7 +1722,7 @@ function DeploymentAIPanel() {
                 href="https://beenuar.github.io/AiSOC/docs/operations/airgap/"
                 target="_blank"
                 rel="noreferrer"
-                className="text-blue-400 hover:text-blue-300 hover:underline"
+                className="text-brand-400 hover:text-brand-300 hover:underline"
               >
                 Air-gapped deployments
               </a>
@@ -1627,13 +1738,13 @@ function DeploymentAIPanel() {
 function AirgapCard({ status }: { status: AirgapStatus }) {
   return (
     <section
-      className="rounded-xl border border-gray-800 bg-gray-950/40 p-5"
+      className="rounded-xl border border-surface-border bg-surface-sunken/50 p-5"
       aria-label="Air-gap policy"
     >
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-100">Air-gap policy</h3>
-          <p className="mt-1 text-xs text-gray-500">
+          <h3 className="text-sm font-semibold text-fg-primary">Air-gap policy</h3>
+          <p className="mt-1 text-xs text-fg-muted">
             Enforced by the egress gate before any outbound HTTP request.
           </p>
         </div>
@@ -1651,14 +1762,14 @@ function AirgapCard({ status }: { status: AirgapStatus }) {
               {status.allowlist.map((host) => (
                 <code
                   key={host}
-                  className="rounded bg-gray-900 px-1.5 py-0.5 font-mono text-[11px] text-gray-200"
+                  className="rounded bg-surface-card px-1.5 py-0.5 font-mono text-[11px] text-fg-primary"
                 >
                   {host}
                 </code>
               ))}
             </div>
           ) : (
-            <span className="text-gray-500">— none configured —</span>
+            <span className="text-fg-muted">— none configured —</span>
           )}
         </KeyValue>
         <KeyValue label="Always-allowed private suffixes">
@@ -1666,7 +1777,7 @@ function AirgapCard({ status }: { status: AirgapStatus }) {
             {status.implicit_private_suffixes.map((suffix) => (
               <code
                 key={suffix}
-                className="rounded bg-gray-900 px-1.5 py-0.5 font-mono text-[11px] text-gray-400"
+                className="rounded bg-surface-card px-1.5 py-0.5 font-mono text-[11px] text-fg-secondary"
               >
                 {suffix}
               </code>
@@ -1699,13 +1810,13 @@ function LlmCard({
 
   return (
     <section
-      className="rounded-xl border border-gray-800 bg-gray-950/40 p-5"
+      className="rounded-xl border border-surface-border bg-surface-sunken/50 p-5"
       aria-label="LLM provider"
     >
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-sm font-semibold text-gray-100">LLM provider</h3>
-          <p className="mt-1 text-xs text-gray-500">
+          <h3 className="text-sm font-semibold text-fg-primary">LLM provider</h3>
+          <p className="mt-1 text-xs text-fg-muted">
             Where Explain, triage, and other AI features will call out to.
           </p>
         </div>
@@ -1775,37 +1886,37 @@ function LlmCard({
             how "Live" came to mean "configured" without anyone noticing. */}
         {isDegraded ? null : (
           <KeyValue label="Recent calls">
-            <span className="text-xs text-gray-300">{llm.recent_note}</span>
+            <span className="text-xs text-fg-secondary">{llm.recent_note}</span>
           </KeyValue>
         )}
         <KeyValue label="Model">
           {llm.model ? (
-            <code className="font-mono text-xs text-gray-100">{llm.model}</code>
+            <code className="font-mono text-xs text-fg-primary">{llm.model}</code>
           ) : (
-            <span className="text-gray-500">—</span>
+            <span className="text-fg-muted">—</span>
           )}
         </KeyValue>
         <KeyValue label="Base URL">
           {llm.base_url ? (
-            <code className="break-all font-mono text-xs text-gray-200">
+            <code className="break-all font-mono text-xs text-fg-primary">
               {llm.base_url}
             </code>
           ) : (
-            <span className="text-gray-500">—</span>
+            <span className="text-fg-muted">—</span>
           )}
         </KeyValue>
         <KeyValue label="Host">
           {llm.host ? (
-            <code className="font-mono text-xs text-gray-200">{llm.host}</code>
+            <code className="font-mono text-xs text-fg-primary">{llm.host}</code>
           ) : (
-            <span className="text-gray-500">—</span>
+            <span className="text-fg-muted">—</span>
           )}
         </KeyValue>
         <KeyValue label="API key">
           <span
             className={clsx(
               'inline-flex items-center gap-1.5 text-xs',
-              llm.key_set ? 'text-emerald-300' : 'text-gray-400',
+              llm.key_set ? 'text-emerald-300' : 'text-fg-secondary',
             )}
           >
             <span
@@ -1842,7 +1953,7 @@ function LlmCard({
       </dl>
 
       {!blockedByAirgap && !isFallback && llm.policy_note ? (
-        <p className="mt-4 text-xs text-gray-500">{llm.policy_note}</p>
+        <p className="mt-4 text-xs text-fg-muted">{llm.policy_note}</p>
       ) : null}
     </section>
   );
@@ -2137,11 +2248,11 @@ function BYOKCard({
   // ── VIEW: have credential, not editing ──────────────────────────────────
   if (credential && !editing) {
     return (
-      <section className="rounded-lg border border-gray-800 bg-gray-950/40 p-5">
+      <section className="rounded-lg border border-surface-border bg-surface-sunken/50 p-5">
         <header className="flex items-start justify-between gap-3">
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-semibold text-gray-200">
+              <h3 className="text-sm font-semibold text-fg-primary">
                 Bring-your-own-LLM (BYOK)
               </h3>
               {credential.enabled ? (
@@ -2150,7 +2261,7 @@ function BYOKCard({
                 <StatusPill tone="gray" label="Disabled" />
               )}
             </div>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-fg-muted">
               Per-tenant override for this AiSOC workspace. The platform
               uses these settings instead of the pod-level defaults.
             </p>
@@ -2160,14 +2271,14 @@ function BYOKCard({
               type="button"
               onClick={onTestClick}
               disabled={testing || submitting}
-              className="rounded-md border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs font-medium text-gray-200 hover:bg-gray-800 disabled:opacity-50"
+              className="rounded-md border border-surface-border-strong bg-surface-card px-3 py-1.5 text-xs font-medium text-fg-primary hover:bg-surface-elevated disabled:opacity-50"
             >
               {testing ? 'Testing…' : 'Test'}
             </button>
             <button
               type="button"
               onClick={() => setEditing(true)}
-              className="rounded-md border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs font-medium text-gray-200 hover:bg-gray-800"
+              className="rounded-md border border-surface-border-strong bg-surface-card px-3 py-1.5 text-xs font-medium text-fg-primary hover:bg-surface-elevated"
             >
               Edit
             </button>
@@ -2179,7 +2290,7 @@ function BYOKCard({
                 'rounded-md px-3 py-1.5 text-xs font-medium transition-colors disabled:opacity-50',
                 confirmingDelete
                   ? 'border border-red-500/50 bg-red-500/15 text-red-200 hover:bg-red-500/25'
-                  : 'border border-gray-700 bg-gray-900 text-gray-200 hover:bg-gray-800',
+                  : 'border border-surface-border-strong bg-surface-card text-fg-primary hover:bg-surface-elevated',
               )}
             >
               {confirmingDelete ? 'Confirm remove' : 'Remove'}
@@ -2188,33 +2299,33 @@ function BYOKCard({
         </header>
         <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <KeyValue label="Provider">
-            <span className="text-sm text-gray-200">
+            <span className="text-sm text-fg-primary">
               {PROVIDER_LABEL[credential.provider]}
             </span>
           </KeyValue>
           <KeyValue label="Endpoint">
             {credential.base_url ? (
-              <span className="break-all font-mono text-xs text-gray-300">
+              <span className="break-all font-mono text-xs text-fg-secondary">
                 {credential.base_url}
               </span>
             ) : (
-              <span className="text-xs text-gray-500">Provider default</span>
+              <span className="text-xs text-fg-muted">Provider default</span>
             )}
           </KeyValue>
           <KeyValue label="Model">
             {credential.model ? (
-              <span className="font-mono text-xs text-gray-300">
+              <span className="font-mono text-xs text-fg-secondary">
                 {credential.model}
               </span>
             ) : (
-              <span className="text-xs text-gray-500">Provider default</span>
+              <span className="text-xs text-fg-muted">Provider default</span>
             )}
           </KeyValue>
           <KeyValue label="API key">
             <span
               className={clsx(
                 'inline-flex items-center gap-1.5 text-xs',
-                credential.has_api_key ? 'text-emerald-300' : 'text-gray-400',
+                credential.has_api_key ? 'text-emerald-300' : 'text-fg-secondary',
               )}
             >
               <span
@@ -2230,7 +2341,7 @@ function BYOKCard({
           <KeyValue label="Last rotated">
             {credential.last_rotated_at ? (
               <span
-                className="text-xs text-gray-300"
+                className="text-xs text-fg-secondary"
                 title={credential.last_rotated_at}
               >
                 {formatDistanceToNow(new Date(credential.last_rotated_at), {
@@ -2238,12 +2349,12 @@ function BYOKCard({
                 })}
               </span>
             ) : (
-              <span className="text-xs text-gray-500">Never</span>
+              <span className="text-xs text-fg-muted">Never</span>
             )}
           </KeyValue>
           <KeyValue label="Updated">
             <span
-              className="text-xs text-gray-300"
+              className="text-xs text-fg-secondary"
               title={credential.updated_at}
             >
               {formatDistanceToNow(new Date(credential.updated_at), {
@@ -2273,13 +2384,13 @@ function BYOKCard({
   // ── EMPTY: no credential, not editing ────────────────────────────────────
   if (!credential && !editing) {
     return (
-      <section className="rounded-lg border border-gray-800 bg-gray-950/40 p-5">
+      <section className="rounded-lg border border-surface-border bg-surface-sunken/50 p-5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-gray-200">
+            <h3 className="text-sm font-semibold text-fg-primary">
               Bring-your-own-LLM (BYOK)
             </h3>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-fg-muted">
               No tenant override configured. Investigations use the pod-level
               defaults shown above. Configure BYOK to point this tenant at
               your own provider — keys are stored vault-encrypted.
@@ -2288,7 +2399,7 @@ function BYOKCard({
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="shrink-0 rounded-md border border-blue-500/50 bg-blue-500/15 px-3 py-1.5 text-xs font-medium text-blue-200 hover:bg-blue-500/25"
+            className="shrink-0 rounded-md border border-brand-500/50 bg-brand-500/15 px-3 py-1.5 text-xs font-medium text-blue-200 hover:bg-brand-500/25"
           >
             Configure BYOK
           </button>
@@ -2299,12 +2410,12 @@ function BYOKCard({
 
   // ── EDIT: form (creating or editing) ─────────────────────────────────────
   return (
-    <section className="rounded-lg border border-blue-500/30 bg-blue-500/5 p-5">
+    <section className="rounded-lg border border-brand-500/30 bg-blue-500/5 p-5">
       <header className="mb-4">
-        <h3 className="text-sm font-semibold text-gray-200">
+        <h3 className="text-sm font-semibold text-fg-primary">
           {credential ? 'Edit BYOK credential' : 'Configure BYOK credential'}
         </h3>
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-fg-muted">
           API keys are encrypted with the platform credential vault before
           persistence and are never returned to the UI.
         </p>
@@ -2386,7 +2497,7 @@ function BYOKCard({
               type="button"
               onClick={onDiscoverClick}
               disabled={discovering || submitting || !baseUrl.trim()}
-              className="shrink-0 rounded-md border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs font-medium text-gray-200 hover:bg-gray-800 disabled:opacity-50"
+              className="shrink-0 rounded-md border border-surface-border-strong bg-surface-card px-3 py-1.5 text-xs font-medium text-fg-primary hover:bg-surface-elevated disabled:opacity-50"
             >
               {discovering ? 'Listing models…' : 'List models from endpoint'}
             </button>
@@ -2415,7 +2526,7 @@ function BYOKCard({
               className={clsx(
                 'text-xs',
                 shownDiscovery.outcome === 'ok' && discoveredModels.length > 0
-                  ? 'text-gray-400'
+                  ? 'text-fg-secondary'
                   : 'text-amber-300/80',
               )}
             >
@@ -2432,7 +2543,7 @@ function BYOKCard({
                 : `${shownDiscovery.detail} The Model field still accepts a typed id.`}
             </p>
           ) : (
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-fg-muted">
               Asks the endpoint&apos;s <code className="font-mono">/models</code>{' '}
               for the chat models it serves. Optional — a typed model id
               always works.
@@ -2458,7 +2569,7 @@ function BYOKCard({
           type="button"
           onClick={onCancel}
           disabled={submitting}
-          className="rounded-md border border-gray-700 bg-gray-900 px-4 py-2 text-sm font-medium text-gray-200 hover:bg-gray-800 disabled:opacity-50"
+          className="rounded-md border border-surface-border-strong bg-surface-card px-4 py-2 text-sm font-medium text-fg-primary hover:bg-surface-elevated disabled:opacity-50"
         >
           Cancel
         </button>
@@ -2466,7 +2577,7 @@ function BYOKCard({
           type="button"
           onClick={onSave}
           disabled={submitting}
-          className="rounded-md bg-blue-500/80 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-50"
+          className="rounded-md bg-blue-500/80 px-4 py-2 text-sm font-medium text-white hover:bg-brand-500 disabled:opacity-50"
         >
           {submitting
             ? 'Saving…'
@@ -2488,10 +2599,10 @@ function KeyValue({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <dt className="text-[11px] uppercase tracking-wide text-gray-500">
+      <dt className="text-[11px] uppercase tracking-wide text-fg-muted">
         {label}
       </dt>
-      <dd className="text-sm text-gray-200">{children}</dd>
+      <dd className="text-sm text-fg-primary">{children}</dd>
     </div>
   );
 }
@@ -2508,7 +2619,7 @@ function StatusPill({
     tone === 'emerald' && 'border-emerald-500/40 bg-emerald-500/10 text-emerald-200',
     tone === 'amber' && 'border-amber-500/40 bg-amber-500/10 text-amber-200',
     tone === 'red' && 'border-red-500/40 bg-red-500/10 text-red-200',
-    tone === 'gray' && 'border-gray-700 bg-gray-900 text-gray-300',
+    tone === 'gray' && 'border-surface-border-strong bg-surface-card text-fg-secondary',
   );
   const dotCls = clsx(
     'inline-block h-1.5 w-1.5 rounded-full',
@@ -2542,18 +2653,18 @@ function AuditPanel() {
       />
       {entries.length === 0 ? (
         <div className="px-6 py-8 text-center">
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-fg-secondary">
             Administrative events are recorded in the searchable audit log.
           </p>
           <Link
             href="/audit"
-            className="mt-2 inline-block text-sm text-blue-400 hover:text-blue-300"
+            className="mt-2 inline-block text-sm text-brand-400 hover:text-brand-300"
           >
             Open the audit log
           </Link>
         </div>
       ) : (
-      <ol className="divide-y divide-gray-800">
+      <ol className="divide-y divide-surface-border">
         {entries.map((a) => (
           <li key={a.id} className="flex items-start gap-3 px-6 py-4">
             <span
@@ -2568,12 +2679,12 @@ function AuditPanel() {
               )}
             />
             <div className="min-w-0 flex-1">
-              <p className="text-sm text-gray-100">
+              <p className="text-sm text-fg-primary">
                 <span className="font-medium">{a.actor}</span>{' '}
-                <span className="text-gray-400">{a.action}</span>{' '}
+                <span className="text-fg-secondary">{a.action}</span>{' '}
                 <span>{a.target}</span>
               </p>
-              <p className="text-xs text-gray-500" suppressHydrationWarning>
+              <p className="text-xs text-fg-muted" suppressHydrationWarning>
                 {formatDistanceToNow(new Date(a.at), { addSuffix: true })}
               </p>
             </div>
@@ -2600,12 +2711,12 @@ function AboutPanel() {
         <InfoTile label="License" value="MIT" />
         <InfoTile label="Source" value="github.com/beenuar/AiSOC" mono />
       </div>
-      <div className="border-t border-gray-800 px-6 py-5 text-sm text-gray-400">
+      <div className="border-t border-surface-border px-6 py-5 text-sm text-fg-secondary">
         <p>
           AiSOC is community-driven. Issues, ideas, and PRs welcome on GitHub.
           See the{' '}
           <a
-            className="text-blue-400 hover:text-blue-300"
+            className="text-brand-400 hover:text-brand-300"
             href="https://github.com/beenuar/AiSOC/blob/main/CONTRIBUTING.md"
             target="_blank"
             rel="noreferrer"
@@ -2616,7 +2727,7 @@ function AboutPanel() {
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <a
-            className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-800"
+            className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-1.5 text-xs text-fg-primary hover:bg-surface-elevated"
             href="https://github.com/beenuar/AiSOC"
             target="_blank"
             rel="noreferrer"
@@ -2624,7 +2735,7 @@ function AboutPanel() {
             GitHub →
           </a>
           <a
-            className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-800"
+            className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-1.5 text-xs text-fg-primary hover:bg-surface-elevated"
             href="https://github.com/beenuar/AiSOC/blob/main/CHANGELOG.md"
             target="_blank"
             rel="noreferrer"
@@ -2632,7 +2743,7 @@ function AboutPanel() {
             Changelog →
           </a>
           <a
-            className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 text-xs text-gray-200 hover:bg-gray-800"
+            className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-1.5 text-xs text-fg-primary hover:bg-surface-elevated"
             href="https://github.com/beenuar/AiSOC/blob/main/SECURITY.md"
             target="_blank"
             rel="noreferrer"

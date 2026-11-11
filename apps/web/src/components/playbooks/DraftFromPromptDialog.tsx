@@ -1,63 +1,58 @@
 'use client';
 
 /**
- * DraftFromPromptDialog — T3.7 NL → playbook generator UI.
- * ========================================================
+ * DraftFromPromptDialog
+ * =====================
+ * T3.7 — Modal dialog that takes a natural-language description of an
+ * incident response workflow, calls `POST /api/v1/playbooks/draft-from-nl`,
+ * parks the returned playbook draft in `sessionStorage["aisoc:nl-draft"]`,
+ * and navigates to `/playbooks/new?nl=true` where `PlaybookEditor` hydrates
+ * from it.
  *
- * Modal launched from /playbooks. The analyst types a free-text
- * description ("when a high-severity exfil alert fires on a prod
- * S3 bucket, isolate the IAM role, snapshot the bucket policy and
- * page on-call"), the dialog POSTs to ``/api/v1/playbooks/draft-from-nl``
- * and routes to /playbooks/new with the draft parked in sessionStorage
- * under ``aisoc:nl-draft`` for the editor to pick up.
- *
- * Drafts are NEVER auto-saved or auto-run. The editor is the gate —
- * the drafted playbook arrives with ``enabled=false`` and the analyst
- * reviews each node before saving.
- *
- * Design choices:
- *   • The modal is purely controlled (open / onClose) so the parent
- *     owns its visibility; tests can mount the body component
- *     directly without a portal.
- *   • Network failures surface inline (red banner). The submit button
- *     is disabled while the request is in flight to prevent dupes.
- *   • A small "suggestions" footer offers two canned prompts the
- *     analyst can click to populate the textarea — helps first-time
- *     users discover what the drafter understands.
- *   • The dialog returns *real* HTTP errors verbatim. We don't try to
- *     pretty-print the backend's message because the backend already
- *     emits short, actionable text ("prompt is required",
- *     "prompt is too long (max 4000 chars)").
+ * The dialog intentionally never saves the draft to the database — the
+ * operator reviews the generated DAG on the canvas first and hits Save
+ * when they are happy with it. Every generated playbook also starts with
+ * `enabled: false` on the backend as a belt-and-suspenders guard.
  */
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Playbook } from './types';
 import { apiFetch } from '@/lib/api';
+import { AiSpinner } from '@/components/ui/AiSpinner';
 
-const SUGGESTIONS: { label: string; prompt: string }[] = [
-  {
-    label: 'High-sev exfil → isolate + notify',
-    prompt:
-      'When a high-severity exfil alert fires on a prod S3 bucket, ' +
-      'isolate the IAM role, snapshot the bucket policy and page on-call.',
-  },
-  {
-    label: 'Account takeover → disable + reset',
-    prompt:
-      'On a critical account-takeover case, disable the user, ' +
-      'reset the password, revoke sessions and notify the SOC.',
-  },
-];
+/** Storage key shared with `PlaybookEditor` when hydrating an NL draft. */
+export const NL_DRAFT_STORAGE_KEY = 'aisoc:nl-draft';
 
-const MAX_PROMPT_LEN = 4000;
-
-interface DraftResponse {
+interface DraftFromPromptResponse {
   playbook: Playbook;
   rationale: string;
   used_llm: boolean;
   schema_validated: boolean;
 }
+
+const EXAMPLE_PROMPTS: Array<{ label: string; prompt: string }> = [
+  {
+    label: 'High-sev exfil → isolate + ticket',
+    prompt:
+      'When a high-severity exfil alert fires, enrich the source IP, isolate the affected host if the verdict is malicious, open a P1 Jira ticket, and page the on-call on Slack.',
+  },
+  {
+    label: 'Impossible travel → disable user',
+    prompt:
+      'On an impossible-travel alert, enrich the user and source IP, require analyst approval, then disable the user account and notify #soc-identity.',
+  },
+  {
+    label: 'Malware hash → quarantine + block',
+    prompt:
+      'When malware is detected on an endpoint, quarantine the file, block the C2 domain and IP at the firewall, and create an incident case.',
+  },
+  {
+    label: 'Phishing triage',
+    prompt:
+      'Triggered on a phishing alert: enrich the sender domain, hunt for other recipients in the last 24h, and notify the SOC channel with a summary.',
+  },
+];
 
 export interface DraftFromPromptDialogProps {
   open: boolean;
@@ -66,175 +61,177 @@ export interface DraftFromPromptDialogProps {
 
 export function DraftFromPromptDialog({ open, onClose }: DraftFromPromptDialogProps) {
   const router = useRouter();
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-
   const [prompt, setPrompt] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (open) {
+    if (!open) {
       setError(null);
       setBusy(false);
-      // Defer focus so the dialog has actually mounted in the DOM.
-      const t = setTimeout(() => textareaRef.current?.focus(), 0);
-      return () => clearTimeout(t);
     }
-    return undefined;
   }, [open]);
 
-  const handleSubmit = useCallback(async () => {
+  if (!open) return null;
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
     const trimmed = prompt.trim();
     if (!trimmed) {
-      setError('Add a description of the playbook you want.');
-      return;
-    }
-    if (trimmed.length > MAX_PROMPT_LEN) {
-      setError(`Prompt is too long (max ${MAX_PROMPT_LEN} chars).`);
+      setError('Describe what the playbook should do.');
       return;
     }
     setBusy(true);
     setError(null);
     try {
-      const resp = await apiFetch('/api/v1/playbooks/draft-from-nl', {
+      const res = await apiFetch('/api/v1/playbooks/draft-from-nl', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: trimmed, allow_llm: true }),
       });
-      if (!resp.ok) {
-        const txt = await resp.text();
-        setError(txt || `Drafter returned HTTP ${resp.status}`);
-        setBusy(false);
-        return;
+      if (!res.ok) {
+        const msg = await res.text();
+        throw new Error(msg || `${res.status} ${res.statusText}`);
       }
-      const data = (await resp.json()) as DraftResponse;
-      if (!data?.playbook || !Array.isArray(data.playbook.steps)) {
-        setError('Drafter returned an unexpected payload — try again.');
-        setBusy(false);
-        return;
+      const data = (await res.json()) as DraftFromPromptResponse;
+      try {
+        sessionStorage.setItem(
+          NL_DRAFT_STORAGE_KEY,
+          JSON.stringify({
+            ...data.playbook,
+            _nlRationale: data.rationale,
+            _nlUsedLlm: data.used_llm,
+          }),
+        );
+      } catch {
+        // sessionStorage may be disabled in strict privacy modes; the
+        // editor will fall back to an empty playbook rather than crash.
       }
-      // Park the draft for the editor to pick up. sessionStorage is the
-      // simplest pipe — survives the navigation, doesn't leak across tabs.
-      sessionStorage.setItem('aisoc:nl-draft', JSON.stringify(data.playbook));
       onClose();
       router.push('/playbooks/new?nl=true');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error');
+      setError(err instanceof Error ? err.message : 'Could not draft playbook.');
+    } finally {
       setBusy(false);
     }
-  }, [prompt, router, onClose]);
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-        e.preventDefault();
-        void handleSubmit();
-      }
-      if (e.key === 'Escape' && !busy) {
-        onClose();
-      }
-    },
-    [handleSubmit, busy, onClose],
-  );
-
-  if (!open) return null;
+  }
 
   return (
     <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="nl-draft-title"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-      onClick={(e) => {
-        if (e.target === e.currentTarget && !busy) onClose();
+      onClick={() => {
+        if (!busy) onClose();
       }}
     >
-      <div className="w-full max-w-2xl rounded-xl border border-gray-800 bg-gray-950 p-6 shadow-2xl">
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 id="nl-draft-title" className="text-base font-semibold text-white">
-              Draft a playbook from a prompt
-            </h2>
-            <p className="mt-0.5 text-xs text-gray-500">
-              Describe what should happen — AiSOC drafts the DAG, you review and save.
-            </p>
+      <div
+        className="w-full max-w-xl rounded-xl border border-surface-border bg-surface-card p-6 text-fg-primary shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-4 mb-4">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brand-500/10 border border-brand-500/30">
+              <AiSpinner size="sm" state={busy ? 'busy' : 'idle'} />
+            </div>
+            <div>
+              <h2 id="nl-draft-title" className="text-lg font-semibold text-fg-primary">
+                Draft a playbook from a prompt
+              </h2>
+              <p className="text-xs text-fg-muted mt-0.5">
+                Describe the trigger and response steps in plain English. You&rsquo;ll
+                review and edit the generated DAG before saving — nothing runs
+                automatically.
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             disabled={busy}
-            className="rounded-md p-1 text-gray-500 hover:bg-gray-800 hover:text-gray-300 disabled:opacity-40"
             aria-label="Close"
+            className="text-fg-muted hover:text-fg-primary text-sm disabled:opacity-50"
           >
             ✕
           </button>
         </div>
 
-        <textarea
-          ref={textareaRef}
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          onKeyDown={handleKeyDown}
-          rows={6}
-          maxLength={MAX_PROMPT_LEN}
-          placeholder={
-            'e.g. "When a high-severity exfil alert fires on a prod S3 bucket, ' +
-            'isolate the IAM role, snapshot the bucket policy, and page on-call."'
-          }
-          className="mt-4 w-full resize-y rounded-lg border border-gray-800 bg-gray-900 px-3 py-2 text-sm text-gray-200 placeholder:text-gray-600 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600"
-          disabled={busy}
-        />
-
-        <div className="mt-1 flex items-center justify-between text-[11px] text-gray-500">
-          <span>
-            {prompt.trim().length}/{MAX_PROMPT_LEN} chars · Press Cmd/Ctrl-Enter to draft
-          </span>
-        </div>
-
-        {error && (
-          <div
-            role="alert"
-            className="mt-3 rounded-lg border border-red-900/60 bg-red-950/40 px-3 py-2 text-xs text-red-300"
-          >
-            {error}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="nl-draft-prompt" className="block text-xs font-medium text-fg-secondary mb-1.5">
+              What should this playbook do?
+            </label>
+            <textarea
+              id="nl-draft-prompt"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              disabled={busy}
+              rows={4}
+              maxLength={4000}
+              placeholder="e.g. When a high-severity exfil alert fires, enrich the source IP, isolate the host if malicious, open a P1 Jira ticket, and notify #soc-critical on Slack."
+              className="w-full rounded-lg border border-surface-border bg-surface-sunken px-3 py-2 text-sm text-fg-primary placeholder-fg-faint focus:border-brand-500 focus:outline-none disabled:opacity-50"
+              onKeyDown={(e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+                  void handleSubmit(e);
+                }
+              }}
+            />
           </div>
-        )}
 
-        <div className="mt-4 border-t border-gray-800 pt-3">
-          <p className="text-[11px] uppercase tracking-wide text-gray-500">Try one of:</p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {SUGGESTIONS.map((s) => (
+          {/* Example prompt chips */}
+          <div>
+            <div className="text-[11px] uppercase tracking-wider text-fg-faint mb-1.5">
+              Try an example
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {EXAMPLE_PROMPTS.map((ex) => (
+                <button
+                  key={ex.label}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => setPrompt(ex.prompt)}
+                  className="text-xs px-2.5 py-1 rounded-full border border-surface-border bg-surface-sunken text-fg-secondary hover:text-fg-primary hover:border-brand-500/40 transition-colors disabled:opacity-50"
+                >
+                  {ex.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {error && (
+            <div
+              role="alert"
+              className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300"
+            >
+              {error}
+            </div>
+          )}
+
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-[11px] text-fg-faint">
+              Tip: press &#8984;+Enter (or Ctrl+Enter) to generate.
+            </span>
+            <div className="flex items-center gap-2">
               <button
-                key={s.label}
                 type="button"
+                onClick={onClose}
                 disabled={busy}
-                onClick={() => setPrompt(s.prompt)}
-                className="rounded-md border border-gray-800 bg-gray-900 px-2 py-1 text-[11px] text-gray-400 hover:border-gray-700 hover:bg-gray-800 hover:text-gray-200 disabled:opacity-50"
+                className="px-3 py-1.5 rounded-lg border border-surface-border text-xs text-fg-secondary hover:text-fg-primary transition-colors disabled:opacity-50"
               >
-                {s.label}
+                Cancel
               </button>
-            ))}
+              <button
+                type="submit"
+                disabled={busy || !prompt.trim()}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-400 text-xs font-semibold text-fg-primary transition-colors disabled:opacity-50"
+              >
+                <AiSpinner size="xs" state={busy ? 'busy' : 'idle'} monochrome={false} />
+                <span>{busy ? 'Drafting…' : 'Draft playbook'}</span>
+              </button>
+            </div>
           </div>
-        </div>
-
-        <div className="mt-5 flex items-center justify-end gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            disabled={busy}
-            className="rounded-lg border border-gray-800 px-4 py-2 text-sm text-gray-400 hover:bg-gray-800 hover:text-gray-200 disabled:opacity-50"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={() => void handleSubmit()}
-            disabled={busy || !prompt.trim()}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {busy ? 'Drafting…' : 'Draft playbook'}
-          </button>
-        </div>
+        </form>
       </div>
     </div>
   );

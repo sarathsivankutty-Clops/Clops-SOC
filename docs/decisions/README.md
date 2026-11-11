@@ -29,6 +29,10 @@ ADRs are immutable once accepted. If a decision changes, write a new ADR that su
 | [ADR-0013](./0013-truncating-a-hash-chained-audit-log.md) | Truncating a hash-chained audit log without making an intact chain look tampered with | accepted | 2026-10-11 |
 | [ADR-0014](./0014-tenant-erasure-crosses-the-audit-trigger.md) | Tenant erasure crosses the audit-log immutability trigger; nothing smaller does | accepted | 2026-10-12 |
 | [ADR-0015](./0015-siem-replacement-scope.md) | AiSOC does not take on SIEM-replacement scope; it federates to the SIEM instead | proposed | 2026-11-01 |
+| [ADR-0022](./0022-identity-provider-abstraction.md) | Provider-agnostic Identity Provider abstraction on the console (ADR-001) | accepted | 2026-11-10 |
+| [ADR-0023](./0023-backend-managed-oidc.md) | Backend-managed OIDC Relying Party over browser-managed authentication (ADR-002) | accepted | 2026-11-10 |
+| [ADR-0024](./0024-feature-flag-strategy.md) | Feature flag strategy for UI navigation, branding, and external IdPs (ADR-003) | accepted | 2026-11-10 |
+| [ADR-0025](./0025-configuration-centralization.md) | Centralized frontend configuration and separation of branding from theme (ADR-004) | accepted | 2026-11-10 |
 
 ## Authoring conventions
 

@@ -96,6 +96,66 @@ class TriggerOutcome:
         }
 
 
+def _derive_alert_tags(raw: dict[str, Any]) -> list[str]:
+    """Derive normalized trigger tags from raw alert fields (AWS CloudTrail, Security Hub, GuardDuty, MITRE, etc.).
+
+    Preserves the caller's explicit ``tags`` list first and only appends
+    derived tags when explicit cloud/source/MITRE fields are present on the
+    alert payload.
+    """
+    base_tags = list(raw.get("tags") or [])
+    seen = {str(t).lower() for t in base_tags if t}
+    derived: list[str] = [str(t) for t in base_tags if t]
+
+    def _add(tag: str) -> None:
+        norm = tag.strip().lower()
+        if norm and norm not in seen:
+            seen.add(norm)
+            derived.append(norm)
+
+    cat = str(raw.get("category") or "").strip().lower()
+    if cat:
+        _add(cat)
+
+    source_blob = " ".join(
+        str(raw.get(k) or "")
+        for k in ("source", "connector_type", "service", "event_source", "finding_type", "cloud_provider", "product_name")
+    ).lower()
+
+    if any(tok in source_blob for tok in ("aws", "cloudtrail", "securityhub", "security hub", "guardduty", "s3", "iam", "ec2")) or any(
+        raw.get(k) for k in ("principal_arn", "resource_arn", "account_id", "trail", "bucket")
+    ):
+        _add("cloud")
+        _add("aws")
+        _add("cloud-misconfig")
+
+    if "cloudtrail" in source_blob or raw.get("trail") or raw.get("event_name") or raw.get("event_source"):
+        _add("cloudtrail")
+        _add("aws-cloudtrail")
+
+    if "securityhub" in source_blob or "security hub" in source_blob or raw.get("finding_type") or raw.get("asff_id"):
+        _add("securityhub")
+        _add("aws-securityhub")
+        _add("cspm")
+
+    if "guardduty" in source_blob:
+        _add("guardduty")
+        _add("aws-guardduty")
+
+    if "iam" in source_blob or raw.get("principal_arn") or raw.get("role") or raw.get("policy"):
+        _add("iam")
+
+    if "s3" in source_blob or raw.get("bucket"):
+        _add("s3")
+
+    for tid in raw.get("mitre_techniques") or []:
+        tid_str = str(tid).strip().lower()
+        if tid_str:
+            _add(tid_str if tid_str.startswith("mitre.") else f"mitre.{tid_str}")
+
+    return derived
+
+
 def alert_context(state: Any) -> dict[str, Any]:
     """The trigger context a playbook's conditions read.
 
@@ -110,16 +170,63 @@ def alert_context(state: Any) -> dict[str, Any]:
         "tenant_id": str(getattr(state, "tenant_id", "") or ""),
         "alert_id": str(getattr(state, "incident_id", "") or ""),
         "severity": raw.get("severity") or getattr(state, "severity", None),
-        "tags": raw.get("tags") or [],
+        "tags": _derive_alert_tags(raw),
         "title": raw.get("title") or "",
         "verdict": getattr(state, "verdict", None),
         "confidence": getattr(state, "confidence", None),
     }
-    for key in ("host", "hostname", "username", "user", "src_ip", "dst_ip", "domain", "file_hash"):
+    for key in (
+        "host",
+        "hostname",
+        "username",
+        "user",
+        "src_ip",
+        "source_ip",
+        "dst_ip",
+        "domain",
+        "file_hash",
+        "principal_arn",
+        "resource_arn",
+        "account_id",
+        "event_name",
+        "event_source",
+        "finding_type",
+        "trail",
+        "bucket",
+        "role",
+        "policy",
+        "key_id",
+        "instance",
+        "sg",
+        "rule_id",
+        "actor",
+        "external_account",
+    ):
         value = raw.get(key)
         if value:
             context.setdefault(key, value)
+    if context.get("src_ip") and not context.get("source_ip"):
+        context["source_ip"] = context["src_ip"]
+    elif context.get("source_ip") and not context.get("src_ip"):
+        context["src_ip"] = context["source_ip"]
     return context
+
+
+def matching_runbooks_for_alert(state: Any) -> list[Any]:
+    """Return matching operational Runbooks/Playbooks for an alert state without executing them.
+
+    Used by AI triage and RCA investigation to surface applicable runbooks and
+    calibrate confidence when an alert is backed by a verified RCA runbook.
+    """
+    try:
+        from app.playbook.store import PlaybookStore
+
+        context = alert_context(state)
+        tenant_id = context.get("tenant_id") or "00000000-0000-0000-0000-000000000000"
+        store = PlaybookStore.default()
+        return list(store.find_matching(TRIGGER_EVENT, context, tenant_id=str(tenant_id)))
+    except Exception:  # noqa: BLE001
+        return []
 
 
 async def run_for_alert(state: Any) -> TriggerOutcome:

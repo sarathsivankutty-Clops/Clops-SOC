@@ -85,8 +85,8 @@ export function ExploreView() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 p-6">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold text-slate-100">Data Explorer</h1>
-        <p className="text-sm text-slate-400">
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-semibold text-fg-primary */>Data Explorer</h1>
+        <p className="text-sm text-fg-secondary">
           One investigation surface across events, identity, config and intel — no SIEM context-switch.
         </p>
       </header>
@@ -101,7 +101,7 @@ export function ExploreView() {
             className={
               source === s.id
                 ? 'rounded-lg border border-sky-500 bg-sky-500/10 px-3 py-2 text-sm font-medium text-sky-300'
-                : 'rounded-lg border border-slate-700 bg-slate-800/40 px-3 py-2 text-sm text-slate-300 hover:border-slate-500'
+                : 'rounded-lg border border-surface-border-strong bg-surface-sunken/50 px-3 py-2 text-sm text-fg-secondary hover:border-surface-border-strong'
             }
           >
             {s.label}
@@ -120,9 +120,9 @@ export function ExploreView() {
 
 function PivotCard({ source }: { source: SourceDef }) {
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-800/40 p-6">
-      <h2 className="text-lg font-medium text-slate-100">{source.label}</h2>
-      <p className="mt-1 text-sm text-slate-400">{source.description}</p>
+    <div className="rounded-xl border border-surface-border-strong bg-surface-sunken/50 p-6">
+      <h2 className="text-lg font-medium text-fg-primary">{source.label}</h2>
+      <p className="mt-1 text-sm text-fg-secondary">{source.description}</p>
       {source.pivotHref ? (
         <a
           href={source.pivotHref}
@@ -321,7 +321,7 @@ function EventsExplorer() {
           void ask(question);
         }}
       >
-        <label htmlFor="explore-nl" className="text-sm font-medium text-slate-300">
+        <label htmlFor="explore-nl" className="text-sm font-medium text-fg-secondary">
           Ask in plain English
         </label>
         <div className="flex flex-wrap gap-2">
@@ -330,13 +330,13 @@ function EventsExplorer() {
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             placeholder="e.g. show critical events in the last 24 hours"
-            className="min-w-[16rem] flex-1 rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500"
+            className="min-w-[16rem] flex-1 rounded-lg border border-surface-border-strong bg-surface-card px-3 py-2 text-sm text-fg-primary placeholder:text-fg-muted"
           />
           <select
             aria-label="Time range"
             value={hours}
             onChange={(e) => setHours(Number(e.target.value))}
-            className="rounded-lg border border-slate-700 bg-slate-900 px-3 py-2 text-sm text-slate-100"
+            className="rounded-lg border border-surface-border-strong bg-surface-card px-3 py-2 text-sm text-fg-primary"
           >
             {TIME_RANGES.map((range) => (
               <option key={range.hours} value={range.hours}>
@@ -361,7 +361,7 @@ function EventsExplorer() {
                 setQuestion(q);
                 void ask(q);
               }}
-              className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-300 hover:border-slate-500"
+              className="rounded-full border border-surface-border-strong px-3 py-1 text-xs text-fg-secondary hover:border-surface-border-strong"
             >
               {q}
             </button>
@@ -372,7 +372,7 @@ function EventsExplorer() {
       {answer ? <QueryDisclosure answer={answer} /> : null}
 
       <div className="flex flex-col gap-2">
-        <label htmlFor="explore-sql" className="text-sm font-medium text-slate-300">
+        <label htmlFor="explore-sql" className="text-sm font-medium text-fg-secondary">
           SQL
         </label>
         <textarea
@@ -381,14 +381,14 @@ function EventsExplorer() {
           onChange={(e) => setSql(e.target.value)}
           rows={5}
           spellCheck={false}
-          className="w-full rounded-lg border border-slate-700 bg-slate-900 p-3 font-mono text-xs text-slate-100"
+          className="w-full rounded-lg border border-surface-border-strong bg-surface-card p-3 font-mono text-xs text-fg-primary"
         />
         <div>
           <button
             type="button"
             disabled={running}
             onClick={() => void runSql(sql)}
-            className="rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-600 disabled:opacity-50"
+            className="rounded-lg bg-surface-hover px-4 py-2 text-sm font-medium text-fg-primary hover:bg-slate-600 disabled:opacity-50"
           >
             {running ? 'Running…' : 'Run query'}
           </button>
@@ -447,12 +447,12 @@ function QueryDisclosure({ answer }: { answer: NlQueryExecuteResponse }) {
         : null;
 
   return (
-    <div data-testid="query-disclosure" className="rounded-lg border border-slate-700 bg-slate-900/60 p-4">
+    <div data-testid="query-disclosure" className="rounded-lg border border-surface-border-strong bg-surface-card p-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-medium text-slate-200">The query that ran</h3>
+        <h3 className="text-sm font-medium text-fg-primary">The query that ran</h3>
         <div className="flex flex-wrap items-center gap-2 text-xs">
           {store ? (
-            <span className="rounded bg-slate-800 px-2 py-0.5 text-slate-300">against {store}</span>
+            <span className="rounded bg-surface-elevated px-2 py-0.5 text-fg-secondary">against {store}</span>
           ) : (
             // Not a guess: an execution that never reached a store has no
             // "nothing matched" to report, and saying so is the difference
@@ -461,14 +461,14 @@ function QueryDisclosure({ answer }: { answer: NlQueryExecuteResponse }) {
               no store was reached
             </span>
           )}
-          <span className="rounded bg-slate-800 px-2 py-0.5 uppercase text-slate-400">
+          <span className="rounded bg-surface-elevated px-2 py-0.5 uppercase text-fg-secondary">
             {answer.executed_query_language ?? 'unknown'}
           </span>
           <span
             className={
               answer.engine === 'llm'
                 ? 'rounded bg-violet-500/10 px-2 py-0.5 text-violet-300 ring-1 ring-violet-500/30'
-                : 'rounded bg-slate-800 px-2 py-0.5 text-slate-400'
+                : 'rounded bg-surface-elevated px-2 py-0.5 text-fg-secondary'
             }
           >
             {answer.engine === 'llm' ? 'model-assisted translation' : 'deterministic translation'}
@@ -477,7 +477,7 @@ function QueryDisclosure({ answer }: { answer: NlQueryExecuteResponse }) {
       </div>
 
       {answer.executed_query ? (
-        <pre className="mt-3 overflow-x-auto rounded bg-slate-950 p-3 font-mono text-xs text-slate-200">
+        <pre className="mt-3 overflow-x-auto rounded bg-surface-base p-3 font-mono text-xs text-fg-primary">
           {answer.executed_query}
         </pre>
       ) : (
@@ -488,15 +488,15 @@ function QueryDisclosure({ answer }: { answer: NlQueryExecuteResponse }) {
 
       {Object.keys(answer.executed_query_params).length > 0 ? (
         <div className="mt-3">
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-fg-secondary">
             Bound values. These are sent separately from the text above, so no
             value is ever part of the query.
           </p>
           <dl className="mt-1 grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 font-mono text-xs">
             {Object.entries(answer.executed_query_params).map(([key, value]) => (
               <Fragment key={key}>
-                <dt className="text-slate-500">{key}</dt>
-                <dd className="truncate text-slate-200">{formatCell(value)}</dd>
+                <dt className="text-fg-muted">{key}</dt>
+                <dd className="truncate text-fg-primary">{formatCell(value)}</dd>
               </Fragment>
             ))}
           </dl>
@@ -515,7 +515,7 @@ function QueryDisclosure({ answer }: { answer: NlQueryExecuteResponse }) {
       ) : null}
 
       {answer.explanation ? (
-        <p className="mt-3 text-xs text-slate-400">{answer.explanation}</p>
+        <p className="mt-3 text-xs text-fg-secondary">{answer.explanation}</p>
       ) : null}
     </div>
   );
@@ -544,15 +544,15 @@ function CrossFilters({
           new Set(rows.map((row) => String(row[index] ?? '')).filter((v) => v !== '' && v !== 'null')),
         ).sort();
         return (
-          <label key={facet} className="text-xs text-slate-400">
+          <label key={facet} className="text-xs text-fg-secondary">
             <span className="mb-1 block">
-              {FACET_LABEL[facet]} <span className="font-mono text-slate-600">({column})</span>
+              {FACET_LABEL[facet]} <span className="font-mono text-fg-subtle">({column})</span>
             </span>
             <select
               aria-label={`Filter by ${FACET_LABEL[facet].toLowerCase()}`}
               value={active[facet] ?? ''}
               onChange={(e) => onChange({ ...active, [facet]: e.target.value || undefined })}
-              className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-xs text-slate-200"
+              className="rounded border border-surface-border-strong bg-surface-card px-2 py-1 text-xs text-fg-primary"
             >
               <option value="">All ({values.length})</option>
               {values.slice(0, 200).map((value) => (
@@ -568,7 +568,7 @@ function CrossFilters({
         <button
           type="button"
           onClick={() => onChange({})}
-          className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:border-slate-500"
+          className="rounded border border-surface-border-strong px-2 py-1 text-xs text-fg-secondary hover:border-surface-border-strong"
         >
           Clear filters
         </button>
@@ -638,7 +638,7 @@ function ResultsPanel({
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-slate-500" aria-live="polite">
+        <p className="text-xs text-fg-muted" aria-live="polite">
           {rows.length === totalBeforeFilter
             ? `${meta.rowCount} row${meta.rowCount === 1 ? '' : 's'}`
             : `${rows.length} of ${totalBeforeFilter} rows after filtering`}
@@ -649,7 +649,7 @@ function ResultsPanel({
           {entityValue ? (
             <a
               href={`/graph?entity=${encodeURIComponent(entityValue[1] as string)}`}
-              className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:border-slate-500"
+              className="rounded border border-surface-border-strong px-2 py-1 text-xs text-fg-secondary hover:border-surface-border-strong"
             >
               Open in graph
             </a>
@@ -657,31 +657,31 @@ function ResultsPanel({
           <button
             type="button"
             onClick={onExport}
-            className="rounded border border-slate-700 px-2 py-1 text-xs text-slate-300 hover:border-slate-500"
+            className="rounded border border-surface-border-strong px-2 py-1 text-xs text-fg-secondary hover:border-surface-border-strong"
           >
             Export CSV
           </button>
         </div>
       </div>
-      <div className="overflow-x-auto rounded-lg border border-slate-700">
-        <table className="min-w-full divide-y divide-slate-700 text-left text-xs">
-          <thead className="bg-slate-800/60">
+      <div className="overflow-x-auto rounded-lg border border-surface-border-strong">
+        <table className="min-w-full divide-y divide-surface-border text-left text-xs">
+          <thead className="bg-surface-sunken">
             <tr>
               {columns.map((col) => (
-                <th key={col} scope="col" className="px-3 py-2 font-medium text-slate-300">
+                <th key={col} scope="col" className="px-3 py-2 font-medium text-fg-secondary">
                   {col}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800">
+          <tbody className="divide-y divide-surface-border">
             {rows.map((row, ri) => (
-              <tr key={ri} className="hover:bg-slate-800/40">
+              <tr key={ri} className="hover:bg-surface-sunken/50">
                 {row.map((cell, ci) => {
                   const facet = facetIndex.get(ci);
                   const text = formatCell(cell);
                   return (
-                    <td key={ci} className="px-3 py-2 font-mono text-slate-200">
+                    <td key={ci} className="px-3 py-2 font-mono text-fg-primary">
                       {facet && text !== '—' ? (
                         <button
                           type="button"

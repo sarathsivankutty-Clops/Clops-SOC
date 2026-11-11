@@ -319,22 +319,22 @@ export function RealtimeGraph({
     <div
       className={
         className ??
-        'flex h-full w-full flex-col rounded-xl border border-white/5 bg-slate-900/60'
+        'flex h-full w-full flex-col rounded-xl border border-surface-border bg-surface-card'
       }
     >
-      <header className="flex items-center justify-between gap-3 border-b border-white/5 px-4 py-2 text-xs text-slate-300">
+      <header className="flex items-center justify-between gap-3 border-b border-surface-border px-4 py-2 text-xs text-fg-secondary">
         <div className="flex items-center gap-2">
           <StatusDot status={status} />
           <span>{statusLabel}</span>
-          <span className="text-slate-500">·</span>
+          <span className="text-fg-muted">·</span>
           <span>
             {stats.nodes} node{stats.nodes === 1 ? '' : 's'}
           </span>
-          <span className="text-slate-500">·</span>
+          <span className="text-fg-muted">·</span>
           <span>
             {stats.edges} edge{stats.edges === 1 ? '' : 's'}
           </span>
-          <span className="text-slate-500">·</span>
+          <span className="text-fg-muted">·</span>
           <span>
             {events.length} event{events.length === 1 ? '' : 's'} buffered
           </span>
@@ -343,14 +343,14 @@ export function RealtimeGraph({
           <button
             type="button"
             onClick={onRelayout}
-            className="rounded border border-white/10 px-2 py-1 text-[10px] uppercase tracking-wider text-slate-300 hover:border-white/30"
+            className="rounded border border-surface-border px-2 py-1 text-[10px] uppercase tracking-wider text-fg-secondary hover:border-surface-border"
           >
             Re-layout
           </button>
           <button
             type="button"
             onClick={onClear}
-            className="rounded border border-white/10 px-2 py-1 text-[10px] uppercase tracking-wider text-slate-300 hover:border-white/30"
+            className="rounded border border-surface-border px-2 py-1 text-[10px] uppercase tracking-wider text-fg-secondary hover:border-surface-border"
           >
             Clear
           </button>

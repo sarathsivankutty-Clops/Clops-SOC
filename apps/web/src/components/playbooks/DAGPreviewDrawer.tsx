@@ -65,9 +65,9 @@ export function DAGPreviewDrawer({ playbook, onClose, onFork, forking }: DAGPrev
       />
 
       {/* Drawer panel */}
-      <aside className="w-full max-w-3xl bg-gray-950 border-l border-gray-800 shadow-2xl flex flex-col">
+      <aside className="w-full max-w-3xl bg-surface-sunken border-l border-surface-border shadow-2xl flex flex-col">
         {/* Header */}
-        <header className="flex items-start justify-between gap-3 border-b border-gray-800 px-6 py-4">
+        <header className="flex items-start justify-between gap-3 border-b border-surface-border px-6 py-4">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               {isPack && (
@@ -83,13 +83,13 @@ export function DAGPreviewDrawer({ playbook, onClose, onFork, forking }: DAGPrev
                   {categoryLabel(cat)}
                 </span>
               )}
-              <h2 className="text-base font-semibold text-white truncate">{playbook.name}</h2>
-              <span className="text-xs text-gray-500">v{playbook.version}</span>
+              <h2 className="text-base font-semibold text-fg-primary truncate">{playbook.name}</h2>
+              <span className="text-xs text-fg-muted">v{playbook.version}</span>
             </div>
             {playbook.description && (
-              <p className="text-sm text-gray-400 mt-1.5">{playbook.description}</p>
+              <p className="text-sm text-fg-muted mt-1.5">{playbook.description}</p>
             )}
-            <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+            <div className="flex items-center gap-3 mt-2 text-xs text-fg-muted">
               <span>{playbook.steps.length} steps</span>
               <span aria-hidden="true">·</span>
               <span>Trigger: {triggerLabel}</span>
@@ -104,22 +104,22 @@ export function DAGPreviewDrawer({ playbook, onClose, onFork, forking }: DAGPrev
           <button
             onClick={onClose}
             aria-label="Close"
-            className="text-gray-500 hover:text-gray-200 transition-colors text-xl leading-none px-2 py-1"
+            className="text-fg-muted hover:text-fg-primary transition-colors text-xl leading-none px-2 py-1"
           >
             ×
           </button>
         </header>
 
         {/* DAG canvas — read-only */}
-        <div className="flex-1 min-h-0 bg-gray-950">
+        <div className="flex-1 min-h-0 bg-surface-sunken">
           {playbook.steps.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-sm text-gray-600">
+            <div className="h-full flex items-center justify-center text-sm text-fg-faint">
               This playbook has no steps yet.
             </div>
           ) : (
             <Suspense
               fallback={
-                <div className="h-full flex items-center justify-center text-sm text-gray-600">
+                <div className="h-full flex items-center justify-center text-sm text-fg-faint">
                   Loading DAG preview…
                 </div>
               }
@@ -135,8 +135,8 @@ export function DAGPreviewDrawer({ playbook, onClose, onFork, forking }: DAGPrev
         </div>
 
         {/* Action bar */}
-        <footer className="border-t border-gray-800 px-6 py-3 flex items-center justify-between">
-          <p className="text-xs text-gray-500">
+        <footer className="border-t border-surface-border px-6 py-3 flex items-center justify-between">
+          <p className="text-xs text-fg-muted">
             {isPack
               ? 'Fork to make a local copy you can edit and enable.'
               : 'Open in editor to modify steps.'}
@@ -153,7 +153,7 @@ export function DAGPreviewDrawer({ playbook, onClose, onFork, forking }: DAGPrev
             )}
             <Link
               href={`/playbooks/${playbook.id}`}
-              className="px-3 py-1.5 rounded-md border border-gray-700 text-gray-200 hover:bg-gray-800 text-sm font-medium transition-colors"
+              className="px-3 py-1.5 rounded-md border border-surface-border text-fg-primary hover:bg-surface-elevated text-sm font-medium transition-colors"
             >
               {isPack ? 'View source' : 'Open editor'}
             </Link>

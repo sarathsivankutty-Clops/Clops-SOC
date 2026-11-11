@@ -1,0 +1,99 @@
+###############################################################################
+# AiSOC - Optional Enterprise Keycloak Identity Provider Compose Overlay
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f infra/compose/docker-compose.keycloak.yml up -d
+#
+# Production / AWS EC2 notes:
+#   - Set KEYCLOAK_START_COMMAND=start in .env when running behind a TLS
+#     reverse proxy or AWS ALB.
+#   - Set KEYCLOAK_DB_PASSWORD and KEYCLOAK_ADMIN_PASSWORD in .env (enforced
+#     via :? fail-fast interpolation; containers refuse to boot if unset).
+#   - All ports, addresses, resource limits, and hostnames are injected via
+#     environment variables. Zero secrets or paths are hardcoded.
+###############################################################################
+
+volumes:
+  keycloak_postgres_data:
+
+services:
+  keycloak-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    stop_grace_period: 30s
+    shm_size: ${KEYCLOAK_DB_SHM_SIZE:-128mb}
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      POSTGRES_DB: ${KEYCLOAK_DB_NAME:-keycloak}
+      POSTGRES_USER: ${KEYCLOAK_DB_USER:-keycloak}
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?KEYCLOAK_DB_PASSWORD must be set}
+    volumes:
+      - keycloak_postgres_data:/var/lib/postgresql/data
+    networks:
+      - aisoc
+    deploy:
+      resources:
+        limits:
+          memory: ${KEYCLOAK_DB_MEMORY_LIMIT:-512M}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "25m"
+        max-file: "5"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    restart: unless-stopped
+    stop_grace_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    command:
+      - ${KEYCLOAK_START_COMMAND:-start-dev}
+      - --health-enabled=true
+      - --metrics-enabled=true
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/${KEYCLOAK_DB_NAME:-keycloak}
+      KC_DB_USERNAME: ${KEYCLOAK_DB_USER:-keycloak}
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?KEYCLOAK_DB_PASSWORD must be set}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USER:-admin}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:?KEYCLOAK_ADMIN_PASSWORD must be set}
+      KC_HTTP_ENABLED: ${KEYCLOAK_HTTP_ENABLED:-true}
+      KC_HOSTNAME_STRICT: ${KEYCLOAK_HOSTNAME_STRICT:-false}
+      KC_PROXY_HEADERS: ${KEYCLOAK_PROXY_HEADERS:-xforwarded}
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: ${KEYCLOAK_METRICS_ENABLED:-true}
+      KC_LOG_LEVEL: ${KEYCLOAK_LOG_LEVEL:-INFO}
+    ports:
+      - "${AISOC_BIND_ADDR:-127.0.0.1}:${KEYCLOAK_HTTP_PORT:-8081}:8080"
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    networks:
+      - aisoc
+    deploy:
+      resources:
+        limits:
+          memory: ${KEYCLOAK_MEMORY_LIMIT:-1536M}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "25m"
+        max-file: "5"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "exec 3<>/dev/tcp/127.0.0.1/9000; echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3; grep -q '200' <&3",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 40s

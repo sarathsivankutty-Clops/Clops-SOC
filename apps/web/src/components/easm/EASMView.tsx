@@ -31,7 +31,7 @@ const RISK_CONFIG: Record<RiskLevel, { label: string; className: string }> = {
   high: { label: 'High', className: 'text-orange-400 bg-orange-500/10 border-orange-500/20' },
   medium: { label: 'Medium', className: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20' },
   low: { label: 'Low', className: 'text-blue-400 bg-blue-500/10 border-blue-500/20' },
-  info: { label: 'Info', className: 'text-gray-400 bg-gray-500/10 border-gray-500/20' },
+  info: { label: 'Info', className: 'text-fg-muted bg-gray-500/10 border-surface-border-strong/20' },
 };
 
 const STATUS_COLOR: Record<Asset['status'], string> = {
@@ -96,11 +96,11 @@ function NotYetWired({ title, description }: { title: string; description: strin
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-gray-100">{title}</h1>
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-xl font-semibold text-gray-100 */>{title}</h1>
       </div>
-      <div className="rounded-lg border border-gray-800 bg-gray-950/40 p-8 text-center">
-        <p className="text-sm font-medium text-gray-300">Not available yet</p>
-        <p className="mx-auto mt-2 max-w-lg text-sm text-gray-500">{description}</p>
+      <div className="rounded-lg border border-surface-border bg-surface-base/40 p-8 text-center">
+        <p className="text-sm font-medium text-fg-secondary">Not available yet</p>
+        <p className="mx-auto mt-2 max-w-lg text-sm text-fg-subtle">{description}</p>
       </div>
     </div>
   );
@@ -131,8 +131,8 @@ export function EASMView() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-semibold text-gray-100">External Attack Surface Management</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Monitor external assets, exposed services, and certificate health</p>
+        <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-xl font-semibold text-gray-100 */>External Attack Surface Management</h1>
+        <p className="text-sm text-fg-subtle mt-0.5">Monitor external assets, exposed services, and certificate health</p>
       </div>
 
       {/* Summary Cards */}
@@ -143,19 +143,19 @@ export function EASMView() {
           { label: 'Certificate Issues', value: SUMMARY.certIssues, color: 'text-red-400' },
           { label: 'Risk Score', value: `${SUMMARY.riskScore}/100`, color: SUMMARY.riskScore >= 70 ? 'text-amber-400' : 'text-green-400' },
         ].map((card) => (
-          <div key={card.label} className="bg-gray-900/60 border border-gray-800/60 rounded-xl p-4">
+          <div key={card.label} className="bg-surface-card/60 border border-surface-border/60 rounded-xl p-4">
             <p className={clsx('text-2xl font-bold', card.color)}>{card.value}</p>
-            <p className="text-xs text-gray-500 mt-0.5">{card.label}</p>
+            <p className="text-xs text-fg-subtle mt-0.5">{card.label}</p>
           </div>
         ))}
       </div>
 
       {/* Asset Discovery Table */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-800/60 flex items-center justify-between">
+      <div className="bg-surface-card/60 border border-surface-border/60 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-surface-border/60 flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-semibold text-gray-200">Asset Discovery</h2>
-            <p className="text-xs text-gray-500 mt-0.5">{filteredAssets.length} assets found</p>
+            <h2 className="text-sm font-semibold text-fg-primary">Asset Discovery</h2>
+            <p className="text-xs text-fg-subtle mt-0.5">{filteredAssets.length} assets found</p>
           </div>
           <div className="flex gap-2">
             {(['all', 'healthy', 'warning', 'critical'] as const).map((f) => (
@@ -166,7 +166,7 @@ export function EASMView() {
                   'text-xs px-3 py-1 rounded-lg border transition-colors',
                   assetFilter === f
                     ? 'bg-blue-600/15 text-blue-300 border-blue-600/30'
-                    : 'text-gray-400 border-gray-800 hover:border-gray-700'
+                    : 'text-fg-muted border-surface-border hover:border-surface-border'
                 )}
               >
                 {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
@@ -177,12 +177,12 @@ export function EASMView() {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800/40">
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Asset</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Type</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Status</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Risk</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Last Seen</th>
+              <tr className="border-b border-surface-border/40">
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Asset</th>
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Type</th>
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Status</th>
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Risk</th>
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Last Seen</th>
               </tr>
             </thead>
             <tbody>
@@ -197,7 +197,7 @@ export function EASMView() {
                         <button
                           type="button"
                           onClick={() => setAssetFilter('all')}
-                          className="rounded-lg bg-gray-800 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 transition-colors"
+                          className="rounded-lg bg-surface-elevated px-4 py-2 text-sm text-fg-primary hover:bg-surface-hover transition-colors"
                         >
                           Show all assets
                         </button>
@@ -207,11 +207,11 @@ export function EASMView() {
                 </tr>
               ) : (
                 filteredAssets.map((asset) => (
-                  <tr key={asset.id} className="border-b border-gray-800/30 hover:bg-gray-800/30 transition-colors">
+                  <tr key={asset.id} className="border-b border-surface-border/30 hover:bg-surface-elevated/30 transition-colors">
                     <td className="px-5 py-3">
-                      <span className="text-gray-200 font-mono text-xs">{asset.asset}</span>
+                      <span className="text-fg-primary font-mono text-xs">{asset.asset}</span>
                     </td>
-                    <td className="px-5 py-3 text-gray-400 text-xs">{TYPE_LABELS[asset.type]}</td>
+                    <td className="px-5 py-3 text-fg-muted text-xs">{TYPE_LABELS[asset.type]}</td>
                     <td className="px-5 py-3">
                       <span className={clsx('text-xs font-medium px-2 py-0.5 rounded border', STATUS_COLOR[asset.status])}>
                         {asset.status.charAt(0).toUpperCase() + asset.status.slice(1)}
@@ -222,7 +222,7 @@ export function EASMView() {
                         {RISK_CONFIG[asset.risk].label}
                       </span>
                     </td>
-                    <td className="px-5 py-3 text-xs text-gray-500">{asset.lastSeen}</td>
+                    <td className="px-5 py-3 text-xs text-fg-subtle">{asset.lastSeen}</td>
                   </tr>
                 ))
               )}
@@ -232,30 +232,30 @@ export function EASMView() {
       </div>
 
       {/* Certificate Monitor */}
-      <div className="bg-gray-900/60 border border-gray-800/60 rounded-xl overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-800/60">
-          <h2 className="text-sm font-semibold text-gray-200">Certificate Monitor</h2>
-          <p className="text-xs text-gray-500 mt-0.5">Track TLS certificate health and expiry dates</p>
+      <div className="bg-surface-card/60 border border-surface-border/60 rounded-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-surface-border/60">
+          <h2 className="text-sm font-semibold text-fg-primary">Certificate Monitor</h2>
+          <p className="text-xs text-fg-subtle mt-0.5">Track TLS certificate health and expiry dates</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-gray-800/40">
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Domain</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Issuer</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Expiry Date</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Days Remaining</th>
-                <th className="text-left text-xs font-medium text-gray-500 px-5 py-3">Status</th>
+              <tr className="border-b border-surface-border/40">
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Domain</th>
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Issuer</th>
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Expiry Date</th>
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Days Remaining</th>
+                <th className="text-left text-xs font-medium text-fg-subtle px-5 py-3">Status</th>
               </tr>
             </thead>
             <tbody>
               {MOCK_CERTIFICATES.map((cert) => (
-                <tr key={cert.id} className="border-b border-gray-800/30 hover:bg-gray-800/30 transition-colors">
+                <tr key={cert.id} className="border-b border-surface-border/30 hover:bg-surface-elevated/30 transition-colors">
                   <td className="px-5 py-3">
-                    <span className="text-gray-200 font-mono text-xs">{cert.domain}</span>
+                    <span className="text-fg-primary font-mono text-xs">{cert.domain}</span>
                   </td>
-                  <td className="px-5 py-3 text-gray-400 text-xs">{cert.issuer}</td>
-                  <td className="px-5 py-3 text-gray-400 text-xs">{cert.expiryDate}</td>
+                  <td className="px-5 py-3 text-fg-muted text-xs">{cert.issuer}</td>
+                  <td className="px-5 py-3 text-fg-muted text-xs">{cert.expiryDate}</td>
                   <td className="px-5 py-3">
                     <span className={clsx(
                       'text-xs font-medium',

@@ -57,7 +57,7 @@ import { EnabledToggle, RunButton, deletePlaybook } from './rowActions';
 const TRIGGER_COLORS: Record<string, string> = {
   alert:    'bg-red-900/40 text-red-300 border-red-800',
   case:     'bg-blue-900/40 text-blue-300 border-blue-800',
-  manual:   'bg-gray-800 text-gray-400 border-gray-700',
+  manual:   'bg-surface-elevated text-fg-muted border-surface-border',
   schedule: 'bg-purple-900/40 text-purple-300 border-purple-800',
 };
 
@@ -75,9 +75,11 @@ interface PlaybooksGalleryProps {
   playbooks: Playbook[];
   /** Pre-seed local filter state from a saved view preset. */
   initialFilters?: Partial<PlaybookGalleryFilters>;
+  /** Open the inline Runbook Studio drawer to edit any runbook in place. */
+  onEditRunbook?: (playbook: Playbook) => void;
 }
 
-export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGalleryProps) {
+export function PlaybooksGallery({ playbooks, initialFilters, onEditRunbook }: PlaybooksGalleryProps) {
   const router = useRouter();
   const [source, setSource] = useState<PlaybookSource>(initialFilters?.source ?? 'all');
   const [category, setCategory] = useState<PackCategory | 'all'>(initialFilters?.category ?? 'all');
@@ -204,14 +206,14 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
             type="search"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search playbooks by name, tag, description…"
+            placeholder="Search runbooks by name, AWS CloudTrail, Security Hub, tag, description…"
             aria-label="Search playbooks"
-            className="flex-1 rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+            className="flex-1 rounded-lg border border-surface-border bg-surface-card px-3 py-2 text-sm text-fg-primary placeholder-fg-faint focus:border-brand-500 focus:outline-none"
           />
         </div>
 
         <div
-          className="flex gap-1 rounded-lg border border-gray-700 bg-gray-900 p-1"
+          className="flex gap-1 rounded-lg border border-surface-border bg-surface-card p-1"
           role="tablist"
           aria-label="Playbook source"
         >
@@ -239,7 +241,7 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
         {hasActiveFilters && (
           <button
             onClick={clearAllFilters}
-            className="text-xs text-gray-500 hover:text-red-400 transition-colors px-2 py-1 rounded border border-gray-800 hover:border-red-900"
+            className="text-xs text-fg-muted hover:text-red-400 transition-colors px-2 py-1 rounded border border-surface-border hover:border-red-900"
           >
             Clear filters
           </button>
@@ -249,7 +251,7 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
       {/* Category facet (only when a category is meaningful) */}
       {showCategoryRow && (
         <div className="flex flex-wrap items-center gap-2" aria-label="Filter by category">
-          <span className="text-xs text-gray-600 w-16 shrink-0">Category</span>
+          <span className="text-xs text-fg-faint w-16 shrink-0">Category</span>
           <CategoryPill
             label="All"
             active={category === 'all'}
@@ -273,7 +275,7 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
 
       {/* MITRE Tactic filter */}
       <div className="flex flex-wrap items-center gap-2" aria-label="Filter by MITRE tactic">
-        <span className="text-xs text-gray-600 w-16 shrink-0">MITRE</span>
+        <span className="text-xs text-fg-faint w-16 shrink-0">MITRE</span>
         <FacetPill
           label="All"
           active={mitreTactic === 'all'}
@@ -296,7 +298,7 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
 
       {/* Severity filter */}
       <div className="flex flex-wrap items-center gap-2" aria-label="Filter by severity">
-        <span className="text-xs text-gray-600 w-16 shrink-0">Severity</span>
+        <span className="text-xs text-fg-faint w-16 shrink-0">Severity</span>
         <FacetPill
           label="All"
           active={severity === 'all'}
@@ -307,7 +309,7 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
           if (n === 0) return null;
           const COLOR_MAP: Record<SeverityLevel, string> = {
             info:     'bg-blue-900/40 text-blue-300 border-blue-800',
-            low:      'bg-gray-800/60 text-gray-300 border-gray-600',
+            low:      'bg-surface-elevated/60 text-fg-secondary border-surface-border',
             medium:   'bg-yellow-900/40 text-yellow-300 border-yellow-800',
             high:     'bg-orange-900/40 text-orange-300 border-orange-800',
             critical: 'bg-red-900/60 text-red-200 border-red-700',
@@ -326,7 +328,7 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
 
       {/* Integration filter */}
       <div className="flex flex-wrap items-center gap-2" aria-label="Filter by integration">
-        <span className="text-xs text-gray-600 w-16 shrink-0">Uses</span>
+        <span className="text-xs text-fg-faint w-16 shrink-0">Uses</span>
         <FacetPill
           label="All"
           active={integration === 'all'}
@@ -359,15 +361,15 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
       {/* Empty state */}
       {filtered.length === 0 && (
         <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="text-lg font-medium text-gray-400 mb-2">No matching playbooks</div>
-          <div className="text-sm text-gray-600 mb-6">
-            Try clearing your filters, or create a new playbook from scratch.
+          <div className="text-lg font-medium text-fg-muted mb-2">No matching runbooks</div>
+          <div className="text-sm text-fg-faint mb-6">
+            Try clearing your filters, or create a new runbook from scratch.
           </div>
           <Link
             href="/playbooks/new"
             className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm transition-colors"
           >
-            Create a playbook
+            Create a runbook
           </Link>
         </div>
       )}
@@ -382,6 +384,7 @@ export function PlaybooksGallery({ playbooks, initialFilters }: PlaybooksGallery
               forking={forkingId === pb.id}
               onPreview={() => setPreviewing(pb)}
               onFork={() => handleFork(pb)}
+              onEdit={onEditRunbook ? () => onEditRunbook(pb) : undefined}
             />
           ))}
         </div>
@@ -417,7 +420,7 @@ function FacetPill({
         'rounded-full px-3 py-0.5 text-xs font-medium border transition-colors',
         active
           ? activeClass ?? 'bg-blue-900/40 text-blue-200 border-blue-700'
-          : 'border-gray-800 text-gray-500 hover:text-gray-300 hover:border-gray-700',
+          : 'border-surface-border text-fg-muted hover:text-fg-secondary hover:border-surface-border',
       )}
     >
       {label}
@@ -451,7 +454,7 @@ function SourcePill({
           ? tone === 'pack'
             ? 'bg-purple-700 text-white'
             : 'bg-blue-600 text-white'
-          : 'text-gray-400 hover:text-gray-200',
+          : 'text-fg-muted hover:text-fg-primary',
       )}
     >
       {label} ({count})
@@ -476,7 +479,7 @@ function CategoryPill({
       onClick={onClick}
       className={clsx(
         'rounded-full px-3 py-1 text-xs font-medium border transition-colors',
-        active ? activeClasses : 'border-gray-800 text-gray-500 hover:text-gray-300 hover:border-gray-700',
+        active ? activeClasses : 'border-surface-border text-fg-muted hover:text-fg-secondary hover:border-surface-border',
       )}
     >
       {label}
@@ -486,16 +489,41 @@ function CategoryPill({
 
 /* ─────────────────────────── Row ─────────────────────────── */
 
+function stepRolePillClass(type: string): string {
+  if (type === 'investigate' || type === 'ask_model') {
+    return 'border-emerald-700/60 bg-emerald-950/50 text-emerald-300';
+  }
+  if (type === 'approval' || type === 'verify_user') {
+    return 'border-amber-700/60 bg-amber-950/50 text-amber-300';
+  }
+  if (type === 'enrich' || type === 'search_siem' || type === 'osquery_live_query') {
+    return 'border-sky-700/60 bg-sky-950/50 text-sky-300';
+  }
+  if (
+    type === 'isolate_host' ||
+    type === 'block_ip' ||
+    type === 'block_ioc' ||
+    type === 'disable_user' ||
+    type === 'revoke_session' ||
+    type === 'reset_password'
+  ) {
+    return 'border-rose-700/60 bg-rose-950/50 text-rose-300';
+  }
+  return 'border-surface-border bg-surface-elevated/70 text-fg-secondary';
+}
+
 function PlaybookRow({
   playbook,
   forking,
   onPreview,
   onFork,
+  onEdit,
 }: {
   playbook: Playbook;
   forking: boolean;
   onPreview: () => void;
   onFork: () => void;
+  onEdit?: () => void;
 }) {
   const isPack = isShippedPack(playbook);
   const cat = categoryOf(playbook);
@@ -503,10 +531,18 @@ function PlaybookRow({
   const tactics = mitreTacticsOf(playbook);
   const sevs = severitiesOf(playbook);
   const integrations = integrationsOf(playbook);
+  const tagsLower = (playbook.tags ?? []).map((t) => t.toLowerCase());
+  const hasAiRca = playbook.steps.some(
+    (s) => s.type === 'investigate' || s.type === 'ask_model' || s.type === 'search_siem',
+  );
+  const hasApprovalGate = playbook.steps.some((s) => s.type === 'approval');
+  const isAwsCloudTrail = tagsLower.includes('cloudtrail') || tagsLower.includes('aws-cloudtrail');
+  const isAwsSecurityHub = tagsLower.includes('securityhub') || tagsLower.includes('aws-securityhub');
+  const isAwsGuardDuty = tagsLower.includes('guardduty') || tagsLower.includes('aws-guardduty');
 
   const SEVERITY_MINI: Record<SeverityLevel, string> = {
     info:     'bg-blue-900/40 text-blue-400 border-blue-800',
-    low:      'bg-gray-800/60 text-gray-400 border-gray-700',
+    low:      'bg-surface-elevated/60 text-fg-muted border-surface-border',
     medium:   'bg-yellow-900/40 text-yellow-400 border-yellow-800',
     high:     'bg-orange-900/40 text-orange-400 border-orange-800',
     critical: 'bg-red-900/50 text-red-300 border-red-800',
@@ -515,19 +551,21 @@ function PlaybookRow({
   return (
     <div
       className={clsx(
-        'bg-gray-900/60 border rounded-xl px-5 py-4 flex items-center gap-4 transition-colors',
-        playbook.enabled ? 'border-gray-800 hover:border-gray-700' : 'border-gray-800/40 opacity-70',
+        'bg-surface-card/60 border rounded-xl px-5 py-4 flex items-start gap-4 transition-colors',
+        playbook.enabled ? 'border-surface-border hover:border-brand-500/40' : 'border-surface-border/40 opacity-70',
       )}
     >
-      <EnabledToggle playbook={playbook} />
+      <div className="pt-1">
+        <EnabledToggle playbook={playbook} />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
           {isPack && (
             <span
               className="text-[10px] font-semibold tracking-wide px-1.5 py-0.5 rounded border border-purple-700/60 bg-purple-900/40 text-purple-200"
-              title="Shipped reference pack — fork to customize."
+              title="Shipped reference runbook — click Edit Runbook to customize."
             >
-              PACK
+              RUNBOOK PACK
             </span>
           )}
           {cat && (
@@ -538,9 +576,40 @@ function PlaybookRow({
               {categoryLabel(cat)}
             </span>
           )}
+          {isAwsCloudTrail && (
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded border border-amber-700/60 bg-amber-950/50 text-amber-300">
+              AWS CloudTrail
+            </span>
+          )}
+          {isAwsSecurityHub && (
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded border border-cyan-700/60 bg-cyan-950/50 text-cyan-300">
+              AWS Security Hub
+            </span>
+          )}
+          {isAwsGuardDuty && (
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded border border-orange-700/60 bg-orange-950/50 text-orange-300">
+              AWS GuardDuty
+            </span>
+          )}
+          {hasAiRca && (
+            <span
+              className="text-[10px] font-semibold px-1.5 py-0.5 rounded border border-emerald-700/60 bg-emerald-950/50 text-emerald-300"
+              title="Includes automated AI Root Cause Analysis (RCA) & telemetry correlation"
+            >
+              ✦ AI RCA Ready
+            </span>
+          )}
+          {hasApprovalGate && (
+            <span
+              className="text-[10px] font-semibold px-1.5 py-0.5 rounded border border-amber-700/60 bg-amber-950/40 text-amber-200"
+              title="Suspends destructive actions until a human analyst approves"
+            >
+              ⏸ Approval Gate
+            </span>
+          )}
           <Link
             href={`/playbooks/${playbook.id}`}
-            className="text-white font-medium hover:text-blue-300 transition-colors truncate"
+            className="text-fg-primary font-medium hover:text-blue-300 transition-colors truncate"
           >
             {playbook.name}
           </Link>
@@ -549,18 +618,45 @@ function PlaybookRow({
               TRIGGER_COLORS[triggerOn] ?? TRIGGER_COLORS.manual
             }`}
           >
-            {triggerOn}
+            trigger: {triggerOn}
           </span>
           {!playbook.enabled && (
-            <span className="text-xs px-1.5 py-0.5 rounded border border-gray-700 text-gray-500">
+            <span className="text-xs px-1.5 py-0.5 rounded border border-surface-border text-fg-muted">
               disabled
             </span>
           )}
         </div>
         {playbook.description && (
-          <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{playbook.description}</p>
+          <p className="text-sm text-fg-muted mt-1 line-clamp-2">{playbook.description}</p>
         )}
-        <div className="flex items-center gap-3 mt-1 text-xs text-gray-700">
+
+        {/* Easy-to-understand Visual Step-by-Step RCA & Response Pipeline */}
+        {playbook.steps.length > 0 && (
+          <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+            <span className="text-[10px] font-semibold uppercase tracking-wider text-fg-faint mr-1">
+              RCA &amp; Response Flow:
+            </span>
+            {playbook.steps.map((s, idx) => (
+              <React.Fragment key={s.id || idx}>
+                <span
+                  className={clsx(
+                    'inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium',
+                    stepRolePillClass(s.type),
+                  )}
+                  title={`Step ${idx + 1} (${s.type}): ${s.name}`}
+                >
+                  <span className="font-mono text-[10px] opacity-75">{idx + 1}.</span>
+                  <span className="truncate max-w-[180px]">{s.name}</span>
+                </span>
+                {idx < playbook.steps.length - 1 && (
+                  <span className="text-fg-faint text-xs select-none">→</span>
+                )}
+              </React.Fragment>
+            ))}
+          </div>
+        )}
+
+        <div className="flex items-center gap-3 mt-2 text-xs text-fg-faint">
           <span>{playbook.steps.length} steps</span>
           <span>v{playbook.version}</span>
           {playbook.author && <span>by {playbook.author}</span>}
@@ -578,7 +674,7 @@ function PlaybookRow({
               </span>
             ))}
             {tactics.length > 3 && (
-              <span className="text-[9px] text-gray-600">+{tactics.length - 3} more</span>
+              <span className="text-[9px] text-fg-faint">+{tactics.length - 3} more</span>
             )}
             {sevs.map((s) => (
               <span
@@ -599,20 +695,37 @@ function PlaybookRow({
               </span>
             ))}
             {integrations.length > 2 && (
-              <span className="text-[9px] text-gray-600">+{integrations.length - 2} integrations</span>
+              <span className="text-[9px] text-fg-faint">+{integrations.length - 2} integrations</span>
             )}
           </div>
         )}
       </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 flex-shrink-0 pt-0.5">
         <RunButton playbook={playbook} />
         <button
           onClick={onPreview}
           aria-label={`Preview DAG for ${playbook.name}`}
-          className="text-xs px-2.5 py-1 rounded border border-gray-700 text-gray-300 hover:text-blue-300 hover:border-blue-800 transition-colors"
+          className="text-xs px-2.5 py-1 rounded border border-surface-border text-fg-secondary hover:text-blue-300 hover:border-blue-800 transition-colors"
         >
           Preview
         </button>
+        {onEdit ? (
+          <button
+            type="button"
+            onClick={onEdit}
+            aria-label={`Edit ${playbook.name}`}
+            className="text-xs px-2.5 py-1 rounded border border-brand-500/40 bg-brand-500/10 text-brand-300 hover:bg-brand-500/20 transition-colors font-medium"
+          >
+            Edit Runbook
+          </button>
+        ) : (
+          <Link
+            href={`/playbooks/${playbook.id}`}
+            className="text-xs px-2.5 py-1 rounded border border-brand-500/40 bg-brand-500/10 text-brand-300 hover:bg-brand-500/20 transition-colors font-medium"
+          >
+            Edit Runbook
+          </Link>
+        )}
         {isPack ? (
           <button
             onClick={onFork}
@@ -623,21 +736,13 @@ function PlaybookRow({
             {forking ? 'Forking…' : 'Fork'}
           </button>
         ) : (
-          <>
-            <Link
-              href={`/playbooks/${playbook.id}`}
-              className="text-xs px-2.5 py-1 rounded border border-gray-700 text-gray-400 hover:text-gray-200 hover:border-gray-600 transition-colors"
-            >
-              Edit
-            </Link>
-            <button
-              onClick={() => deletePlaybook(playbook.id)}
-              className="text-xs px-2.5 py-1 rounded border border-gray-800 text-gray-600 hover:text-red-400 hover:border-red-900 transition-colors"
-              aria-label={`Delete ${playbook.name}`}
-            >
-              Delete
-            </button>
-          </>
+          <button
+            onClick={() => deletePlaybook(playbook.id)}
+            className="text-xs px-2.5 py-1 rounded border border-surface-border text-fg-faint hover:text-red-400 hover:border-red-900 transition-colors"
+            aria-label={`Delete ${playbook.name}`}
+          >
+            Delete
+          </button>
         )}
       </div>
     </div>

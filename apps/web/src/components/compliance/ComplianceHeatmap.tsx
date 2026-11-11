@@ -22,7 +22,7 @@ const STATUS_COLORS: Record<string, string> = {
   collected: 'bg-blue-500',
   review: 'bg-yellow-500',
   rejected: 'bg-red-500',
-  missing: 'bg-gray-700',
+  missing: 'bg-surface-hover',
 };
 
 const STATUS_LABELS: Record<string, string> = {
@@ -56,7 +56,7 @@ export function ComplianceHeatmap({ framework }: Props) {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-48 text-gray-400">
+      <div className="flex items-center justify-center h-48 text-fg-muted">
         Loading heatmap…
       </div>
     );
@@ -82,15 +82,15 @@ export function ComplianceHeatmap({ framework }: Props) {
   const maxCount = Math.max(...allCounts, 1);
 
   return (
-    <div className="bg-gray-900 border border-gray-700 rounded-lg p-4 overflow-x-auto">
-      <h3 className="text-white font-semibold text-base mb-4">
+    <div className="bg-surface-card border border-surface-border rounded-lg p-4 overflow-x-auto">
+      <h3 className="text-fg-primary font-semibold text-base mb-4">
         {data.framework_name} — Control Coverage Heatmap
       </h3>
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 mb-4">
         {data.statuses.map((st) => (
-          <div key={st} className="flex items-center gap-1.5 text-xs text-gray-300">
+          <div key={st} className="flex items-center gap-1.5 text-xs text-fg-secondary">
             <span className={`w-3 h-3 rounded-sm ${STATUS_COLORS[st] ?? 'bg-gray-500'}`} />
             {STATUS_LABELS[st] ?? st}
           </div>
@@ -101,18 +101,18 @@ export function ComplianceHeatmap({ framework }: Props) {
       <table className="min-w-full text-xs border-separate border-spacing-0.5">
         <thead>
           <tr>
-            <th className="text-left text-gray-400 font-medium pr-3 pb-2 min-w-[180px]">
+            <th className="text-left text-fg-muted font-medium pr-3 pb-2 min-w-[180px]">
               Category
             </th>
             {data.statuses.map((st) => (
               <th
                 key={st}
-                className="text-center text-gray-400 font-medium pb-2 min-w-[70px]"
+                className="text-center text-fg-muted font-medium pb-2 min-w-[70px]"
               >
                 {STATUS_LABELS[st] ?? st}
               </th>
             ))}
-            <th className="text-right text-gray-400 font-medium pb-2 pl-3 min-w-[50px]">
+            <th className="text-right text-fg-muted font-medium pb-2 pl-3 min-w-[50px]">
               Total
             </th>
           </tr>
@@ -124,7 +124,7 @@ export function ComplianceHeatmap({ framework }: Props) {
 
             return (
               <tr key={cat}>
-                <td className="text-gray-300 pr-3 py-0.5 truncate max-w-[180px]" title={cat}>
+                <td className="text-fg-secondary pr-3 py-0.5 truncate max-w-[180px]" title={cat}>
                   {cat}
                 </td>
                 {data.statuses.map((st) => {
@@ -134,20 +134,20 @@ export function ComplianceHeatmap({ framework }: Props) {
                     <td key={st} className="text-center py-0.5">
                       {count > 0 ? (
                         <span
-                          className={`inline-flex items-center justify-center w-full h-7 rounded text-white font-medium ${color} ${intensityClass(count, maxCount)}`}
+                          className={`inline-flex items-center justify-center w-full h-7 rounded text-fg-primary font-medium ${color} ${intensityClass(count, maxCount)}`}
                           title={`${count} control(s) — ${STATUS_LABELS[st] ?? st}`}
                         >
                           {count}
                         </span>
                       ) : (
-                        <span className="inline-flex items-center justify-center w-full h-7 rounded text-gray-600 bg-gray-800">
+                        <span className="inline-flex items-center justify-center w-full h-7 rounded text-fg-secondary bg-surface-elevated">
                           —
                         </span>
                       )}
                     </td>
                   );
                 })}
-                <td className="text-right text-gray-400 pl-3 py-0.5 font-medium">
+                <td className="text-right text-fg-muted pl-3 py-0.5 font-medium">
                   {rowTotal}
                 </td>
               </tr>

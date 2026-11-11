@@ -58,7 +58,7 @@ const SEVERITY_TONE: Record<string, string> = {
   high: 'bg-orange-500/15 text-orange-300 border-orange-500/40',
   medium: 'bg-amber-500/15 text-amber-300 border-amber-500/40',
   low: 'bg-sky-500/15 text-sky-300 border-sky-500/40',
-  info: 'bg-gray-500/15 text-gray-300 border-gray-500/40',
+  info: 'bg-gray-500/15 text-fg-secondary border-surface-border-strong/40',
 };
 
 /**
@@ -223,14 +223,14 @@ export default function RuleTuningView({ initialSuggestion = 'all' }: RuleTuning
     <div className="space-y-8 p-6 max-w-7xl mx-auto">
       <header className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white">Detection Tuning</h1>
-          <p className="text-gray-400 mt-1 max-w-2xl">
+          <h1 className="co-page-title" /* [HIDDEN-UI P1 title-style-unified] was: text-2xl font-bold text-white */>Detection Tuning</h1>
+          <p className="text-fg-muted mt-1 max-w-2xl">
             Live tuning workbench for noisy or under-performing detection rules. Suggestions
             are scored from real false-positive rates, hit volume, and confidence — no more
             static dashboards.
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500">
+        <div className="flex items-center gap-2 text-xs text-fg-muted">
           {isValidating ? (
             <span className="inline-flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400 animate-pulse" />
@@ -242,7 +242,7 @@ export default function RuleTuningView({ initialSuggestion = 'all' }: RuleTuning
           <button
             type="button"
             onClick={() => mutate()}
-            className="rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-1.5 text-sm text-gray-200 hover:bg-gray-700 transition-colors"
+            className="rounded-lg border border-surface-border bg-surface-elevated/60 px-3 py-1.5 text-sm text-fg-primary hover:bg-surface-elevated transition-colors"
           >
             Refresh
           </button>
@@ -251,7 +251,7 @@ export default function RuleTuningView({ initialSuggestion = 'all' }: RuleTuning
 
       <SummaryCards summary={summary} isLoading={isLoading && !summary} />
 
-      <div className="rounded-xl border border-gray-800/60 bg-gray-900/40">
+      <div className="rounded-xl border border-surface-border/60 bg-surface-card/40">
         <FilterBar
           severity={severity}
           suggestion={suggestion}
@@ -313,7 +313,7 @@ export default function RuleTuningView({ initialSuggestion = 'all' }: RuleTuning
                     <button
                       type="button"
                       onClick={resetFilters}
-                      className="rounded-lg bg-gray-800 px-4 py-2 text-sm text-gray-200 hover:bg-gray-700 transition-colors"
+                      className="rounded-lg bg-surface-elevated px-4 py-2 text-sm text-fg-primary hover:bg-surface-elevated transition-colors"
                     >
                       Clear filters
                     </button>
@@ -359,7 +359,7 @@ function SummaryCards({ summary, isLoading }: SummaryCardsProps) {
         {Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4"
+            className="rounded-xl border border-surface-border/60 bg-surface-card/40 p-4"
           >
             <Skeleton className="w-24 h-3" />
             <Skeleton className="w-20 h-7 mt-2" />
@@ -407,13 +407,13 @@ function SummaryCards({ summary, isLoading }: SummaryCardsProps) {
       {cards.map((c) => (
         <div
           key={c.label}
-          className="rounded-xl border border-gray-800/60 bg-gray-900/40 p-4"
+          className="rounded-xl border border-surface-border/60 bg-surface-card/40 p-4"
         >
-          <p className="text-xs text-gray-400 uppercase tracking-wider">{c.label}</p>
-          <p className={clsx('mt-1 text-2xl font-semibold text-white', c.tone)}>
+          <p className="text-xs text-fg-muted uppercase tracking-wider">{c.label}</p>
+          <p className={clsx('mt-1 text-2xl font-semibold text-fg-primary', c.tone)}>
             {c.value}
           </p>
-          <p className="mt-1 text-xs text-gray-500">{c.hint}</p>
+          <p className="mt-1 text-xs text-fg-muted">{c.hint}</p>
         </div>
       ))}
     </div>
@@ -452,14 +452,14 @@ function FilterBar({
   filtersDirty,
 }: FilterBarProps) {
   return (
-    <div className="border-b border-gray-800/60 px-5 py-4 flex flex-wrap items-center gap-3">
+    <div className="border-b border-surface-border/60 px-5 py-4 flex flex-wrap items-center gap-3">
       <input
         type="search"
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         placeholder="Search rules…"
         aria-label="Search rules"
-        className="w-56 rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-1.5 text-sm text-gray-200 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+        className="w-56 rounded-lg border border-surface-border bg-surface-elevated/60 px-3 py-1.5 text-sm text-fg-primary placeholder-fg-faint focus:border-brand-500 focus:outline-none"
       />
 
       <label className="sr-only" htmlFor="suggestion-filter">
@@ -469,7 +469,7 @@ function FilterBar({
         id="suggestion-filter"
         value={suggestion}
         onChange={(e) => onSuggestionChange(e.target.value as SuggestionFilter)}
-        className="rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-1.5 text-sm text-gray-200 focus:border-blue-500 focus:outline-none"
+        className="rounded-lg border border-surface-border bg-surface-elevated/60 px-3 py-1.5 text-sm text-fg-primary focus:border-brand-500 focus:outline-none"
       >
         {SUGGESTION_FILTERS.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -485,7 +485,7 @@ function FilterBar({
         id="severity-filter"
         value={severity}
         onChange={(e) => onSeverityChange(e.target.value as SeverityFilter)}
-        className="rounded-lg border border-gray-700 bg-gray-800/60 px-3 py-1.5 text-sm text-gray-200 focus:border-blue-500 focus:outline-none"
+        className="rounded-lg border border-surface-border bg-surface-elevated/60 px-3 py-1.5 text-sm text-fg-primary focus:border-brand-500 focus:outline-none"
       >
         {SEVERITY_FILTERS.map((s) => (
           <option key={s} value={s}>
@@ -494,22 +494,22 @@ function FilterBar({
         ))}
       </select>
 
-      <label className="inline-flex items-center gap-2 text-sm text-gray-300 ml-2">
+      <label className="inline-flex items-center gap-2 text-sm text-fg-secondary ml-2">
         <input
           type="checkbox"
           checked={enabledOnly}
           onChange={(e) => onEnabledOnlyChange(e.target.checked)}
-          className="rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500"
+          className="rounded border-surface-border bg-surface-elevated text-blue-500 focus:ring-blue-500"
         />
         Enabled only
       </label>
 
-      <label className="inline-flex items-center gap-2 text-sm text-gray-300">
+      <label className="inline-flex items-center gap-2 text-sm text-fg-secondary">
         <input
           type="checkbox"
           checked={includeDismissed}
           onChange={(e) => onIncludeDismissedChange(e.target.checked)}
-          className="rounded border-gray-600 bg-gray-800 text-blue-500 focus:ring-blue-500"
+          className="rounded border-surface-border bg-surface-elevated text-blue-500 focus:ring-blue-500"
         />
         Include dismissed
       </label>
@@ -519,7 +519,7 @@ function FilterBar({
           <button
             type="button"
             onClick={onReset}
-            className="text-sm px-3 py-1.5 rounded-lg border border-gray-700 bg-gray-800/60 hover:bg-gray-700 text-gray-200 transition-colors"
+            className="text-sm px-3 py-1.5 rounded-lg border border-surface-border bg-surface-elevated/60 hover:bg-surface-elevated text-fg-primary transition-colors"
           >
             Reset filters
           </button>
@@ -549,7 +549,7 @@ function TuningTable({
   return (
     <table className="w-full text-sm">
       <thead>
-        <tr className="border-b border-gray-800/60 text-left text-gray-400">
+        <tr className="border-b border-surface-border/60 text-left text-fg-muted">
           <th className="px-5 py-3 font-medium">Rule</th>
           <th className="px-5 py-3 font-medium">Suggestion</th>
           <th className="px-5 py-3 font-medium text-right">FP Rate</th>
@@ -598,15 +598,15 @@ function TuningRow({
   return (
     <tr
       className={clsx(
-        'border-b border-gray-800/40 transition-colors',
-        entry.dismissed_at ? 'opacity-60' : 'hover:bg-gray-800/30',
+        'border-b border-surface-border/40 transition-colors',
+        entry.dismissed_at ? 'opacity-60' : 'hover:bg-surface-elevated/30',
       )}
       data-testid={`tuning-row-${entry.rule_id}`}
     >
       <td className="px-5 py-3 align-top">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-white">{entry.name}</span>
+            <span className="font-medium text-fg-primary">{entry.name}</span>
             <span
               className={clsx(
                 'px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border',
@@ -616,22 +616,22 @@ function TuningRow({
               {entry.severity}
             </span>
             {!entry.enabled ? (
-              <span className="px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border border-gray-600 text-gray-400">
+              <span className="px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border border-surface-border text-fg-muted">
                 Disabled
               </span>
             ) : null}
             {entry.dismissed_at ? (
-              <span className="px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border border-gray-600 text-gray-400">
+              <span className="px-1.5 py-0.5 rounded text-[10px] uppercase tracking-wider border border-surface-border text-fg-muted">
                 Dismissed
               </span>
             ) : null}
           </div>
           {entry.reasons.length > 0 ? (
-            <p className="text-xs text-gray-400 max-w-md">
+            <p className="text-xs text-fg-muted max-w-md">
               {entry.reasons[0]}
             </p>
           ) : null}
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-fg-muted">
             {entry.category}
             {entry.last_triggered_at
               ? ` • last hit ${new Date(entry.last_triggered_at).toLocaleDateString()}`
@@ -657,10 +657,10 @@ function TuningRow({
       >
         {fpPct.toFixed(1)}%
       </td>
-      <td className="px-5 py-3 align-top text-right text-gray-300">
+      <td className="px-5 py-3 align-top text-right text-fg-secondary">
         {entry.total_hits.toLocaleString()}
       </td>
-      <td className="px-5 py-3 align-top text-right text-gray-300">
+      <td className="px-5 py-3 align-top text-right text-fg-secondary">
         {entry.confidence}
       </td>
       <td className="px-5 py-3 align-top text-center">
@@ -690,7 +690,7 @@ function TuningRow({
               type="button"
               onClick={() => onApply(entry, primaryAction)}
               disabled={busy || !entry.enabled}
-              className="text-xs px-2.5 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
+              className="text-xs px-2.5 py-1.5 rounded-md bg-blue-600 hover:bg-blue-500 text-white transition-colors disabled:bg-surface-hover disabled:text-fg-muted disabled:cursor-not-allowed"
               title={
                 !entry.enabled
                   ? 'Rule is already disabled'
@@ -704,7 +704,7 @@ function TuningRow({
               type="button"
               onClick={() => onApply(entry, 'acknowledge')}
               disabled={busy}
-              className="text-xs px-2.5 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700 text-gray-200 transition-colors disabled:opacity-50"
+              className="text-xs px-2.5 py-1.5 rounded-md bg-surface-elevated hover:bg-surface-elevated text-fg-primary transition-colors disabled:opacity-50"
             >
               {busyAction === 'apply' ? 'Acknowledging…' : 'Acknowledge'}
             </button>
@@ -713,7 +713,7 @@ function TuningRow({
             type="button"
             onClick={() => onDismiss(entry)}
             disabled={busy || Boolean(entry.dismissed_at)}
-            className="text-xs px-2.5 py-1.5 rounded-md border border-gray-700 bg-gray-800/60 hover:bg-gray-700 text-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="text-xs px-2.5 py-1.5 rounded-md border border-surface-border bg-surface-elevated/60 hover:bg-surface-elevated text-fg-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {busyAction === 'dismiss' ? 'Dismissing…' : 'Dismiss'}
           </button>
@@ -727,7 +727,7 @@ function TuningRow({
 
 function TuningTableSkeleton() {
   return (
-    <div className="divide-y divide-gray-800/40">
+    <div className="divide-y divide-surface-border/40">
       {Array.from({ length: 6 }).map((_, i) => (
         <div key={i} className="flex items-center gap-4 px-5 py-4">
           <div className="flex-1 space-y-2">
@@ -754,7 +754,7 @@ interface PaginationProps {
 
 function Pagination({ page, totalPages, total, onPageChange }: PaginationProps) {
   return (
-    <div className="px-5 py-3 border-t border-gray-800/60 flex flex-wrap items-center justify-between gap-3 text-sm text-gray-400">
+    <div className="px-5 py-3 border-t border-surface-border/60 flex flex-wrap items-center justify-between gap-3 text-sm text-fg-muted">
       <span>
         Page {page} of {totalPages} • {total.toLocaleString()} rules
       </span>
@@ -763,7 +763,7 @@ function Pagination({ page, totalPages, total, onPageChange }: PaginationProps) 
           type="button"
           onClick={() => onPageChange(Math.max(1, page - 1))}
           disabled={page <= 1}
-          className="px-2.5 py-1 rounded-md border border-gray-700 bg-gray-800/60 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 transition-colors"
+          className="px-2.5 py-1 rounded-md border border-surface-border bg-surface-elevated/60 hover:bg-surface-elevated disabled:opacity-40 disabled:cursor-not-allowed text-fg-primary transition-colors"
         >
           ← Prev
         </button>
@@ -771,7 +771,7 @@ function Pagination({ page, totalPages, total, onPageChange }: PaginationProps) 
           type="button"
           onClick={() => onPageChange(Math.min(totalPages, page + 1))}
           disabled={page >= totalPages}
-          className="px-2.5 py-1 rounded-md border border-gray-700 bg-gray-800/60 hover:bg-gray-700 disabled:opacity-40 disabled:cursor-not-allowed text-gray-200 transition-colors"
+          className="px-2.5 py-1 rounded-md border border-surface-border bg-surface-elevated/60 hover:bg-surface-elevated disabled:opacity-40 disabled:cursor-not-allowed text-fg-primary transition-colors"
         >
           Next →
         </button>

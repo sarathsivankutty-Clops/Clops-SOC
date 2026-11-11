@@ -36,7 +36,7 @@ const EffectivePermissionsView = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="flex h-[60vh] items-center justify-center text-gray-400">
+      <div className="flex h-[60vh] items-center justify-center text-fg-muted">
         Loading effective permissions…
       </div>
     ),
@@ -47,7 +47,7 @@ export default function EffectivePermissionsClient() {
   return (
     <Suspense
       fallback={
-        <div className="flex h-[60vh] items-center justify-center text-gray-400">
+        <div className="flex h-[60vh] items-center justify-center text-fg-muted">
           Loading effective permissions…
         </div>
       }
