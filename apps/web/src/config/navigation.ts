@@ -10,7 +10,19 @@
  * derive their state from this registry and `routeRegistry.ts`.
  */
 
-import { isFullIntelligenceEnabled, isOrgTemplateEnabled, isExternalIdpEnabled } from './features';
+import { isFullIntelligenceEnabled, isOrgTemplateEnabled, isExternalIdpEnabled, isRunbooksNavEnabled, isAnalyticsNavEnabled } from './features';
+
+export interface SREOpsNavConfig {
+  showRunbooks: boolean;
+  showAnalytics: boolean;
+}
+
+export function getSREOpsNavConfig(): SREOpsNavConfig {
+  return {
+    showRunbooks: isRunbooksNavEnabled(),
+    showAnalytics: isAnalyticsNavEnabled(),
+  };
+}
 
 export enum WorkspaceId {
   CommandCenter = 'command-center',

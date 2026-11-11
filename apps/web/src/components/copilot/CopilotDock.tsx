@@ -20,6 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { copilotApi, type CopilotMessage } from '@/lib/api';
 import { canUseDemoData } from '@/lib/demoFallback';
 import { AiSpinner } from '@/components/ui/AiSpinner';
+import { LiveQueueBadge } from '@/components/layout/LiveQueueBadge';
 
 const QUICK_PROMPTS = [
   'Summarize critical alerts in the last 24h.',
@@ -94,7 +95,9 @@ export function CopilotDock() {
     if (el) el.scrollTop = el.scrollHeight;
   }, [messages.length, sending, open]);
 
-  if (onCopilotPage) return null;
+  // [HIDDEN-UI SOC-1 present on every screen including /copilot]
+  // if (onCopilotPage) return null;
+  void onCopilotPage;
 
   const send = async (prompt: string) => {
     const trimmed = prompt.trim();
@@ -130,23 +133,35 @@ export function CopilotDock() {
 
   return (
     <>
-      {/* Launcher (bottom-right) */}
+      {/* Floating AI bot button (bottom-right, round gradient, with badge) */}
       <AnimatePresence>
         {!open && (
           <motion.button
             key="launcher"
-            initial={{ opacity: 0, scale: 0.9, y: 12 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 12 }}
+            id="copilot-fab"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-5 right-5 z-40 flex items-center gap-2.5 rounded-full border border-surface-border bg-surface-raised px-4 py-2.5 text-sm font-semibold text-fg-primary shadow-lg transition-all hover:border-brand-500/40 hover:bg-surface-hover"
+            title="Ask the AI SOC Agent (⌘J)"
             aria-label="Open AI Copilot"
+            className="fixed z-50 flex items-center justify-center rounded-full shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
           >
-            <AiSpinner size="sm" state="idle" />
-            <span>Ask Copilot</span>
-            <kbd className="rounded bg-surface-hover px-1.5 py-0.5 text-[10px] font-mono text-fg-muted">
-              ⌘J
-            </kbd>
+            <svg
+              viewBox="0 0 24 24"
+              strokeWidth={2}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 1v3M12 20v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M1 12h3M20 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1" />
+            </svg>
+            {/* Pending count comes from the existing queue poller; it renders nothing when
+                the count is zero or unknown, so the badge never states a made-up number. */}
+            <span className="fab-badge-slot">
+              <LiveQueueBadge />
+            </span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -160,7 +175,7 @@ export function CopilotDock() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 24, scale: 0.98 }}
             transition={{ duration: 0.18 }}
-            className="fixed bottom-5 right-5 z-40 flex h-[32rem] w-[24rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-surface-border bg-surface-raised/95 shadow-2xl backdrop-blur"
+            className="fixed bottom-5 right-5 z-50 flex h-[32rem] w-[24rem] max-w-[calc(100vw-2.5rem)] flex-col overflow-hidden rounded-2xl border border-surface-border bg-surface-raised/95 shadow-2xl backdrop-blur"
             role="dialog"
             aria-label="AI Copilot"
           >

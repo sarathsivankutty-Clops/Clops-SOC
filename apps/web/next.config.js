@@ -115,32 +115,6 @@ const nextConfig = {
     NEXT_PUBLIC_OSQUERY_TLS_URL: process.env.NEXT_PUBLIC_OSQUERY_TLS_URL || '',
     NEXT_PUBLIC_APP_VERSION: APP_VERSION,
   },
-  // ─── Permanent URL redirects (browser-visible) ───────────────────────────
-  //
-  // These run *before* rewrites and emit real 308 responses (so search
-  // engines update their index, cached links retain SEO value, and
-  // share-card crawlers follow the redirect). Use this surface only for
-  // *retired* public URLs that still get external traffic — every other
-  // route should live under apps/web/src/app/.
-  async redirects() {
-    return [
-      // /signup is intentionally not a page. AiSOC is MIT-licensed and
-      // self-hostable, so the public entry point is the interactive
-      // demo at /dashboard (anonymous, demo-tenant, no account needed).
-      // The /signup URL still appears in cached search results, old
-      // blog posts, and a few external decks, so we 308 it to the
-      // intended destination instead of letting Next.js render the
-      // bare unbranded 404 page. The /waitlist surface is for the
-      // managed-instance invite-only beta — a different flow with its
-      // own page.
-      {
-        source: '/signup',
-        destination: '/dashboard',
-        permanent: true,
-      },
-    ];
-  },
-
   // ─── Static asset caching ────────────────────────────────────────────────
   //
   // Self-hosted webfonts live in `public/fonts` rather than going through
@@ -317,6 +291,55 @@ const nextConfig = {
         source: '/api/v1/:path*',
         destination: `${API_HOST}/api/v1/:path*`,
       },
+    ];
+  },
+  // Browser-visible redirects. One function only: a second `redirects` key
+  // in this object would overwrite this one. /signup stays permanent because
+  // cached search results and old posts still point at it. The console
+  // aliases below are temporary so retired paths resolve while the shell
+  // shows the six SREOps screens.
+  async redirects() {
+    return [
+      // /signup is intentionally not a page. The public entry point is the
+      // interactive demo at /dashboard. /waitlist is a different flow.
+      { source: '/signup', destination: '/dashboard', permanent: true },
+      { source: '/overview', destination: '/dashboard', permanent: false },
+      { source: '/alerts', destination: '/incidents', permanent: false },
+      { source: '/alerts/:id', destination: '/incidents/:id', permanent: false },
+      { source: '/queue', destination: '/incidents', permanent: false },
+      { source: '/cases', destination: '/incidents', permanent: false },
+      { source: '/cases/:id', destination: '/incidents/:id', permanent: false },
+      { source: '/investigations', destination: '/incidents', permanent: false },
+      { source: '/investigations/:id', destination: '/incidents/:id', permanent: false },
+      { source: '/investigate', destination: '/incidents', permanent: false },
+      { source: '/mitigations', destination: '/responder/approvals', permanent: false },
+      { source: '/action-center', destination: '/responder/approvals', permanent: false },
+      { source: '/runbooks', destination: '/playbooks', permanent: false },
+      { source: '/analytics', destination: '/sla', permanent: false },
+      { source: '/hunt', destination: '/dashboard', permanent: false },
+      { source: '/detection/:path*', destination: '/dashboard', permanent: false },
+      { source: '/coverage-advisor', destination: '/dashboard', permanent: false },
+      { source: '/noise-tuning', destination: '/dashboard', permanent: false },
+      { source: '/purple-team', destination: '/dashboard', permanent: false },
+      { source: '/honeytokens', destination: '/dashboard', permanent: false },
+      { source: '/threat-intel', destination: '/dashboard', permanent: false },
+      { source: '/explore', destination: '/dashboard', permanent: false },
+      { source: '/federated-search', destination: '/dashboard', permanent: false },
+      { source: '/identity/permissions', destination: '/dashboard', permanent: false },
+      { source: '/ai-estate', destination: '/dashboard', permanent: false },
+      { source: '/easm', destination: '/dashboard', permanent: false },
+      { source: '/compliance/:path*', destination: '/dashboard', permanent: false },
+      { source: '/fim', destination: '/dashboard', permanent: false },
+      { source: '/graph', destination: '/dashboard', permanent: false },
+      { source: '/shifts', destination: '/dashboard', permanent: false },
+      { source: '/audit', destination: '/dashboard', permanent: false },
+      { source: '/access-review', destination: '/dashboard', permanent: false },
+      { source: '/evaluate', destination: '/dashboard', permanent: false },
+      { source: '/marketplace', destination: '/dashboard', permanent: false },
+      { source: '/reports/digest', destination: '/dashboard', permanent: false },
+      { source: '/analytics/team', destination: '/dashboard', permanent: false },
+      { source: '/dashboards/operations', destination: '/dashboard', permanent: false },
+      { source: '/dashboards/soc-insights', destination: '/dashboard', permanent: false },
     ];
   },
 };

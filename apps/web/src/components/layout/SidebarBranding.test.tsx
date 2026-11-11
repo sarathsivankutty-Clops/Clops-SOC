@@ -61,6 +61,7 @@ vi.mock('@/lib/api', async (importOriginal) => {
 });
 
 import { Sidebar } from './Sidebar';
+import { ThemeProvider } from '../theme/ThemeProvider';
 
 const LOGO_OBJECT_URL = 'blob:http://localhost/brand-logo';
 
@@ -107,7 +108,11 @@ describe('Sidebar branding', () => {
   // it — at the default the case timed out before asserting anything, which
   // reports nothing about the logo either way.
   it("shows a white-labelled organisation's name, palette and logo, and drops the platform wordmark", { timeout: 20_000 }, async () => {
-    const { container } = render(<Sidebar />);
+    const { container } = render(
+      <ThemeProvider>
+        <Sidebar />
+      </ThemeProvider>,
+    );
 
     expect(await screen.findByText('Acme Shield')).toBeInTheDocument();
 

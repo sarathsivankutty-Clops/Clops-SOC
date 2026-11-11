@@ -20,6 +20,17 @@ function parseBooleanFlag(value: string | undefined, defaultValue: boolean): boo
 }
 
 /**
+ * Nav flags for items 5 (Runbooks) and 6 (Analytics) so they can be hidden via config.
+ */
+export function isRunbooksNavEnabled(): boolean {
+  return parseBooleanFlag(process.env.NEXT_PUBLIC_NAV_RUNBOOKS_ENABLED, true);
+}
+
+export function isAnalyticsNavEnabled(): boolean {
+  return parseBooleanFlag(process.env.NEXT_PUBLIC_NAV_ANALYTICS_ENABLED, true);
+}
+
+/**
  * When `false` (default), the Sidebar Intelligence section displays only
  * `Investigations` (`/investigate`). Set `NEXT_PUBLIC_SIDEBAR_FULL_INTELLIGENCE=true`
  * to restore all 12 specialist Intelligence links.

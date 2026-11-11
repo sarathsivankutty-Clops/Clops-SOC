@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { ResponderShell } from '@/components/responder/ResponderShell';
+import { demoModeReport } from '@/lib/demoMode';
 
 export const metadata: Metadata = {
   title: {
@@ -23,5 +24,5 @@ export default function ResponderLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <ResponderShell>{children}</ResponderShell>;
+  return <ResponderShell demoMode={demoModeReport().enabled}>{children}</ResponderShell>;
 }

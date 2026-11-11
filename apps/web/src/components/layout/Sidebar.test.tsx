@@ -43,6 +43,7 @@ vi.mock('next/link', () => ({
 }));
 
 import { Sidebar, getVisibleMoreToolsGroups } from './Sidebar';
+import { ThemeProvider } from '../theme/ThemeProvider';
 import { WorkspaceTabBar } from './WorkspaceTabBar';
 import { Breadcrumbs } from './Breadcrumbs';
 import {
@@ -73,34 +74,42 @@ describe('Enterprise 8-Workspace Navigation Architecture', () => {
     vi.unstubAllEnvs();
   });
 
-  it('renders the AiSOC mark, 4 section headers, and exactly 8 primary workspaces with their canonical hrefs', () => {
-    render(<Sidebar />);
+  it('renders the AiSOC mark, one NAVIGATION group label, and the flat six-item list with canonical hrefs', () => {
+    render(
+      <ThemeProvider>
+        <Sidebar />
+      </ThemeProvider>,
+    );
 
     expect(screen.getByText('Ai')).toBeInTheDocument();
     expect(screen.getByText('SOC')).toBeInTheDocument();
 
-    // 4 Grouped Sections
-    expect(screen.getByText(WorkspaceSection.Operations)).toBeInTheDocument();
-    expect(screen.getByText(WorkspaceSection.Investigation)).toBeInTheDocument();
-    expect(screen.getByText(WorkspaceSection.EngineeringAndResponse)).toBeInTheDocument();
-    expect(screen.getByText(WorkspaceSection.Platform)).toBeInTheDocument();
+    // One group label, one level — the four section headers are gone with the eight-workspace rail.
+    expect(screen.getByText(/^navigation$/i)).toBeInTheDocument();
+    for (const section of Object.values(WorkspaceSection)) {
+      expect(screen.queryByText(section)).not.toBeInTheDocument();
+    }
 
-    // 8 Primary Workspaces
-    expect(screen.getByRole('link', { name: /^command center$/i })).toHaveAttribute('href', '/dashboard');
-    expect(screen.getByRole('link', { name: /^alerts$/i })).toHaveAttribute('href', '/alerts');
-    expect(screen.getByRole('link', { name: /^incidents$/i })).toHaveAttribute('href', '/cases');
-    expect(screen.getByRole('link', { name: /^hunting & intel$/i })).toHaveAttribute('href', '/hunt');
-    expect(screen.getByRole('link', { name: /^assets & identities$/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /^overview$/i })).toHaveAttribute('href', '/dashboard');
+    expect(screen.getByRole('link', { name: /^incidents$/i })).toHaveAttribute('href', '/incidents');
+    expect(screen.getByRole('link', { name: /^action center$/i })).toHaveAttribute(
       'href',
-      '/identity/permissions',
+      '/responder/approvals',
     );
-    expect(screen.getByRole('link', { name: /^detections$/i })).toHaveAttribute('href', '/detection');
-    expect(screen.getByRole('link', { name: /^automation$/i })).toHaveAttribute('href', '/playbooks');
-    expect(screen.getByRole('link', { name: /^settings & admin$/i })).toHaveAttribute('href', '/settings');
+    expect(screen.getByRole('link', { name: /^skills & connectors$/i })).toHaveAttribute(
+      'href',
+      '/connectors',
+    );
+    expect(screen.getByRole('link', { name: /^runbooks$/i })).toHaveAttribute('href', '/playbooks');
+    expect(screen.getByRole('link', { name: /^analytics$/i })).toHaveAttribute('href', '/sla');
   });
 
-  it('contains no "More tools" accordion, no duplicate routes, and no /investigate redirect link in the sidebar', () => {
-    render(<Sidebar />);
+  it('contains no "More tools" accordion, no duplicate routes, and no nested sub-rail in the sidebar', () => {
+    render(
+      <ThemeProvider>
+        <Sidebar />
+      </ThemeProvider>,
+    );
 
     expect(screen.queryByRole('button', { name: /more tools/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /^investigations$/i })).not.toBeInTheDocument();
@@ -108,21 +117,28 @@ describe('Enterprise 8-Workspace Navigation Architecture', () => {
 
     const workspaceNav = screen.getByRole('navigation', { name: /primary workspaces/i });
     const links = Array.from(workspaceNav.querySelectorAll('a'));
-    expect(links).toHaveLength(8);
+    expect(links).toHaveLength(6);
+
+    // One level only: no navigation element nested under the primary list.
+    expect(workspaceNav.querySelector('nav')).toBeNull();
 
     const hrefs = links.map((a) => a.getAttribute('href'));
     expect(new Set(hrefs).size).toBe(hrefs.length);
   });
 
-  it('marks the active workspace with aria-current="page" and resolves child routes accurately', () => {
-    pathnameMock.mockReturnValue('/noise-tuning');
-    render(<Sidebar />);
+  it('marks the active item with aria-current="page" and resolves child routes accurately', () => {
+    pathnameMock.mockReturnValue('/incidents/inv-0zfndx');
+    render(
+      <ThemeProvider>
+        <Sidebar />
+      </ThemeProvider>,
+    );
 
-    const detectionsLink = screen.getByRole('link', { name: /^detections$/i });
-    expect(detectionsLink).toHaveAttribute('aria-current', 'page');
+    const incidentsLink = screen.getByRole('link', { name: /^incidents$/i });
+    expect(incidentsLink).toHaveAttribute('aria-current', 'page');
 
-    const commandCenterLink = screen.getByRole('link', { name: /^command center$/i });
-    expect(commandCenterLink).not.toHaveAttribute('aria-current');
+    const overviewLink = screen.getByRole('link', { name: /^overview$/i });
+    expect(overviewLink).not.toHaveAttribute('aria-current');
   });
 
   it('performs segment-safe route matching without prefix false positives', () => {
@@ -255,17 +271,17 @@ describe('Enterprise 8-Workspace Navigation Architecture', () => {
 
     pathnameMock.mockReturnValue('/dashboard');
     render(
-      <>
+      <ThemeProvider>
         <Sidebar />
         <WorkspaceTabBar />
-      </>,
+      </ThemeProvider>,
     );
 
-    await userEvent.click(screen.getByRole('link', { name: /^alerts$/i }));
+    await userEvent.click(screen.getByRole('link', { name: /^incidents$/i }));
     await userEvent.click(screen.getByRole('link', { name: 'SLA Tracker' }));
     window.dispatchEvent(new CustomEvent('aisoc:toggle-sidebar'));
 
-    expect(events.some((e) => e.event === 'workspace_opened' && e.workspaceId === WorkspaceId.Alerts)).toBe(
+    expect(events.some((e) => e.event === 'workspace_opened' && e.workspaceId === WorkspaceId.Incidents)).toBe(
       true,
     );
     expect(events.some((e) => e.event === 'workspace_tab_changed' && e.tab === 'SLA Tracker')).toBe(
@@ -344,10 +360,29 @@ describe('Enterprise 8-Workspace Navigation Architecture', () => {
     expect(noiseMeta.tab).toBe('Noise & Tuning');
   });
 
-  it('renders the MIT license attribution in the footer', () => {
-    render(<Sidebar />);
+  it('renders the light/dark switch and the user card in the sidebar footer', async () => {
+    render(
+      <ThemeProvider>
+        <Sidebar />
+      </ThemeProvider>,
+    );
 
-    const license = screen.getByRole('link', { name: /MIT License/i });
-    expect(license).toHaveAttribute('href', 'https://github.com/beenuar/AiSOC');
+    const themeSwitch = screen.getByRole('switch', { name: /toggle dark mode/i });
+    // Dark is the console default, so the switch starts checked.
+    expect(themeSwitch).toHaveAttribute('aria-checked', 'true');
+
+    // Toggles cleanly between dark and light in both directions without getting
+    // stuck on a 'system' intermediate state.
+    await userEvent.click(themeSwitch);
+    expect(themeSwitch).toHaveAttribute('aria-checked', 'false');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+
+    await userEvent.click(themeSwitch);
+    expect(themeSwitch).toHaveAttribute('aria-checked', 'true');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+
+    expect(screen.getByText('SOC Analyst')).toBeInTheDocument();
+    expect(screen.getByText('analyst@clops.local')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument();
   });
 });

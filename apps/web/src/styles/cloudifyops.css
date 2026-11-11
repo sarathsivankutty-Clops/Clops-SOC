@@ -36,6 +36,40 @@
   --co-dot-na: #94A3B8;
   --co-shadow: 0 1px 3px rgba(0, 0, 0, .06), 0 1px 2px rgba(0, 0, 0, .04);
   --co-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, .07), 0 2px 4px -2px rgba(0, 0, 0, .05);
+
+  /* Shell token aliases */
+  --bg: var(--co-bg);
+  --bg2: var(--co-bg2);
+  --surf: var(--co-surf);
+  --surf2: var(--co-surf2);
+  --surf3: var(--co-surf3);
+  --bd: var(--co-bd);
+  --bd2: var(--co-bd2);
+  --line: var(--co-line);
+  --t: var(--co-t);
+  --t2: var(--co-t2);
+  --m: var(--co-m);
+  --m2: var(--co-m2);
+  --ac: var(--co-ac);
+  --ac2: var(--co-ac2);
+  --g: var(--co-g);
+  --am: var(--co-am);
+  --r: var(--co-r);
+  --p: var(--co-p);
+  --pill-g: var(--co-pill-g);
+  --pill-am: var(--co-pill-am);
+  --pill-r: var(--co-pill-r);
+  --pill-ac: var(--co-pill-ac);
+  --pill-na: var(--co-pill-na);
+  --dot-g: var(--co-dot-g);
+  --dot-am: var(--co-dot-am);
+  --dot-r: var(--co-dot-r);
+  --dot-ac: var(--co-dot-ac);
+  --dot-na: var(--co-dot-na);
+  --nav-active-bg: #EFF6FF;
+  --nav-active-bar: #10B981;
+  --shadow: var(--co-shadow);
+  --shadow-md: var(--co-shadow-md);
 }
 
 [data-theme="dark"] {
@@ -70,13 +104,49 @@
   --co-dot-na: #94A3B8;
   --co-shadow: 0 1px 3px rgba(0, 0, 0, .3), 0 1px 2px rgba(0, 0, 0, .2);
   --co-shadow-md: 0 4px 6px rgba(0, 0, 0, .35), 0 2px 4px rgba(0, 0, 0, .25);
+
+  /* Shell token aliases */
+  --bg: var(--co-bg);
+  --bg2: var(--co-bg2);
+  --surf: var(--co-surf);
+  --surf2: var(--co-surf2);
+  --surf3: var(--co-surf3);
+  --bd: var(--co-bd);
+  --bd2: var(--co-bd2);
+  --line: var(--co-line);
+  --t: var(--co-t);
+  --t2: var(--co-t2);
+  --m: var(--co-m);
+  --m2: var(--co-m2);
+  --ac: var(--co-ac);
+  --ac2: var(--co-ac2);
+  --g: var(--co-g);
+  --am: var(--co-am);
+  --r: var(--co-r);
+  --p: var(--co-p);
+  --pill-g: var(--co-pill-g);
+  --pill-am: var(--co-pill-am);
+  --pill-r: var(--co-pill-r);
+  --pill-ac: var(--co-pill-ac);
+  --pill-na: var(--co-pill-na);
+  --dot-g: var(--co-dot-g);
+  --dot-am: var(--co-dot-am);
+  --dot-r: var(--co-dot-r);
+  --dot-ac: var(--co-dot-ac);
+  --dot-na: var(--co-dot-na);
+  --nav-active-bg: rgba(59, 130, 246, .12);
+  --nav-active-bar: #52B788;
+  --shadow: var(--co-shadow);
+  --shadow-md: var(--co-shadow-md);
 }
 
 :root {
   --co-btn-grad: linear-gradient(135deg, #2563EB, #22C55E);
+  --btn-grad: var(--co-btn-grad);
   --co-radius: 1.25rem;
   --co-radius-sm: 0.75rem;
   --co-radius-pill: 9999px;
+  --sidebar-w: 256px;
 }
 
 /* ─── Page header ─── */
@@ -545,4 +615,289 @@
   font-size: 10px;
   font-weight: 700;
   flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SREOps Shell Components (Sidebar, Nav, Footer, Copilot FAB)
+   ═══════════════════════════════════════════════════════════ */
+.sidebar {
+  background: var(--surf);
+  border-right: 1px solid var(--bd);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 14px;
+}
+.brand-name {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.2px;
+  white-space: nowrap;
+  color: var(--t);
+}
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  padding: 6px 10px;
+}
+.nav-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--m2);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 14px 10px 6px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 0.75rem;
+  color: var(--t2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  position: relative;
+  transition: all .14s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.nav-item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+.nav-item:hover {
+  background: var(--surf2);
+  color: var(--t);
+}
+.nav-item.active {
+  background: var(--nav-active-bg);
+  color: var(--ac);
+  font-weight: 600;
+}
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  border-radius: 0 3px 3px 0;
+  background: var(--nav-active-bar);
+}
+.nav-item.active svg {
+  color: var(--ac);
+}
+.nav-badge {
+  margin-left: auto;
+  background: var(--surf3);
+  color: var(--t2);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill, 9999px);
+  min-width: 20px;
+  text-align: center;
+}
+.nav-badge.amber {
+  background: var(--pill-am);
+  color: var(--am);
+}
+
+.sidebar-foot {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--bd);
+}
+
+/* Dark-mode toggle row */
+.theme-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: var(--surf2);
+  border: 1px solid var(--bd);
+  cursor: pointer;
+  transition: background .14s, border-color .14s;
+}
+.theme-row:hover {
+  background: var(--surf3);
+}
+.theme-row .t-icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  color: var(--am);
+}
+.theme-row .theme-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t);
+}
+.switch {
+  margin-left: auto;
+  flex-shrink: 0;
+  width: 38px;
+  height: 21px;
+  border-radius: 9999px;
+  background: var(--surf3);
+  border: 1px solid var(--bd);
+  position: relative;
+  transition: background .16s;
+}
+.switch-knob {
+  position: absolute;
+  top: 1.5px;
+  left: 1.5px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .35);
+  transition: transform .16s;
+}
+[data-theme="dark"] .switch {
+  background: var(--ac);
+  border-color: var(--ac);
+}
+[data-theme="dark"] .switch-knob {
+  transform: translateX(17px);
+}
+
+/* User card */
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: var(--surf2);
+  border: 1px solid var(--bd);
+  min-width: 0;
+}
+.avatar.lg {
+  width: 38px;
+  height: 38px;
+  font-size: 13px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #fff;
+  background: var(--btn-grad);
+  flex-shrink: 0;
+}
+.user-card .user-meta {
+  flex: 1;
+  min-width: 0;
+}
+.user-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--t);
+}
+.user-email {
+  font-size: 10.5px;
+  color: var(--m);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.logout-btn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--r);
+  cursor: pointer;
+  transition: all .14s;
+}
+.logout-btn:hover {
+  background: var(--pill-r);
+  border-color: var(--bd);
+}
+.logout-btn svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Floating AI bot button */
+#copilot-fab {
+  position: fixed;
+  bottom: 26px;
+  right: 26px;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: var(--btn-grad);
+  border: none;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, .35);
+  z-index: 900;
+  transition: transform .18s, background .18s;
+  cursor: pointer;
+}
+#copilot-fab svg {
+  width: 23px;
+  height: 23px;
+  stroke: #fff;
+  stroke-width: 2;
+  fill: none;
+}
+#copilot-fab:active {
+  transform: scale(.96);
+}
+#copilot-fab:hover {
+  transform: scale(1.08) rotate(8deg);
+}
+/* Slot for the live queue count inside the FAB; the count component keeps its own styling. */
+.fab-badge-slot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  display: inline-flex;
+  pointer-events: none;
+}
+.fab-badge-slot > span {
+  border: 2px solid var(--bg);
+}
+
+/* [HIDDEN-UI SOC-1 static-fab-badge] placeholder badge, replaced by the live queue count above */
+.fab-badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  background: var(--r);
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--bg);
 }

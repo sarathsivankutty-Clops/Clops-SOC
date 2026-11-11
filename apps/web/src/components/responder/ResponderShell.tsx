@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { clsx } from 'clsx';
 import { isAuthenticated, getProfile, clearSession } from '@/lib/responder/auth';
+import { AppShell } from '@/components/layout/AppShell';
 import {
   registerServiceWorker,
   subscribeToPush,
@@ -114,8 +115,32 @@ const NAV_ITEMS: NavItem[] = [
 
 const PUBLIC_ROUTES = ['/responder/login'];
 
-export function ResponderShell({ children }: { children: React.ReactNode }) {
+export function ResponderShell({
+  children,
+  demoMode,
+}: {
+  children: React.ReactNode;
+  demoMode?: boolean;
+}) {
   const pathname = usePathname() ?? '/responder/triage';
+
+  // Action Center (`/responder/approvals`) lives in the primary SREOps console
+  // navigation, so it renders inside the main AppShell instead of the phone-only
+  // responder shell and passkey redirect.
+  if (pathname.startsWith('/responder/approvals')) {
+    return <AppShell demoMode={demoMode}>{children}</AppShell>;
+  }
+
+  return <ResponderShellMobile pathname={pathname}>{children}</ResponderShellMobile>;
+}
+
+function ResponderShellMobile({
+  children,
+  pathname,
+}: {
+  children: React.ReactNode;
+  pathname: string;
+}) {
   const router = useRouter();
   const [authReady, setAuthReady] = useState(false);
   const [authed, setAuthed] = useState(false);
