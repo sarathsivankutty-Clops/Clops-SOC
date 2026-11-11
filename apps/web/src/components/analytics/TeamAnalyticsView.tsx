@@ -49,10 +49,11 @@ const SAMPLE_ACHIEVEMENTS: Achievement[] = [
   { text: 'Aisha Patel reached #1 accuracy rating',          timeAgo: '2 days ago',  icon: 'rank' },
 ];
 
+// [HIDDEN-UI D2 ICN-AN-01 keep numeric rank instead of medals]
 const RANK_ACCENTS: Record<number, { ring: string; text: string; label: string }> = {
-  1: { ring: 'ring-2 ring-amber-400/60',  text: 'text-amber-400',  label: '🥇' },
-  2: { ring: 'ring-2 ring-surface-border/40',   text: 'text-fg-secondary',   label: '🥈' },
-  3: { ring: 'ring-2 ring-orange-400/40', text: 'text-orange-400', label: '🥉' },
+  1: { ring: 'ring-2 ring-amber-400/60',  text: 'text-amber-400',  label: '#1' /* was: '🥇' */ },
+  2: { ring: 'ring-2 ring-surface-border/40',   text: 'text-fg-secondary',   label: '#2' /* was: '🥈' */ },
+  3: { ring: 'ring-2 ring-orange-400/40', text: 'text-orange-400', label: '#3' /* was: '🥉' */ },
 };
 
 type SortKey = 'score' | 'cases' | 'accuracy' | 'speed';
@@ -287,9 +288,11 @@ export function TeamAnalyticsView() {
               key={i}
               className="flex items-start gap-3 rounded-lg border border-surface-border/40 bg-black/20 p-3.5"
             >
+              {/* [HIDDEN-UI D2 ICN-AN-02 hide decorative achievement SVGs, keep values]
               <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-hover">
                 {achievementIcon(ach.icon)}
               </div>
+              */}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-fg-primary">{ach.text}</p>
                 <p className="mt-0.5 text-xs text-fg-subtle">{ach.timeAgo}</p>
