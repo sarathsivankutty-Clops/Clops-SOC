@@ -169,3 +169,6 @@ docker-compose.ports.yml
 # work in.
 plugins/*/go/*-test
 *.test
+
+# Local scratch artifacts
+scratch/
