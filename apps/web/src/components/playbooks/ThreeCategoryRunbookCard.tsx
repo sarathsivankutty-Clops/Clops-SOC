@@ -114,7 +114,7 @@ export function ThreeCategoryRunbookCard({
               onClick={onRun}
               className="rounded-lg bg-brand-500 px-3 py-1 text-xs font-semibold text-fg-inverse hover:bg-brand-400 transition-colors shadow-xs"
             >
-              ▶ Run
+              Run {/* [HIDDEN-UI D2 ICN-PB-02 removed arrow glyph] */}
             </button>
           )}
         </div>
@@ -125,7 +125,8 @@ export function ThreeCategoryRunbookCard({
         {/* Category 1: Investigation */}
         <div className="rounded-lg border border-surface-border/70 bg-surface-base p-3 space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-sky-400">
-            <span>🔍</span>
+            {/* [HIDDEN-UI D2 ICN-PB-03 hide emoji badge] */}
+            {/* <span>🔍</span> */}
             <span className="uppercase tracking-wider text-[11px]">1. Investigation</span>
           </div>
           <div className="text-[11px] font-medium text-fg-muted">
@@ -150,7 +151,8 @@ export function ThreeCategoryRunbookCard({
         {/* Category 2: Response */}
         <div className="rounded-lg border border-surface-border/70 bg-surface-base p-3 space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-400">
-            <span>⚡</span>
+            {/* [HIDDEN-UI D2 ICN-PB-03 hide emoji badge] */}
+            {/* <span>⚡</span> */}
             <span className="uppercase tracking-wider text-[11px]">2. Response</span>
           </div>
           <div className="text-[11px] font-medium text-fg-muted">
@@ -179,7 +181,8 @@ export function ThreeCategoryRunbookCard({
         {/* Category 3: Governance */}
         <div className="rounded-lg border border-surface-border/70 bg-surface-base p-3 space-y-2">
           <div className="flex items-center gap-1.5 text-xs font-semibold text-violet-400">
-            <span>🛡</span>
+            {/* [HIDDEN-UI D2 ICN-PB-03 hide emoji badge] */}
+            {/* <span>🛡</span> */}
             <span className="uppercase tracking-wider text-[11px]">3. Governance</span>
           </div>
           <div className="text-[11px] font-medium text-fg-muted">

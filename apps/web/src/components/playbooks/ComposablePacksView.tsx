@@ -40,9 +40,9 @@ export function ComposablePacksView() {
           {(
             [
               { id: 'all', label: `All Packs (${packs.length})` },
-              { id: 'investigation', label: '🔍 1. Investigation' },
-              { id: 'response', label: '⚡ 2. Response' },
-              { id: 'governance', label: '🛡 3. Governance' },
+              { id: 'investigation', label: '1. Investigation' /* [HIDDEN-UI D2 ICN-PB-01 removed magnifying glass emoji] */ },
+              { id: 'response', label: '2. Response' /* [HIDDEN-UI D2 ICN-PB-01 removed zap emoji] */ },
+              { id: 'governance', label: '3. Governance' /* [HIDDEN-UI D2 ICN-PB-01 removed shield emoji] */ },
             ] as const
           ).map((c) => (
             <button

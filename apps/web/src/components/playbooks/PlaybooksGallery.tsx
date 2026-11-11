@@ -596,7 +596,7 @@ function PlaybookRow({
               className="text-[10px] font-semibold px-1.5 py-0.5 rounded border border-emerald-700/60 bg-emerald-950/50 text-emerald-300"
               title="Includes automated AI Root Cause Analysis (RCA) & telemetry correlation"
             >
-              ✦ AI RCA Ready
+              AI RCA Ready {/* [HIDDEN-UI D2 ICN-PB-05 removed sparkle glyph] */}
             </span>
           )}
           {hasApprovalGate && (
